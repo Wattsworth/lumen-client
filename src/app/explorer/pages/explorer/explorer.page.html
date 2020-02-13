@@ -113,8 +113,14 @@
           Clear Zero
           <fa-icon [icon]="['fas', 'times']" class="fa-close"></fa-icon>
         </div>
+        <!-- Jump to current time -->
+        <div class="btn btn-outline-secondary plot-button float-right" [@fadeInOut]
+        (click) = "plotService.setTimeRangeToNow()"
+          *ngIf="!(plotSelectors.liveUpdate$ | async)">
+          <fa-icon [icon]="['fas', 'clock']"></fa-icon> Now
+        </div>
         <!-- live update notification -->
-        <div class="live-update float-right" [@fadeInOut]
+        <div class="live-update plot-button float-right" [@fadeInOut]
           *ngIf="plotSelectors.liveUpdate$ | async">
           <fa-icon [icon]="['fas', 'heartbeat']"></fa-icon> {{ plotSelectors.liveUpdateInterval$ | async | interval}} Update
           <fa-icon [icon]="['fas', 'times']" class="fa-close" (click)="plotService.disableLiveUpdate()"></fa-icon>

@@ -254,6 +254,19 @@ export class PlotService {
     })
   }
 
+  public setTimeRangeToNow(){
+    let now = Date.now();
+    const NAV_NOW_INTERVAL = 60 * 60 * 1000; //1 hour
+    const PLOT_NOW_INTERVAL = 20 * 60 * 1000; //20 minutes
+    this.setPlotTimeRange({
+      min: now - PLOT_NOW_INTERVAL,
+      max: now
+    })
+    this.setNavTimeRange({
+      min: now - NAV_NOW_INTERVAL,
+      max: now
+    });
+  }
   public autoScaleTime() {
     this.ngRedux.dispatch({
       type: PlotActions.SET_PLOT_TIME_RANGE,

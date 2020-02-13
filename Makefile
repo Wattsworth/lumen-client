@@ -4,8 +4,8 @@
 all : deploy
 .PHONY : all deploy production
 
-deploy : local production
-	rsync -r --delete dist/aws/ portal.wattsworth.net:/opt/angular
+deploy : local
+#	rsync -r --delete dist/aws/ portal.wattsworth.net:/opt/angular
 	rsync -r --delete dist/local/ portal.wattsworth.net:/opt/standalone
 	rsync -r --delete dist/local/ cloud2.wattsworth.net:/var/www/frontend
 	ssh portal.wattsworth.net ./update_lumen_tarball.sh
