@@ -42,7 +42,7 @@ export class DataService {
      
     let o = this.http.get<schema.IApiResponse>('db_elements/data.json', 
       {params: params}).pipe(
-      timeout(7000), //wait a maximum of 7 seconds
+      timeout(20000), //wait a maximum of 20 seconds
       map(json => normalize(json.data, schema.datas)),
       map(normalized => normalized.entities.data),
       share())
