@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
+
 import { 
   ReactiveFormsModule,
   FormsModule
@@ -14,7 +16,7 @@ import {
   TooltipModule
  } from 'ngx-bootstrap';
  import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
- import { library } from '@fortawesome/fontawesome-svg-core';
+ import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
  import {
    faSpinner,
    faLifeRing,
@@ -38,17 +40,6 @@ import { InstallationSelectors } from './installation.selectors';
 import { SharedModule } from '../shared/shared.module';
 import { EditModuleComponent } from './components/edit-module/edit-module.component';
 
-library.add(faSpinner);
-library.add(faLifeRing);
-library.add(faSync);
-library.add(faExclamationTriangle);
-library.add(faUserPlus);
-library.add(faUser);
-library.add(faUsers);
-library.add(faFolder);
-library.add(faDatabase);
-library.add(faExternalLinkAlt);
-
 @NgModule({
   imports: [
     CommonModule,
@@ -57,6 +48,7 @@ library.add(faExternalLinkAlt);
     RouterModule,
     TreeModule.forRoot(),
     NgSelectModule,
+    NgOptionHighlightModule,
     SharedModule,
     FontAwesomeModule,
     TooltipModule.forRoot(),
@@ -79,4 +71,18 @@ library.add(faExternalLinkAlt);
     InstallationPageComponent
   ]
 })
-export class InstallationModule { }
+export class InstallationModule { 
+  constructor(library: FaIconLibrary){
+    library.addIcons(faSpinner,
+      faLifeRing,
+      faSync,
+      faExclamationTriangle,
+      faUserPlus,
+      faUser,
+      faUsers,
+      faFolder,
+      faFolderOpen,
+      faExternalLinkAlt,
+      faDatabase)
+  }
+}

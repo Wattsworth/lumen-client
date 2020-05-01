@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class IntervalPipe implements PipeTransform {
 
-  transform(value: string): any {
+  transform(value: number): any {
       let seconds = +value;
       console.log("got this: ", value)
       if(seconds<60)

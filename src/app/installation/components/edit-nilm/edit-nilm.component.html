@@ -1,10 +1,5 @@
 <alert *ngIf="!nilm.available" type="danger">
   Installation Offline
-  <!-- TODO: This looks broken, where are busy$ and retryingConnection defined??-->
-  <button class="btn btn-danger" [disabled]="busy$ | async"
-    (click) = "refreshNilm()">
-    <fa-icon *ngIf="retryingConnection" [icon]="['fas', 'sync']" [spin]="true"></fa-icon>
-     retry</button> 
 </alert>
 
 <form [formGroup]="form">

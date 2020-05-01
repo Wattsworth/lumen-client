@@ -40,7 +40,7 @@ export class FileTreeComponent implements OnInit {
   constructor(
     public nilmService: NilmService,
     private dbFolderService: DbFolderService,
-    private plotService: PlotService,
+    public plotService: PlotService,
     public plotSelectors: PlotSelectors,
     public interfacesService: InterfacesService
   ) {

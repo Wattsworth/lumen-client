@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 
 import {
   faExclamationTriangle,
@@ -46,15 +46,19 @@ import {
   TabsModule,
   ModalModule,
   BsDropdownModule,
-  DatepickerModule,
-  TimepickerModule
+  TimepickerModule,
 } from 'ngx-bootstrap';
+import {
+  BsDatepickerModule,
+} from 'ngx-bootstrap/datepicker';
+
 import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
 
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 
 import { SharedModule } from '../shared/shared.module';
 import { COMPONENTS } from './components';
@@ -65,41 +69,6 @@ import { TreeModule } from 'angular-tree-component';
 import { PIPES } from './pipes';
 import { NewAnnotationComponent } from './components/new-annotation/new-annotation.component';
 
-library.add(faLifeRing);
-library.add(faSpinner);
-library.add(faExclamationTriangle);
-library.add(faExclamationCircle);
-library.add(faHeartbeat);
-library.add(faChartLine);
-library.add(faSquare);
-library.add(faTimes);
-library.add(faDatabase);
-library.add(faCog);
-library.add(faClock);
-library.add(faCogs);
-library.add(faSyncAlt);
-library.add(faSearch);
-library.add(faCubes);
-library.add(faFolder);
-library.add(faFolderOpen);
-library.add(faChartArea);
-library.add(faLock);
-library.add(faCrosshairs);
-library.add(faExchangeAlt);
-library.add(faImage);
-library.add(faDownload);
-library.add(faExternalLinkAlt);
-library.add(faArrowsAltH);
-library.add(faArrowsAltV);
-library.add(faCaretRight);
-library.add(faCaretDown);
-library.add(faArrowsAltV);
-library.add(faCommentAlt);
-library.add(faArrowRight);
-library.add(faTrashAlt);
-library.add(faFilter);
-library.add(faEdit);
-
 @NgModule({
   imports: [
     CommonModule,
@@ -109,13 +78,14 @@ library.add(faEdit);
     BrowserAnimationsModule,
     ReactiveFormsModule,
     NgSelectModule,
+    NgOptionHighlightModule,
     SharedModule,
     FontAwesomeModule,
     ModalModule.forRoot(),
     TabsModule.forRoot(),
     TooltipModule.forRoot(),
     BsDropdownModule.forRoot(),
-    DatepickerModule.forRoot(),
+    BsDatepickerModule.forRoot(),
     TimepickerModule.forRoot()
   ],
   declarations: [
@@ -133,4 +103,40 @@ library.add(faEdit);
     ExplorerPageComponent
   ]
 })
-export class ExplorerModule { }
+export class ExplorerModule {
+  constructor(library: FaIconLibrary){
+    library.addIcons(faExclamationTriangle,
+      faExclamationCircle,
+      faHeartbeat,
+      faLock,
+      faCrosshairs,
+      faDownload,
+      faChartLine,
+      faLifeRing,
+      faDatabase,
+      faSpinner,
+      faSquare,
+      faTimes,
+      faCog,
+      faClock,
+      faCogs,
+      faSearch,
+      faSyncAlt,
+      faCubes,
+      faFolder,
+      faFolderOpen,
+      faChartArea,
+      faExchangeAlt,
+      faImage,
+      faExternalLinkAlt,
+      faArrowsAltH,
+      faArrowsAltV,
+      faArrowRight,
+      faCaretRight,
+      faCaretDown,
+      faCommentAlt,
+      faTrashAlt,
+      faFilter,
+      faEdit);
+  }
+ }

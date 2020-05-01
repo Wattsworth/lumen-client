@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { createLogger } from 'redux-logger'
 import { NgRedux, DevToolsExtension } from '@angular-redux/store';
-import { createEpicMiddleware } from 'redux-observable';
+import { createEpicMiddleware } from 'redux-observable-es6-compat';
 import { Observable } from 'rxjs';
 import { select } from '@angular-redux/store';
 

@@ -52,7 +52,8 @@ export class GroupComponent implements OnInit {
 
   public emailForm: FormGroup;
   public emailField: AbstractControl;
-
+  public selectedUser: IUser;
+  
   constructor(
     private userGroupService: UserGroupService,
     private userService: UserService,

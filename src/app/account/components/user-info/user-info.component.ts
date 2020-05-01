@@ -22,6 +22,7 @@ export class UserInfoComponent implements OnInit, OnDestroy {
 
 
   public form: FormGroup;
+  public passwords: FormGroup;
   private sub: Subscription;
 
   constructor(
@@ -43,16 +44,18 @@ export class UserInfoComponent implements OnInit, OnDestroy {
     this.sub.unsubscribe();
   }
   buildForm(user: IUserRecord) {
+    this.passwords =  this.fb.group({
+      password: [""],
+      password_confirmation: [""],
+    }, { validator: this.passwordValidator })
     this.form = this.fb.group({
       first_name: [user.first_name, Validators.required],
       last_name: [user.last_name, Validators.required],
       email: [user.email, [Validators.required, CustomValidators.email]],
-      passwords: this.fb.group({
-        password: [""],
-        password_confirmation: [""],
-      }, { validator: this.passwordValidator }),
+      passwords: this.passwords,
       current_password: ["", Validators.required]
     });
+    
   }
 
   passwordValidator(group: FormGroup) {

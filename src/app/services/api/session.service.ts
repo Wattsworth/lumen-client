@@ -71,9 +71,9 @@ export class SessionService {
       console.log("returning empty")
       return empty();
     }
-    let o = this.http.post('auth/password',{ 
+    let o = this.http.post('auth/password.json',{ 
       email: email,
-      redirect_url: `${environment.appUrl}/session/reset_password` })
+      redirect_url: `${window.location.origin}/session/reset_password` })
       .pipe(share());
 
     o.subscribe(

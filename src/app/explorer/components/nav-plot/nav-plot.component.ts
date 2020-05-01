@@ -3,7 +3,7 @@ import {
   Component,
   ViewChild,
   ElementRef,
-  Renderer,
+  Renderer2,
   OnInit,
   OnDestroy,
   AfterViewInit,
@@ -41,7 +41,7 @@ export class NavPlotComponent implements OnInit, AfterViewInit, OnDestroy {
   private storedPlotTimeRange: IRange;
 
   constructor(
-    private renderer: Renderer,
+    private renderer: Renderer2,
     private plotSelectors: PlotSelectors,
     private measurementSelectors: MeasurementSelectors,
     private plotService: PlotService

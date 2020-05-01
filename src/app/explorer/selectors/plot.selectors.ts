@@ -37,12 +37,12 @@ export class PlotSelectors {
 
   @select(_.concat(PLOT_REDUX,'left_elements')) leftElementIDs$: Observable<number[]>;
   @select(_.concat(PLOT_REDUX,'left_axis_settings')) leftAxisSettings$: Observable<IAxisSettings>;
-  @select(_.concat(PLOT_REDUX,'show_left_axis_settings')) showLeftAxisSettings$: boolean;
+  @select(_.concat(PLOT_REDUX,'show_left_axis_settings')) showLeftAxisSettings$: Observable<boolean>;
   @select(_.concat(PLOT_REDUX,'right_elements')) rightElementIDs$: Observable<number[]>;
   @select(_.concat(PLOT_REDUX,'right_axis_settings')) rightAxisSettings$: Observable<IAxisSettings>;
-  @select(_.concat(PLOT_REDUX,'show_right_axis_settings')) showRightAxisSettings$: boolean;
+  @select(_.concat(PLOT_REDUX,'show_right_axis_settings')) showRightAxisSettings$: Observable<boolean>;
   @select(_.concat(PLOT_REDUX,'time_axis_settings')) timeAxisSettings$: Observable<IAxisSettings>;
-  @select(_.concat(PLOT_REDUX,'show_time_axis_settings')) showTimeAxisSettings$: boolean;
+  @select(_.concat(PLOT_REDUX,'show_time_axis_settings')) showTimeAxisSettings$: Observable<boolean>;
   @select(_.concat(PLOT_REDUX,'show_plot')) showPlot$: Observable<boolean>;
   @select(_.concat(PLOT_REDUX,'show_date_selector')) showDateSelector$: Observable<boolean>;
   @select(_.concat(PLOT_REDUX,'plot_time')) plotTimeRange$: Observable<IRange>
