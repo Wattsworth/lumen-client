@@ -59,8 +59,8 @@ export class FileTreeComponent implements OnInit {
         return nilms.map(nilm => {
           return this.mapNilm(nilm, data.dbFolders[nilm.root_folder],
             data.dataApps,
-            data.dbFolders, data.dbStreams, data.dbElements);
-        })
+            data.dbFolders, data.dbStreams, data.dbElements)
+        })//.sort((a,b) => a.name > b.name ? 1:-1)
       }));
   }
 
