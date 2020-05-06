@@ -50,8 +50,8 @@ export class GroupComponent implements OnInit {
   public userType: string;
   public userOptions$: Observable<any[]>;
 
-  public emailForm: FormGroup;
-  public emailField: AbstractControl;
+  public form: FormGroup;
+  //public emailField: AbstractControl;
   public selectedUser: IUser;
   
   constructor(
@@ -76,6 +76,10 @@ export class GroupComponent implements OnInit {
         ];
       }
      }))
+
+    this.form = this.fb.group({
+      email: ['', [Validators.required, CustomValidators.email]],
+    });
   }
 
 
@@ -95,10 +99,10 @@ export class GroupComponent implements OnInit {
   addMember(user: IUser) {
     this.userGroupService.addMember(this.group, user);
   }
-  inviteMember(email: string) {
+  inviteMember() {
     this.userGroupService.inviteMember(
       this.group,
-      this.emailField.value);
+      this.form.controls['email'].value);
   }
   addMemberShown() {
     this.userService.loadUsers();
@@ -123,10 +127,8 @@ export class GroupComponent implements OnInit {
         return { value: user, label: `${user.first_name} ${user.last_name}` }
       });
     }));
-    this.emailForm = this.fb.group({
-      email: ['', [Validators.required, CustomValidators.email]],
-    });
-    this.emailField = this.emailForm.controls['email'];
+
+    //this.emailField = this.emailForm.controls['email'];
   }
 }
 

@@ -109,26 +109,27 @@
           </div>
           <!-- Option 3: invite a new user-->
           <div *ngSwitchCase="'invite'">
-            <form [formGroup]="emailForm">
+            <form [formGroup]="form">
               <div class="form-group"
-                [class.has-error]="!emailForm.get('email').valid && !emailForm.get('email').pristine">
+                [class.has-error]="!form.get('email').valid && !form.get('email').pristine">
                 <label>Email address</label>
                 <input type="email" class="form-control" placeholder="Email" 
-                [formControl]="emailForm.get('email').value">
+                [formControl]="form.controls['email']">
+              </div>
+              <!-- Save and Cancel buttons -->
+              <div class="clearfix">
+                <!-- save -->
+                <button class="btn btn-primary float-left mtop" 
+                     [disabled]="form.valid==false"   
+                        (click)="inviteMember()">Invite</button>
+                <!-- cancel -->
+                <button class="btn btn-secondary float-right mtop"
+                        (click)="userModal.hide()">
+                        Cancel</button>
               </div>
             </form>
-            <!-- Save and Cancel buttons -->
-            <div class="clearfix">
-              <!-- save -->
-              <button class="btn btn-primary float-left mtop" 
-                      [disabled]="!emailForm.valid"
-                      (click)="inviteMember(emailForm.get('email').value)">Invite</button>
-              <!-- cancel -->
-              <button class="btn btn-secondary float-right mtop"
-                      (click)="userModal.hide()">
-                      Cancel</button>
-            </div>
           </div>
       </div>
     </div>
   </div>
+</div>
