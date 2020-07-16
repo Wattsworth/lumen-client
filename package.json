@@ -33,7 +33,7 @@
     "core-js": "^2.6.11",
     "html2canvas": "^1.0.0-rc.5",
     "immutable": "^3.8.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "lz-string": "^1.4.4",
     "moment": "2.24.0",
     "ng2-validation": "^4.2.0",
