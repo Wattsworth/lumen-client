@@ -84,7 +84,9 @@ export class EditStreamComponent implements OnInit {
   }
 
   private _buildElementGroups(dbElements: IDbElement[]) {
-    return dbElements.map(element =>
+    return dbElements
+    .sort((a,b) => a.column - b.column)
+    .map(element =>
       this.fb.group({
         id: [element.id],
         plottable: [element.plottable],

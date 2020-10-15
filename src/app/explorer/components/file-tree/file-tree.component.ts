@@ -181,6 +181,7 @@ export class FileTreeComponent implements OnInit {
       .map(id => elements[id])
       .filter(element => element !== undefined)
       .filter(element => element.plottable)
+      .sort((a,b) => a.column - b.column)
       .map(element => this.mapElement(element))
     //create the DbNode and return it
     return {
