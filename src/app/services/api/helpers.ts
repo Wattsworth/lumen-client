@@ -7,8 +7,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 
 export function parseDeviseErrors(resp: HttpErrorResponse): string[] {
-  console.log("Hello!", resp);
-
   if (resp.status == 0) {
     return ['cannot contact server'];
   } 

@@ -7,7 +7,7 @@
           <timepicker [(ngModel)]="startTime" [showSpinners]=false [showMeridian]=false></timepicker>
         </div>
         <div class='date'>
-          <datepicker [(ngModel)]="startDate" ></datepicker>
+          <input type="text" [bsConfig]="bsConfig" placeholder="Start Date" class="form-control" [(ngModel)]="startDate" bsDatepicker>
         </div>
       </div>
     </div>
@@ -18,7 +18,7 @@
           <timepicker [(ngModel)]="endTime" [showSpinners]=false [showMeridian]=false></timepicker>
         </div>
         <div class='date'>
-          <datepicker [(ngModel)]="endDate"></datepicker>
+          <input type="text" [bsConfig]="bsConfig" placeholder="End Date" class="form-control" [(ngModel)]="endDate" bsDatepicker>
         </div>
       </div>
     </div>

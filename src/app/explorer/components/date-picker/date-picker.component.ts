@@ -5,6 +5,7 @@ import {
 import { PlotService } from '../../services/plot.service'
 
 import { IRange } from '../../store';
+import {BsDatepickerConfig} from 'ngx-bootstrap/datepicker';
 
 @Component({
   animations: [
@@ -30,11 +31,13 @@ export class DatePickerComponent implements OnInit, OnChanges {
   public startTime: Date;
   public endTime: Date;
   public invalidRange: boolean;
+  public bsConfig: Partial<BsDatepickerConfig>;
 
   constructor(
     private plotService: PlotService
   ) { 
     this.invalidRange = false;
+    this.bsConfig = Object.assign({}, {containerClass: 'theme-blue'});
   }
 
   ngOnInit() {

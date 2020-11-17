@@ -9,12 +9,10 @@ import {
   FormsModule
 } from '@angular/forms';
 import { TreeModule } from 'angular-tree-component';
-import { 
-  AlertModule,
-  ModalModule,
-  TabsModule,
-  TooltipModule
- } from 'ngx-bootstrap';
+import { AlertModule } from 'ngx-bootstrap/alert';
+import {ModalModule} from 'ngx-bootstrap/modal';
+import {TooltipModule} from 'ngx-bootstrap/tooltip';
+import { TabsModule } from 'ngx-bootstrap/tabs';
  import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
  import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
  import {

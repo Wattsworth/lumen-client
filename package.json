@@ -37,7 +37,7 @@
     "lz-string": "^1.4.4",
     "moment": "2.24.0",
     "ng2-validation": "^4.2.0",
-    "ngx-bootstrap": "^4.3.0",
+    "ngx-bootstrap": "^6.2.0",
     "normalizr": "^3.6.0",
     "redux": "4.0.1",
     "redux-observable": "^1.2.0",

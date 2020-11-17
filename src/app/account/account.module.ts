@@ -1,13 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import {
-  BsDropdownModule,
-  ModalModule,
-  TooltipModule,
-  PopoverModule,
-  CarouselModule
-} from 'ngx-bootstrap'
+import {CarouselModule} from 'ngx-bootstrap/carousel'
+import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import {ModalModule} from 'ngx-bootstrap/modal';
+import {TooltipModule} from 'ngx-bootstrap/tooltip';
+import {PopoverModule} from 'ngx-bootstrap/popover';
+
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 import {

@@ -41,16 +41,13 @@ import {
   faEdit,
 } from '@fortawesome/free-solid-svg-icons'
 
-import {
-  TooltipModule,
-  TabsModule,
-  ModalModule,
-  BsDropdownModule,
-  TimepickerModule,
-} from 'ngx-bootstrap';
-import {
-  BsDatepickerModule,
-} from 'ngx-bootstrap/datepicker';
+import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import {ModalModule} from 'ngx-bootstrap/modal';
+import {TooltipModule} from 'ngx-bootstrap/tooltip';
+
+import {TabsModule } from 'ngx-bootstrap/tabs';
+import {  TimepickerModule } from 'ngx-bootstrap/timepicker'
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 
 import {
   ReactiveFormsModule,

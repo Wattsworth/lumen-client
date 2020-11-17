@@ -5,7 +5,7 @@ import {
   trigger, animate, style, transition
 } from '@angular/animations';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { TabsetComponent } from 'ngx-bootstrap';
+import { TabsetComponent } from 'ngx-bootstrap/tabs';
 import { Observable, Subscription } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 import * as _ from 'lodash';
