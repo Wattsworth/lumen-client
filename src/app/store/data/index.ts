@@ -1,21 +1,24 @@
-import { combineReducers } from 'redux';
+import { combineReducers} from '@ngrx/store';
+
 import * as types from './types';
 import * as reducers from './reducer';
 
+export * from './types';
+
 export interface IState {
-  nilms: types.INilmRecords;
-  dataApps: types.IDataAppRecords;
-  dbFolders: types.IDbFolderRecords;
-  dbStreams: types.IDbStreamRecords;
-  dbElements: types.IDbElementRecords;
-  users: types.IUserStoreRecord;
-  userGroups: types.IUserGroupStoreRecord;
-  permissions: types.IPermissionRecords;
-  dataViews: types.IDataViewRecords;
-  annotations: types.IAnnotationRecords
+  nilms: types.INilmState;
+  dataApps: types.IDataAppState;
+  dbFolders: types.IDbFolderState;
+  dbStreams: types.IDbStreamState;
+  dbElements: types.IDbElementState;
+  users: types.IUserState;
+  userGroups: types.IUserGroupState;
+  permissions: types.IPremissionState;
+  dataViews: types.IDataViewState;
+  annotations: types.IAnnotationState
 }
 
-export const reducer = combineReducers<IState>({
+export const reducer = combineReducers({
   nilms: reducers.nilmReducer,
   dataApps: reducers.dataAppReducer,
   dbFolders: reducers.dbFolderReducer,
@@ -27,6 +30,3 @@ export const reducer = combineReducers<IState>({
   dataViews: reducers.dataViewReducer,
   annotations: reducers.annotationReducer
 });
-export {DataFactory, DataViewFactory } from './initial-state';
-export * from './actions';
-export * from './types';

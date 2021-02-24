@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import {
   FormBuilder,
@@ -23,13 +22,14 @@ import { environment } from '../../../../environments/environment';
 import {
   IUserGroup,
   IUser,
-  IUserRecords
 } from '../../../store/data';
 
 import {
   UserGroupService,
   UserService
 } from '../../../services';
+import { createSelector, select, Store } from '@ngrx/store';
+import { users_ , global_UI_} from 'app/selectors';
 
 @Component({
   selector: 'account-group',
@@ -40,8 +40,9 @@ export class GroupComponent implements OnInit {
   @ViewChild('userModal', {static: false}) public userModal: ModalDirective;
   @ViewChild('groupModal', {static: false}) public groupModal: ModalDirective;
 
-  @select(['data', 'users', 'entities']) users$: Observable<IUserRecords>
-  @select(['ui', 'global', 'email_enabled']) emailEnabled$: Observable<string>;
+  users$ = this.store.pipe(select(createSelector(users_, state=>state.entities)));
+  emailEnabled$ = this.store.pipe(select(createSelector(global_UI_, state=>state.email_enabled)));
+
 
   @Input() group: IUserGroup;
 
@@ -57,7 +58,8 @@ export class GroupComponent implements OnInit {
   constructor(
     private userGroupService: UserGroupService,
     private userService: UserService,
-    public fb: FormBuilder
+    public fb: FormBuilder,
+    private store: Store
   ) {
     this.userType = 'select';
 

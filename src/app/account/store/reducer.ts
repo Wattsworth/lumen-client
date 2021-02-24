@@ -1,43 +1,19 @@
-import { IPayloadAction } from '../../store/helpers';
-import { AccountActions } from './actions';
-import { IAccountRecord } from './types';
+import { createReducer, on } from '@ngrx/store';
+
+import * as actions from './actions';
+import { IState } from './types';
 import {
-  AccountFactory,
-  INITIAL_STATE
+  defaultAccountState
 } from './initial-state';
 
-export function reducer(
-  state: IAccountRecord = INITIAL_STATE,
-  action: IPayloadAction): IAccountRecord {
-
-  switch (action.type) {
-
-    //set flag to indicate nilms are loaded
-    //
-    case AccountActions.SET_NILMS_LOADED:
-      return state
-        .set('nilms_loaded', true);
-
-    //set flag to indicate data views are loaded
-    //
-    case AccountActions.SET_DATA_VIEWS_LOADED:
-      return state
-        .set('data_views_loaded', true);
-
-    //set flag to indicate user groups are loaded
-    //
-    case AccountActions.SET_USER_GROUPS_LOADED:
-      return state
-        .set('user_groups_loaded', true);
-    
-    //set flag to indicate server is processing login
-    //
-    case AccountActions.SET_LOGGING_IN:
-      return state
-        .set('logging_in', action.payload);
-
-    default:
-        return state;
-  }
-}
-
+export const reducer = createReducer(
+  defaultAccountState,
+  //set flag to indicate data views are loaded
+  on(actions.setDataViewsLoaded, (state: IState)=>({...state, data_views_loaded: true})),
+  //set flag to indicate nilms are loaded
+  on(actions.setNilmsLoaded, (state: IState,)=>({...state, nilms_loaded: true})),
+  //set flag to indicate user groups are loaded
+  on(actions.setUserGroupsLoaded, (state: IState,)=>({...state, user_groups_loaded: true})),
+  //set flag to indicate server is processing login
+  on(actions.setLoggingIn, (state: IState, {logging_in})=>({...state, logging_in})),
+);

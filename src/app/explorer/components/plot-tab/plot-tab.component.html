@@ -26,7 +26,7 @@
   <!-- only shown if axis settings are displayed -->
   <div @slideUpDown *ngIf="(plotSelectors.showLeftAxisSettings$ | async)">
     <app-axis-settings
-      [settings]="plotSelectors.leftAxisSettings$ | async" 
+      [settings]="plotSelectors.leftAxisSettingsMutable$ | async" 
       [yaxis-settings]="true"  
       (changed)="plotService.setLeftAxisSettings($event)"></app-axis-settings>
     
@@ -62,7 +62,7 @@
   <!-- only shown if axis settings are displayed -->
   <div @slideUpDown *ngIf="(plotSelectors.showRightAxisSettings$ | async)">
     <app-axis-settings *ngIf="(plotSelectors.rightElements$ | async)?.length>0" 
-      [settings]="plotSelectors.rightAxisSettings$ | async"
+      [settings]="plotSelectors.rightAxisSettingsMutable$ | async"
       [yaxis-settings]="true"
       (changed)="plotService.setRightAxisSettings($event)"></app-axis-settings>
     
@@ -96,7 +96,7 @@
 <div @slideUpDown
   *ngIf="(plotSelectors.showTimeAxisSettings$ | async)">
   <app-axis-settings 
-      [settings]="plotSelectors.timeAxisSettings$ | async"
+      [settings]="plotSelectors.timeAxisSettingsMutable$ | async"
       [yaxis-settings]="false"
       (changed)="plotService.setTimeAxisSettings($event)">
   </app-axis-settings>

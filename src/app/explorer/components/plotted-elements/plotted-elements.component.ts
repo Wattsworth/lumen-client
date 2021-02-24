@@ -10,7 +10,6 @@ import {
   AfterViewInit,
   SimpleChanges
 } from '@angular/core';
-import { select } from '@angular-redux/store';
 import { Subject, Observable, Subscription } from 'rxjs';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { DbElementService } from '../../../services';
@@ -136,11 +135,7 @@ export class PlottedElementsComponent
   onSave() {
     //check if the axis changed
     if (this.axis != this.newAxis) {
-      let result = this.plotService.setElementAxis(this.element, this.newAxis);
-      if (result == false) {
-        this.axisMessage = `this axis does not have units [ ${this.element.units} ]`
-        return; //do not close the dialog
-      }
+      this.plotService.setElementAxis(this.element, this.newAxis);
     }
     //check if the color changed
     if (this.newColor != null && this.newColor != "" &&

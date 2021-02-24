@@ -1,3 +1,4 @@
+/*
 import { Injectable } from '@angular/core';
 import { combineEpics } from 'redux-observable';
 import { Epic } from 'redux-observable';
@@ -22,3 +23,4 @@ export class AppEpics {
 }
 
 export const EPIC_PROVIDERS = [PageEpics, AppEpics];
+*/

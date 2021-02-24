@@ -1,4 +1,3 @@
-import { TypedRecord } from 'typed-immutable-record';
 import { IRange } from '../helpers';
 export interface IState {
   enabled: boolean;
@@ -9,9 +8,6 @@ export interface IState {
   relative: boolean;
   zero_measurements: IMeasurementSet;
 }
-
-export interface IStateRecord extends
-  TypedRecord<IStateRecord>, IState { };
 
 export interface IMeasurement {
   min?: number;

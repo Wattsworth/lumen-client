@@ -1,6 +1,9 @@
-export const UIActions = {
-  'SET_MESSAGES': 'UI_SET_PAGE_MESSAGES',
-  'CLEAR_MESSAGES': 'UI_CLEAR_PAGE_MESSAGES',
-  'SET_PAGE_HEADER': 'UI_SET_PAGE_HEADER',
-  'ENABLE_EMAILS': 'UI_ENABLE_EMAILS'
-};
+import {createAction, props} from '@ngrx/store'
+
+export const setWarningMessages = createAction('[UI] Set Warning Messages', props<{messages: string[]}>());
+export const setErrorMessages = createAction('[UI] Set Error Messages', props<{messages: string[]}>());
+export const setNoticeMessages = createAction('[UI] Set Notice Messages', props<{messages: string[]}>());
+
+export const clearMessages = createAction('[UI] Clear Messages');
+export const setPageHeader = createAction('[UI] Set Page Header', props<{header: string}>());
+export const enableEmails = createAction('[UI] Enable Emails', props<{enable: boolean}>());

@@ -1,4 +1,3 @@
-import { TypedRecord } from 'typed-immutable-record';
 import { IDataSet } from '../../../store/data';
 import { IRange, IAxisSettings } from '../helpers';
 
@@ -40,8 +39,6 @@ export interface IState {
   
 }
 
-export interface IStateRecord extends
-  TypedRecord<IStateRecord>, IState { };
 export interface IVisualizerTab {
   id: number,
   url: string

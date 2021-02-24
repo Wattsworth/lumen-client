@@ -2,21 +2,19 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
-
-
+import { Store, select, createSelector } from '@ngrx/store';
 import {
   PermissionService
 } from '../../../services';
 
 import {
-  IPermissionRecords,
   IPermission,
-  INilmRecord,
-  IUserRecords,
-  IUserGroupRecords
+  IUserGroup,
+  IUser
+
 } from '../../../store/data';
 import { InstallationSelectors } from '../../installation.selectors';
+import { permissions_, users_, userGroups_ } from 'app/selectors';
 
 @Component({
   selector: 'installation-admin-tab',
@@ -25,10 +23,9 @@ import { InstallationSelectors } from '../../installation.selectors';
 })
 export class AdminTabComponent implements OnInit {
 
-  @select(['data', 'permissions']) permissions$: Observable<IPermissionRecords>;
-  @select(['data','users','entities']) users$: Observable<IUserRecords>;
-  @select(['data','groups','entities']) groups$: Observable<IUserGroupRecords>;
-
+  permissions$ = this.store.pipe(select(permissions_));
+  users$ = this.store.pipe(select(createSelector(users_,state=>state.entities)));
+  groups$ = this.store.pipe(select(createSelector(userGroups_,state=>state.entities)));
   public admins$: Observable<IPermission[]>
   public owners$: Observable<IPermission[]>
   public viewers$: Observable<IPermission[]>
@@ -36,7 +33,8 @@ export class AdminTabComponent implements OnInit {
   private nilmSub: Subscription;
   constructor(
     private permissionService: PermissionService,
-    public installationSelectors: InstallationSelectors
+    public installationSelectors: InstallationSelectors,
+    private store: Store
   ) { 
     
   }

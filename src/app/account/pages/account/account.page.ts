@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { select } from '@angular-redux/store';
 import {environment } from '../../../../environments/environment'
 
 import {
@@ -11,7 +10,7 @@ import {
 } from '../../../services';
 
 import {
-  IUserStoreRecord,
+  IUserState,
 } from '../../../store/data';
 
 
@@ -24,7 +23,6 @@ import { AccountService } from '../../account.service';
 })
 export class AccountPageComponent implements OnInit {
 
-  @select(['data', 'users']) users$: Observable<IUserStoreRecord>
   public helpUrl: string;
 
   constructor(

@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { select } from '@angular-redux/store';
 import { IDbFolder } from '../../../store/data';
 
 import { DbFolderService } from '../../../services';

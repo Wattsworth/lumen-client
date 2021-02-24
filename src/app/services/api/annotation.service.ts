@@ -1,20 +1,18 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
+import { Store } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 import { MessageService } from '../message.service';
-import { IAppState } from '../../app.store';
 
 import {
-  DbStreamActions,
-  AnnotationActions,
   IAnnotation,
 } from '../../store/data';
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
-import { AnnotationUIActions } from 'app/explorer/store';
-
+import * as uiActions from 'app/explorer/store/annotations/actions';
+import * as actions from '../../store/data/actions'
+import {entityFactory, defaultAnnotation} from '../../store/data/initial-state'
 @Injectable()
 export class AnnotationService {
 
@@ -22,7 +20,7 @@ export class AnnotationService {
 
   constructor(
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private messageService: MessageService
   ) { 
     this.annotatedStreams = [];
@@ -44,15 +42,11 @@ export class AnnotationService {
       .post(`/db_streams/${annotation.db_stream_id}/annotations.json`, params)
       .subscribe(
       json => {
-        let normalized = normalize(json['data'], schema.annotations)
-        this.ngRedux.dispatch({
-          type: AnnotationActions.RECEIVE,
-          payload: normalized.entities['annotations']
-        });
-        this.ngRedux.dispatch({
-          type: AnnotationUIActions.SHOW_ANNOTATION,
-          payload: normalized.result
-        })
+        let entities = normalize(json['data'], schema.annotations).entities;
+        let annotations = entityFactory(entities['annotations'], defaultAnnotation);
+        this.store.dispatch(actions.receiveAnnotation({annotations}))
+        this.store.dispatch(uiActions.showAnnotation({id: annotations[0].id}))
+        
     },
     error => this.messageService.setErrorsFromAPICall(error)
     )
@@ -69,11 +63,8 @@ export class AnnotationService {
       .subscribe(
         json => {
           let normalized = normalize(json['data'], schema.annotations)
-          console.log(normalized)
-          this.ngRedux.dispatch({
-            type: AnnotationActions.RECEIVE,
-            payload: normalized.entities['annotations']
-          });
+          let annotations = entityFactory(normalized.entities['annotations'], defaultAnnotation);
+          this.store.dispatch(actions.receiveAnnotation({annotations}))        
         },
         error => this.messageService.setErrorsFromAPICall(error)
       );
@@ -91,11 +82,9 @@ export class AnnotationService {
 
     o.subscribe(
       json => {
-        let annotations = normalize(json['data'], schema.annotations).entities['annotations'];
-        this.ngRedux.dispatch({
-            type: AnnotationActions.RECEIVE,
-            payload: annotations
-          });
+        let normalized = normalize(json['data'], schema.annotations)
+        let annotations = entityFactory(normalized.entities['annotations'], defaultAnnotation);
+        this.store.dispatch(actions.receiveAnnotation({annotations}))        
         if(this.annotatedStreams.indexOf(dbStreamId)==-1)
           this.annotatedStreams.push(dbStreamId);
       },
@@ -107,37 +96,23 @@ export class AnnotationService {
     if(index > -1){
       this.annotatedStreams.splice(index,1);
     }
-
-    this.ngRedux.dispatch({
-      type: DbStreamActions.RELOAD_ANNOTATIONS,
-      payload: dbStreamId
-    })
+    this.store.dispatch(actions.reloadStreamAnnotations({id: dbStreamId}))
 
     this.loadAnnotations(dbStreamId).subscribe(
       json => {
         this.messageService.setNotice("reloaded annotations")
-        this.ngRedux.dispatch({
-          type: DbStreamActions.REFRESHED_ANNOTATIONS,
-          payload: dbStreamId
-        })
+        this.store.dispatch(actions.refreshedAnnotations({id: dbStreamId}))
       },
       error => {
-        this.ngRedux.dispatch({
-          type: DbStreamActions.REFRESHED_ANNOTATIONS,
-          payload: dbStreamId
-        })
+        this.store.dispatch(actions.refreshedAnnotations({id: dbStreamId}))
       });
   }
   public deleteAnnotation(annotation: IAnnotation): void{
-    console.log(annotation)
     this.http
       .delete(`/db_streams/${annotation.db_stream_id}/annotations/${annotation.joule_id}.json`, {})
       .subscribe(
       json => {
-        this.ngRedux.dispatch({
-          type: AnnotationActions.REMOVE,
-          payload: annotation.id
-        })
+        this.store.dispatch(actions.removeAnnotation({id: annotation.id}))
         this.messageService.setMessages(json['messages']);
       },
       error => this.messageService.setErrorsFromAPICall(error)

@@ -1,29 +1,30 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
+import { Store, select, createSelector } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
-import { Observable, empty } from 'rxjs';
-import { tap, map, share } from 'rxjs/operators';
+import { Observable, EMPTY } from 'rxjs';
+import { tap, map, share, take } from 'rxjs/operators';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { normalize } from 'normalizr';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import * as schema from '../../api';
 import { MessageService } from '../message.service';
-import { IAppState } from '../../app.store';
 import { DbElementService } from './db-element.service';
-import { DbStreamService } from './db-stream.service'
+import { DbStreamService } from './db-stream.service';
 import { ColorService } from './color.service';
-import { DataViewFactory } from '../../store/data';
 import {
-  IDbElementRecords,
-  DbElementActions,
   IDataView,
   IData,
   IDataViewRedux,
-  DataViewActions
+  IDbElementState,
+  IDbElement,
+  IDbStream,
 } from '../../store/data';
-
-import * as plot from '../../explorer/store/plot'
-import * as explorer from '../../explorer/store';
+import * as actions from '../../store/data/actions';
+import * as plotActions from '../../explorer/store/plot/actions'
+import * as plot from '../../explorer/store/plot';
+import { defaultDataView, entityFactory } from 'app/store/data/initial-state';
+import { dbElements_, dbStreams_, plot_UI_Ex_ } from 'app/selectors';
+import { Dictionary } from '@ngrx/entity';
 
 export const MAX_SAVE_DATA_LENGTH = 200;
 
@@ -36,7 +37,7 @@ export class DataViewService {
 
   constructor(
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private messageService: MessageService,
     private elementService: DbElementService,
     private streamService: DbStreamService,
@@ -51,9 +52,8 @@ export class DataViewService {
   //
   public loadDataViews() {
     if (this.dataViewsLoaded) {
-      return empty();
+      return EMPTY;
     }
-
     let o = this.http
       .get('data_views.json', {}).pipe(
       map(json => normalize(json, schema.dataViews).entities))
@@ -62,10 +62,8 @@ export class DataViewService {
     o.subscribe(
       entities => {
         this.dataViewsLoaded = true;
-        this.ngRedux.dispatch({
-          type: DataViewActions.RECEIVE,
-          payload: entities['data_views']
-        })
+        let views = entityFactory(entities['data_views'], defaultDataView);
+        this.store.dispatch(actions.receiveDataView({views}));
       },
       error => this.messageService.setErrorsFromAPICall(error)
     );
@@ -79,10 +77,7 @@ export class DataViewService {
       .delete(`data_views/${view.id}.json`)
       .subscribe(
       json => {
-        this.ngRedux.dispatch({
-          type: DataViewActions.REMOVE,
-          payload: view.id
-        })
+        this.store.dispatch(actions.removeDataView({id:view.id}));
         this.messageService.setMessages(json['messages']);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -92,6 +87,7 @@ export class DataViewService {
 
   //create a new data view
   //
+  
   public create(name: string, description: string, 
     isPrivate: boolean, isHome: boolean, image: string): Observable<any> {
 
@@ -116,10 +112,8 @@ export class DataViewService {
 
     o.subscribe(
       entities => {
-        this.ngRedux.dispatch({
-          type: DataViewActions.RECEIVE,
-          payload: entities['data_views']
-        })
+        let views = entityFactory(entities['data_views'], defaultDataView);
+        this.store.dispatch(actions.receiveDataView({views}));
       },
       error => this.messageService.setErrorsFromAPICall(error)
     );
@@ -142,10 +136,8 @@ export class DataViewService {
 
     o.subscribe(
       entities => {
-        this.ngRedux.dispatch({
-          type: DataViewActions.RECEIVE,
-          payload: entities['data_views']
-        })
+        let views = entityFactory(entities['data_views'], defaultDataView);
+        this.store.dispatch(actions.receiveDataView({views}));
       },
       error => this.messageService.setErrorsFromAPICall(error)
     );
@@ -162,10 +154,10 @@ export class DataViewService {
       .get('data_views/home.json', {}).pipe(
        map(json => normalize(json, schema.dataView)),
        map(json => json.entities.data_views[json.result]),
-       map(json => DataViewFactory(json)))
+       map(json => ({...defaultDataView, ...json})))
       .subscribe(
       view => this.restoreDataView(view),
-      error => console.log("unable to load home data view")
+      error => {}//no home view
       );
   }
 
@@ -176,21 +168,15 @@ export class DataViewService {
   public restoreDataView(view: IDataView) {
     //first clear the plot
     this.elementService.resetElements();
-    this.ngRedux.dispatch({
-      type: explorer.PlotActions.HIDE_ALL_ELEMENTS,
-    })
+    this.store.dispatch(plotActions.hideAllElements())
     //now set the plot & nav time ranges so we don't reload the data 
     //(they are null after HIDE_ALL_ELEMENTS)
-    this.ngRedux.dispatch({
-      type: explorer.PlotActions.SET_PLOT_TIME_RANGE,
-      payload: view.redux.ui_explorer.plot_time
-    })
-    this.ngRedux.dispatch({
-      type: explorer.PlotActions.SET_NAV_TIME_RANGE,
-      payload: view.redux.ui_explorer.nav_time
-    })
+    this.store.dispatch(plotActions.setPlotTimeRange({range: view.redux.ui_explorer.plot_time}))
+
+    this.store.dispatch(plotActions.setNavTimeRange({range: view.redux.ui_explorer.nav_time}))
+
     //now load the data elements
-    this.elementService.restoreElements(view.redux.data_dbElements)
+    this.elementService.restoreElements(Object.values(view.redux.data_dbElements))
 
     //register colors with color service
     let newElements = view.redux.data_dbElements;
@@ -200,16 +186,15 @@ export class DataViewService {
         this.colorService.checkoutColor(element.color);
       })
     //restore the plot
-    this.ngRedux.dispatch({
-      type: explorer.PlotActions.RESTORE_VIEW,
-      payload: view.redux.ui_explorer
-    });
+    this.store.dispatch(plotActions.restoreDataView({saved_state: view.redux.ui_explorer}))
+
     //load the associated streams if they haven't been retrieved already
-    this.ngRedux.getState().data.dbStreams
+    let dbStreams: Dictionary<IDbStream>;
+    this.store.pipe(select(dbStreams_),take(1)).subscribe(state=>dbStreams=state)
     let viewStreamIds = _.uniq(_.keys(newElements)
       .map(id => newElements[id])
       .map(elem => elem.db_stream_id))
-    let existingStreamIds = _.keys(this.ngRedux.getState().data.dbStreams)
+    let existingStreamIds = _.keys(dbStreams)
       .map(id => parseInt(id))
     let newStreamIds = _.difference(viewStreamIds, existingStreamIds)
     if (newStreamIds.length > 0)
@@ -220,9 +205,15 @@ export class DataViewService {
   // GetDataViewState:
   // Compute redux state for the data view
   //
+  
   public getDataViewState(includeData: boolean): IDataViewState {
-    let allElements = this.ngRedux.getState().data.dbElements;
-    let explorerState = this.ngRedux.getState().ui.explorer.plot;
+    let allElements:Dictionary<IDbElement>
+    this.store.select(dbElements_)
+      .pipe(take(1)).subscribe(state => allElements=state);
+  
+    let explorerState: plot.IState;
+    this.store.select(plot_UI_Ex_)
+      .pipe(take(1)).subscribe(state => explorerState=_.cloneDeep(state));
     let plottedElements = _.concat(
       explorerState.left_elements,
       explorerState.right_elements)
@@ -236,22 +227,21 @@ export class DataViewService {
     let stream_ids = _.uniq(Object.keys(plottedElements)
       .map(id => plottedElements[id].db_stream_id))
     //sanitize explorer ui state
-    let plot_ui = <plot.IState>(<any>this.ngRedux.getState().ui.explorer.plot).toJS();
-    plot_ui.show_date_selector = false; //hide in case it is visible
+    explorerState.show_date_selector = false; //hide in case it is visible
     if (includeData) {
       //remove nav_data and data that are not part of plottedElements
-      plot_ui.plot_data = Object.keys(plottedElements)
+      explorerState.plot_data = Object.keys(plottedElements)
         .reduce((acc, id) => {
-          let dataset = plot_ui.plot_data[id];
+          let dataset = explorerState.plot_data[id];
           if (dataset === undefined) {
             return acc; //data is missing we can't save it
           }
           acc[id] = this.decimateDataset(dataset);
           return acc;
         }, {})
-      plot_ui.nav_data = Object.keys(plottedElements)
+        explorerState.nav_data = Object.keys(plottedElements)
         .reduce((acc, id) => {
-          let dataset = plot_ui.nav_data[id];
+          let dataset = explorerState.nav_data[id];
           if (dataset === undefined) {
             return acc; //data is missing we can't save it
           }
@@ -259,12 +249,12 @@ export class DataViewService {
           return acc;
         }, {})
     } else {
-      plot_ui.plot_data = {};
-      plot_ui.nav_data = {};
+      explorerState.plot_data = {};
+      explorerState.nav_data = {};
     }
     return {
       redux: {
-        ui_explorer: plot_ui,
+        ui_explorer: explorerState,
         data_dbElements: plottedElements
       },
       stream_ids: stream_ids

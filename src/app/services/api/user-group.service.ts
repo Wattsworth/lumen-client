@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Observable, empty } from 'rxjs';
+import { Observable, EMPTY } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { NgRedux } from '@angular-redux/store';
+import { Store } from '@ngrx/store';
 import { share } from 'rxjs/operators';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 
-import { IAppState } from '../../app.store';
 import {
-  UserGroupActions,
-  UserActions,
   IUser,
   IUserGroup
 } from '../../store/data';
+import * as actions from '../../store/data/actions'
+
 import {
   MessageService
 } from '../message.service';
+import { defaultUserGroup, defaultUser, entityFactory } from 'app/store/data/initial-state';
 
 @Injectable()
 export class UserGroupService {
@@ -25,7 +25,7 @@ export class UserGroupService {
   constructor(
     //private http: Http,
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private messageService: MessageService
   ) {
     this.groupsLoaded = false;
@@ -34,7 +34,7 @@ export class UserGroupService {
   public loadUserGroups(): Observable<any> {
     //only execute request once
     if (this.groupsLoaded) {
-      return empty();
+      return EMPTY;
     }
 
     let o = this.http
@@ -43,28 +43,26 @@ export class UserGroupService {
     o.subscribe(
       json => {
         this.groupsLoaded = true;
+        console.log("here!")
         //load owned groups (contains user data)
-        let objs = normalize(json['owner'], schema.userGroups);
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_OWNER_GROUPS,
-          payload: objs
-        });
-        if (objs.entities['users'] !== undefined) {
-          this.ngRedux.dispatch({
-            type: UserActions.RECEIVE,
-            payload: objs.entities['users']
-          })
+        let entities = normalize(json['owner'], schema.userGroups).entities;
+        let groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveOwnerGroups({groups}))
+        
+        if (entities['users'] !== undefined) {
+          let users = entityFactory(entities['users'], defaultUser)
+          this.store.dispatch(actions.receiveUser({users}))
         }
-        //load member groups 
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_MEMBER_GROUPS,
-          payload: normalize(json['member'], schema.userGroups)
-        });
+        //load member groups
+        entities = normalize(json['member'], schema.userGroups).entities;
+        groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveMemberGroups({groups}))
+        
         //load other groups (generic action)
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_GROUPS,
-          payload: normalize(json['other'], schema.userGroups)
-        });
+        entities = normalize(json['other'], schema.userGroups).entities;
+        groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveGroups({groups}))
+        
       },
       error => this.messageService.setErrorsFromAPICall(error)
       );
@@ -76,11 +74,9 @@ export class UserGroupService {
       .put<schema.IApiResponse>(`user_groups/${group.id}/remove_member.json`, { user_id: member.id })
       .subscribe(
       json => {
-        let data = normalize(json.data, schema.userGroup)
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_GROUPS,
-          payload: data
-        })
+        let entities = normalize(json.data, schema.userGroup).entities
+        let groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveGroups({groups}))
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -92,11 +88,9 @@ export class UserGroupService {
       .put<schema.IApiResponse>(`user_groups/${group.id}/add_member.json`, { user_id: member.id })
       .subscribe(
       json => {
-        let data = normalize(json.data, schema.userGroup)
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_GROUPS,
-          payload: data
-        })
+        let entities = normalize(json.data, schema.userGroup).entities
+        let groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveGroups({groups}));
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -111,11 +105,9 @@ export class UserGroupService {
       })
       .subscribe(
       json => {
-        let data = normalize(json.data, schema.userGroup)
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_GROUPS,
-          payload: data
-        })
+        let entities = normalize(json.data, schema.userGroup).entities
+        let groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveGroups({groups}));
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -130,16 +122,12 @@ export class UserGroupService {
       .pipe(share());
     o.subscribe(
       json => {
-        let data = normalize(json.data, schema.userGroup)
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_GROUPS,
-          payload: data
-        })
-        if (data.entities['users'] !== undefined) {
-          this.ngRedux.dispatch({
-            type: UserActions.RECEIVE,
-            payload: data.entities['users']
-          })
+        let entities = normalize(json.data, schema.userGroup).entities
+        let groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveGroups({groups}));
+        if (entities['users'] !== undefined) {
+          let users = entityFactory(entities['users'], defaultUser);
+          this.store.dispatch(actions.receiveUser({users}));
         }
         this.messageService.setMessages(json.messages);
       },
@@ -158,11 +146,9 @@ export class UserGroupService {
 
     o.subscribe(
       json => {
-        let data = normalize(json.data, schema.userGroup)
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_OWNER_GROUPS,
-          payload: data
-        })
+        let entities = normalize(json.data, schema.userGroup).entities
+        let groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveOwnerGroups({groups}))
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -181,11 +167,9 @@ export class UserGroupService {
       .pipe(share());
     o.subscribe(
       json => {
-        let data = normalize(json.data, schema.userGroup)
-        this.ngRedux.dispatch({
-          type: UserGroupActions.RECEIVE_GROUPS,
-          payload: data
-        })
+        let entities = normalize(json.data, schema.userGroup).entities
+        let groups = entityFactory(entities['user_groups'], defaultUserGroup);
+        this.store.dispatch(actions.receiveGroups({groups}))
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -198,10 +182,7 @@ export class UserGroupService {
       .delete<schema.IApiResponse>(`user_groups/${group.id}.json`)
       .subscribe(
       json => {
-        this.ngRedux.dispatch({
-          type: UserGroupActions.REMOVE,
-          payload: group.id
-        })
+        this.store.dispatch(actions.removeUserGroup({id: group.id}));
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)

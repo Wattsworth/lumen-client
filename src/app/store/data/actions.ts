@@ -1,50 +1,41 @@
+import {createAction, props} from '@ngrx/store'
+import * as types from './types';
 
-export const NilmActions = {
-  'RECEIVE': 'NILM_RECEIVE',
-  'REFRESHING': 'NILM_REFRESHING',
-  'REFRESHED': 'NILM_REFRESHED',
-  'REMOVE': 'NILM_REMOVE',
-};
-export const DataAppActions = {
-  'RECEIVE': 'DATA_APP_RECEIVE'
-};
-export const DbFolderActions = {
-  'RECEIVE': 'DB_FOLDER_RECEIVE'
-};
-export const DbStreamActions = {
-  'RECEIVE': 'DB_STREAM_RECEIVE',
-  'RELOAD_ANNOTATIONS': 'DB_STREAM_RELOAD_ANNOTATIONS',
-  'REFRESHED_ANNOTATIONS': 'DB_STREAM_REFRESHED_ANNOTATIONS'
+export const receiveNilm = createAction('[NILM] Receive', props<{nilms: types.INilm[]}>());
+export const refreshingNilm = createAction('[NILM] Refreshing', props<{id: number}>());
+export const refreshedNilm = createAction('[NILM] Refreshed', props<{id: number}>());
+export const removeNilm = createAction('[NILM] Remove', props<{id: number}>());
 
-};
-export const DbElementActions = {
-  'RECEIVE': 'DB_ELEMENT_RECEIVE',
-  'SET_COLOR': 'DB_ELEMENT_SET_COLOR',
-  'SET_DISPLAY_NAME': 'DB_ELEMENT_SET_DISPLAY_NAME',
-  'RESTORE': 'DB_ELEMENT_RESTORE',
-  'RESET': 'DB_ELEMENT_RESET'
-};
-export const AnnotationActions = {
-  'RECEIVE': 'ANNOTATION_RECEIVE',
-  'REMOVE': 'ANNOTATION_REMOVE'
-};
-export const UserActions = {
-  'SET_CURRENT': 'USER_SET_CURRENT',
-  'RECEIVE': 'USER_RECEIVE',
-  'RECEIVE_INSTALLATION_TOKEN': 'USER_RECEIVE_INSTALLATION_TOKEN',
-  'INSTALLATION_TOKENS_UNAVAILABLE': 'USER_INSTALLATION_TOKENS_UNAVAILABLE'
-};
-export const UserGroupActions = {
-  'RECEIVE_OWNER_GROUPS': 'USER_GROUP_RECEIVE_OWNER_GROUPS',
-  'RECEIVE_MEMBER_GROUPS': 'USER_GROUP_RECEIVE_MEMBER_GROUPS',
-  'RECEIVE_GROUPS': 'USER_GROUP_RECEIVE_GROUPS',
-  'REMOVE': 'USER_GROUP_REMOVE'
-};
-export const PermissionActions = {
-  'RECEIVE': 'PERMISSION_RECEIVE',
-  'REMOVE': 'PERMISSION_REMOVE'
-};
-export const DataViewActions = {
-  'RECEIVE': 'DATA_VIEW_RECEIVE',
-  'REMOVE': 'DATA_VIEW_REMOVE'
-}
+export const receiveDataApp = createAction('[DATA_APP] Receive', props<{apps: types.IDataApp[]}>());
+
+export const receiveDbFolder = createAction('[FOLDER] Receive', props<{folders: types.IDbFolder[]}>());
+
+export const receiveDbStream = createAction('[STREAM] Receive', props<{streams: types.IDbStream[]}>());
+export const reloadStreamAnnotations = createAction('[STREAM] Reload Annotations', props<{id: number}>());
+export const refreshedAnnotations = createAction('[STREAM] Refreshed Annotations', props<{id: number}>());
+
+export const receiveDbElement = createAction('[ELEMENT] Receive', props<{elements: types.IDbElement[]}>());
+export const setDbElementColor = createAction('[ELEMENT] Set Color', props<{id: number, color: string}>());
+export const setDbElementName = createAction('[ELEMENT] Set Display Name', props<{id: number, name: string}>());
+export const restoreDbElement = createAction('[ELEMENT] Restore', props<{elements: types.IDbElement[]}>());
+export const resetDbElement = createAction('[ELEMENT] Reset');
+
+export const receiveAnnotation = createAction('[ANNOTATION] Receive', props<{annotations: types.IAnnotation[]}>());
+export const removeAnnotation = createAction('[ANNOTATION] Remove', props<{id: string}>());
+
+export const setCurrentUser = createAction('[USER] Set Current', props<{user: types.IUser}>());
+export const receiveUser = createAction('[USER] Receive', props<{users: types.IUser[]}>());
+export const receiveUserInstallationToken = createAction('[USER] Receive Installation Token', props<{token: string}>());
+export const installationTokensUnavailable = createAction('[USER] Installation Tokens Unavailable');
+
+export const receiveOwnerGroups = createAction('[USER GROUP] Receive Owner', props<{groups: types.IUserGroup[]}>())
+export const receiveMemberGroups = createAction('[USER GROUP] Receive Member', props<{groups: types.IUserGroup[]}>())
+export const receiveGroups = createAction('[USER GROUP] Receive Other', props<{groups: types.IUserGroup[]}>())
+export const removeUserGroup = createAction('[USER GROUP] Remove', props<{id: number}>())
+
+export const receivePermission = createAction('[PERMISSION] Receive', props<{permissions: types.IPermission[]}>())
+export const removePermission = createAction('[PERMISSION] Remove', props<{id: number}>())
+
+export const receiveDataView = createAction('[DATA VIEW] Receive', props<{views: types.IDataView[]}>())
+export const removeDataView = createAction('[DATA VIEW] Remove', props<{id: number}>())
+

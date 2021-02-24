@@ -86,7 +86,7 @@ const routes: Routes = [
     path: '',
     redirectTo: 'explorer',
     pathMatch: 'full',
-    canActivate: [AuthGuard]
+    //canActivate: [AuthGuard]
   },
   {
     path: 'explorer',
@@ -123,5 +123,5 @@ const routes: Routes = [
 
 ];
 
-export const appRoutes: ModuleWithProviders =
+export const appRoutes: ModuleWithProviders<RouterModule> =
   RouterModule.forRoot(routes);

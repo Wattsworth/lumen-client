@@ -9,7 +9,7 @@
   </thead>-->
 
   <!-- nilms with admin or owner privleges -->
-  <tr *ngFor="let nilm of nilmArray$ | async">
+  <tr *ngFor="let nilm of nilms$ | async">
     <!-- Installation status (nilm state) -->
     <td style="vertical-align: middle">
       <fa-icon *ngIf="nilm.available" [icon]="['fas', 'circle']" size="2x" class="icon available" tooltip="online"></fa-icon>
@@ -35,7 +35,7 @@
   </tr>
 </table>
 <!-- ...or a message if the user doesn't have access to any installations -->
-<div class="alert alert-info" *ngIf="(nilmArray$ | async).length==0">
+<div class="alert alert-info" *ngIf="(nilms$ | async).length==0">
     You do have access to any installations</div>
 
 <!-- add a new NILM -->

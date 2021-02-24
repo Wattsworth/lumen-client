@@ -1,51 +1,30 @@
-import { IPayloadAction } from '../../../store/helpers';
-import { InterfaceActions } from './actions';
-import {
-  IState,
-  IStateRecord
-} from './types';
+import { createReducer, on } from '@ngrx/store';
 
+import * as actions from './actions';
+import { IInterfaceState } from './types';
 import {
-  INITIAL_STATE
+  defaultInterfaceState
 } from './initial-state';
 
-import * as _ from 'lodash';
-
-
-export function reducer(
-  state: IStateRecord = INITIAL_STATE,
-  action: IPayloadAction): IStateRecord {
-
-  switch (action.type) {
-    //add interface to the display and select it
-    //
-    case InterfaceActions.ADD:
+export const reducer = createReducer(
+  defaultInterfaceState,
+  on(actions.addInterface, (state: IInterfaceState, {id})=>{
+    if (state.displayed.indexOf(id)>-1){
       //just select the id if it is already in the state
-      if(state['displayed'].indexOf(action.payload) > -1)
-        return state.set('selected',action.payload)
-      return state
-        .set('displayed',state['displayed'].concat([action.payload]))
-        .set('selected',action.payload);
-    
-    //remove interface from the display
-    //
-    case InterfaceActions.REMOVE:
+      return {...state, selected: id};
+    } else {
+      //otherwise add it and select it
+      return ({...state, selected: id, displayed: [...state.displayed, id]});
+    }
+  }),
+  on(actions.removeInterface, (state: IInterfaceState, {id})=>{
+    if(id==state.selected){
       //if removed interface is selected switch to explorer
-      if(state['selected']==action.payload)
-        return state
-          .set('selected', null)
-          .set('displayed', 
-            state['displayed'].filter(id => id!=action.payload));
+      return  {...state, selected: null, displayed: state.displayed.filter(fid=>fid!=id)}
+    } else {
       //otherwise just remove the interface
-      return state
-        .set('displayed',
-          state['displayed'].filter(id => id!=action.payload));
-
-    //select a displayed interface
-    case InterfaceActions.SELECT:
-      return state.set('selected',action.payload)
-
-    default:
-      return state;
-  }
-}
+      return  {...state, displayed: state.displayed.filter(fid=>fid!=id)}
+    }
+  }),
+  on(actions.selectInterface, (state: IInterfaceState, {id})=>({...state, selected: id})),
+  )

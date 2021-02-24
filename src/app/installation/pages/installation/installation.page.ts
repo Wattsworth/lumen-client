@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, filter, tap } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
 import { environment } from '../../../../environments/environment'
 import {
   NilmService, SessionService,
@@ -16,6 +15,7 @@ import {
 import {
   INilm
 } from '../../../store/data';
+import {InstallationSelectors} from '../../installation.selectors';
 
 import { ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -27,7 +27,6 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 })
 export class InstallationPageComponent implements OnInit {
 
-  @select(['data', 'nilms']) nilms$: Observable<INilm[]>;
   @ViewChild('childModal', {static: false}) public childModal: ModalDirective;
 
   public nilm$: Observable<INilm>
@@ -39,7 +38,8 @@ export class InstallationPageComponent implements OnInit {
     private route: ActivatedRoute,
     private session: SessionService,
     private nilmService: NilmService,
-    private installationService: InstallationService
+    private installationService: InstallationService,
+    private selectors: InstallationSelectors
   ) {
     this.helpUrl = environment.helpUrl;
 
@@ -54,7 +54,7 @@ export class InstallationPageComponent implements OnInit {
       this.installationService.setNilm(+params['id'])
     }));
 
-    this.nilm$ = combineLatest(this.nilms$, this.route.params).pipe(
+    this.nilm$ = combineLatest([this.selectors.nilms$, this.route.params]).pipe(
       map(([nilms, params]) => nilms[params['id']]),
       filter(nilm => !(nilm === undefined)));
   }

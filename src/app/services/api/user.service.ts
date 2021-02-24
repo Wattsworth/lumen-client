@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store'
 import { HttpClient } from '@angular/common/http';
-import { NgRedux } from '@angular-redux/store';
 import { normalize } from 'normalizr';
+import * as types  from '../../store/data/types';
+import {entityFactory, defaultUser} from '../../store/data/initial-state';
 import * as schema from '../../api';
 import {map} from 'rxjs/operators';
-import { IAppState } from '../../app.store';
-import {
-  UserActions,
-} from '../../store/data';
+import { 
+  receiveUser, 
+  installationTokensUnavailable, 
+  receiveUserInstallationToken } from '../../store/data/actions'
 import {
   MessageService
 } from '../message.service';
@@ -23,7 +24,7 @@ export class UserService {
   constructor(
     //private http: Http,
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private messageService: MessageService,
     private router: Router
   ) {
@@ -34,16 +35,13 @@ export class UserService {
     //only execute request once
     if (this.usersLoaded)
       return;
-
     this.http
       .get('users.json', {}).pipe(
         map(json => normalize(json, schema.users).entities))
       .subscribe(
       entities => {
-        this.ngRedux.dispatch({
-          type: UserActions.RECEIVE,
-          payload: entities['users']
-        });
+        let users: types.IUser[] = entityFactory(entities.users, defaultUser)
+        this.store.dispatch(receiveUser({users}))
         this.usersLoaded = true;
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -55,15 +53,10 @@ export class UserService {
       .post('users/auth_token.json',{})
       .subscribe(
       data => {
-        this.ngRedux.dispatch({
-          type: UserActions.RECEIVE_INSTALLATION_TOKEN,
-          payload: data["key"]
-        });
+        this.store.dispatch(receiveUserInstallationToken({token: data["key"]}));
       },
       error => {
-        this.ngRedux.dispatch({
-          type: UserActions.INSTALLATION_TOKENS_UNAVAILABLE,
-        });
+        this.store.dispatch(installationTokensUnavailable());
       }
     )
   }

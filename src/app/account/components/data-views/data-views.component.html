@@ -1,4 +1,4 @@
-<div *ngFor="let view of myDataViewArray$ | async" class="clearfix">
+<div *ngFor="let view of dataViews$ | async" class="clearfix">
   <!-- add icon to indicate the home view -->
   <fa-icon [icon]="['fas', 'home']" *ngIf="view.home"></fa-icon>
   <!-- view title -->
@@ -11,7 +11,7 @@
   
 </div>
 <!-- ...or a message if the user doesn't own any groups -->
-<div class="alert alert-info" *ngIf="(myDataViewArray$ | async).length==0">
+<div class="alert alert-info" *ngIf="(dataViews$ | async).length==0">
   You do not have any saved views</div>
 
 <!-- ====== update data view modal ====== -->

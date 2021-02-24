@@ -1,11 +1,8 @@
 import { Injectable, OnInit, OnDestroy } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
-import * as _ from 'lodash';
-import {
-  MeasurementActions,
-  IRange,
-  AnnotationUIActions,
-} from '../store';
+import { Store } from '@ngrx/store';
+import { IRange } from '../store';
+import * as MeasurementActions from '../store/measurement/actions';
+import * as AnnotationActions from '../store/annotations/actions';
 import {
   MeasurementSelectors,
   PlotSelectors
@@ -19,7 +16,7 @@ export class MeasurementService {
 
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store<IAppState>,
     private plotService: PlotService,
     private measurementSelectors: MeasurementSelectors,
     private plotSelectors: PlotSelectors
@@ -29,89 +26,63 @@ export class MeasurementService {
   //start measurement mode
   //
   public startMeasurement() {
-    this.ngRedux.dispatch({
-      type: MeasurementActions.ENABLE
-    })
+    this.store.dispatch(MeasurementActions.enableMeasurements());
   }
 
   //exit measurement mode
   //
   public cancelMeasurement() {
-    this.ngRedux.dispatch({
-      type: MeasurementActions.DISABLE
-    })
+    this.store.dispatch(MeasurementActions.disableMeasurements());
+
   }
 
   //makeMeasurement
   //  make a measurement over the specified range
   //
   public setRange(range: IRange) {
-    this.ngRedux.dispatch({
-      type: MeasurementActions.SET_RANGE,
-      payload: range
-    })
+    this.store.dispatch(MeasurementActions.setMeasurementRange({range}));
   }
 
   //eraseMeasurement
   //
   public clearRange(){
-    this.ngRedux.dispatch({
-      type: MeasurementActions.CLEAR_RANGE,
-    });
+    this.store.dispatch(MeasurementActions.clearMeasurementRange())
   }
 
   //set zero to current measurement range
   //
   public setZero() {
     //hide annotation if displayed
-    this.ngRedux.dispatch({
-      type: AnnotationUIActions.HIDE_ANNOTATION
-    });
-    this.ngRedux.dispatch({
-      type: MeasurementActions.SET_ZERO,
-    })
+    this.store.dispatch(AnnotationActions.hideAnnotation());
+    this.store.dispatch(MeasurementActions.setMeasurementZero());
   }
 
   //remove the zero
   public clearZero(){
-    this.ngRedux.dispatch({
-      type: MeasurementActions.CLEAR_ZERO
-    })
+    this.store.dispatch(MeasurementActions.clearMeasurementZero());
   }
 
   //set whether the measurement is relative
   //
-  public setRelative(x: boolean) {
-    this.ngRedux.dispatch({
-      type: MeasurementActions.SET_RELATIVE,
-      payload: x
-    })
+  public setRelative(relative: boolean) {
+    this.store.dispatch(MeasurementActions.setRelativeMeasurementMode({relative}))
   }
 
   //set the direct measurements
   //
   public setDirectMeasurements(measurements: IMeasurementSet) {
-    this.ngRedux.dispatch({
-      type: MeasurementActions.SET_DIRECT_MEASUREMENTS,
-      payload: measurements
-    })
+    this.store.dispatch(MeasurementActions.setDirectMeasurements({measurements}))
   }
 
   //set the relative measurements
   //
   public setRelativeMeasurements(measurements: IMeasurementSet) {
-    this.ngRedux.dispatch({
-      type: MeasurementActions.SET_RELATIVE_MEASUREMENTS,
-      payload: measurements
-    })
+    this.store.dispatch(MeasurementActions.setRelativeMeasurements({measurements}))
   }
 
   //add new zero measurements 
   //
   public addZeroMeasurements(measurements: IMeasurementSet){
-    this.ngRedux.dispatch({
-      type: MeasurementActions.ADD_ZERO_MEASUREMENTS,
-      payload: measurements
-    })
+    this.store.dispatch(MeasurementActions.addZeroMeasurements({measurements}))
   }
 }

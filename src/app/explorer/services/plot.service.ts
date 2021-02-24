@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
-import * as _ from 'lodash';
-import {
-  PlotActions,
-  IRange
-} from '../store';
+import { createSelector, Store } from '@ngrx/store';
+import * as _ from 'lodash-es';
+import { IRange } from '../store';
+import { take } from 'rxjs/operators'
+import * as PlotActions from '../store/plot/actions';
 import { IAppState } from '../../app.store';
+import * as plotStore from '../store/plot/types';
 import { MessageService } from '../../services/';
 import {
   IDbElement,
@@ -18,13 +18,15 @@ import {
   DataService,
   DbElementService,
 } from '../../services';
+import { data_, explorer_UI_ } from 'app/selectors';
+import { Dictionary } from '@ngrx/entity';
 
 
 @Injectable()
 export class PlotService {
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store<IAppState>,
     private messageService: MessageService,
     private dataService: DataService,
     private elementService: DbElementService
@@ -34,115 +36,79 @@ export class PlotService {
   //
   public plotElement(element, axis: string = 'either') {
     this.elementService.assignColor(element);
-    this.ngRedux.dispatch({
-      type: PlotActions.PLOT_ELEMENT,
-      payload: element
-    })
+    this.store.dispatch(PlotActions.plotElement({element}));
   }
 
   // remove element from plot
   //
   public hideElement(element) {
-    this.ngRedux.dispatch({
-      type: PlotActions.HIDE_ELEMENT,
-      payload: element
-    })
+    this.store.dispatch(PlotActions.hideElement({id: element.id}));
     this.elementService.removeColor(element);
   }
 
   // remove all elements from the plot
-  /*public hideAllElements() {
-    let elementRecords = this.ngRedux.getState().data.dbElements;
-    Object.keys(elementRecords)
-      .map(id => {
-        this.hideElement(elementRecords[id]);
+  public hideAllElements() {
+    let elements: Dictionary<IDbElement>
+    this.store.select(
+      createSelector(data_,state=>state.dbElements.entities))
+      .pipe(take(1)).subscribe(state => elements=state);
+    Object.values(elements)
+      .map(element => {
+        this.hideElement(element);
       })
-  }*/
+    }
 
   public setElementAxis(element: IDbElement, axis: string) {
-    //if the destination axis has elements plotted, this element
-    //must have the same units, otherwise return false
-    if (axis == "left") {
-      if (this.ngRedux.getState().ui.explorer.plot.left_elements.length > 0 &&
-        element.units != this.ngRedux.getState().ui.explorer.plot.left_units)
-        return false;
-    } else if (axis == "right") {
-      if (this.ngRedux.getState().ui.explorer.plot.right_elements.length > 0 &&
-        element.units != this.ngRedux.getState().ui.explorer.plot.right_units)
-        return false;
-    } else {
-      console.log(`invalid axis ${axis}`)
-      return false;
-    }
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_ELEMENT_AXIS,
-      payload: {
-        element: element,
-        axis: axis
-      }
-    })
+    //the reducer verifies that the element can switch axes
+    this.store.dispatch(PlotActions.setElementAxis({element, axis}));
   }
   public showPlot() {
-    if (this.ngRedux.getState().ui.explorer.plot.show_plot == false)
-      this.ngRedux.dispatch({
-        type: PlotActions.SHOW_PLOT
-      })
+    this.store.dispatch(PlotActions.showPlot());
   }
   public showDateSelector() {
-    this.ngRedux.dispatch({
-      type: PlotActions.SHOW_DATE_SELECTOR
-    })
+    this.store.dispatch(PlotActions.showDateSelector());
   }
   public hideDateSelector() {
-    this.ngRedux.dispatch({
-      type: PlotActions.HIDE_DATE_SELECTOR
-    })
+    this.store.dispatch(PlotActions.hideDateSelector());
   }
 
   public hidePlot() {
-    if (this.ngRedux.getState().ui.explorer.plot.show_plot)
-      this.ngRedux.dispatch({
-        type: PlotActions.HIDE_PLOT
-      })
+    this.store.dispatch(PlotActions.hidePlot());
   }
   public loadPlotData(
     elements: IDbElement[],
     timeRange: IRange,
     resolution: number
   ) {
-
-    let existingData = this.ngRedux.getState().ui.explorer.plot.plot_data;
+    let existingData:IDataSet
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot.plot_data))
+      .pipe(take(1)).subscribe(state => existingData=state);
+    //let existingData = this.ngRedux.getState().ui.explorer.plot.plot_data;
     let neededElements = this.findNeededElements(elements, existingData, timeRange);
     if (neededElements.length == 0)
       return; //nothing to do
-    this.ngRedux.dispatch({
-      type: PlotActions.ADDING_PLOT_DATA
-    });
+    this.store.dispatch(PlotActions.addingPlotData());
     //add padding to plot data if ranges are not null
     this.dataService.loadData(
       timeRange.min, timeRange.max, 
       neededElements, resolution, 0.25)
-      .subscribe(data => {
-        this.ngRedux.dispatch({
-          type: PlotActions.ADD_PLOT_DATA,
-          payload: data
-        })
-      },
-      error => {
-        //nothing came back so create dummy error entries
-        this.ngRedux.dispatch({
-          type: PlotActions.ADD_PLOT_DATA,
-          payload: neededElements.reduce((acc,e) => {
-            acc[e.id] = {
-              'element_id': e.id,
-              'type': 'error',
-              'data': [],
-              'start_time': timeRange.min==null?0:timeRange.min,
-              'end_time': timeRange.max==null?0:timeRange.max
-            }
-            return acc
-          },{}) 
-        })
+      .subscribe(
+        data => {this.store.dispatch(PlotActions.addPlotData({data}))},
+        error => {
+          //nothing came back so create dummy error entries
+          this.store.dispatch(PlotActions.addPlotData({
+            data: neededElements.reduce((acc,e) => {
+              acc[e.id] = {
+                'element_id': e.id,
+                'type': 'error',
+                'data': [],
+                'start_time': timeRange.min==null?0:timeRange.min,
+                'end_time': timeRange.max==null?0:timeRange.max
+              }
+              return acc
+            },{})
+          })) 
       })
   }
   public loadNavData(
@@ -150,25 +116,23 @@ export class PlotService {
     timeRange: IRange,
     resolution
   ) {
-    let existingData = this.ngRedux.getState().ui.explorer.plot.nav_data;
+    
+    let existingData:IDataSet
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot.nav_data))
+      .pipe(take(1)).subscribe(state => existingData=state);    
     let neededElements = this.findNeededElements(elements, existingData, timeRange);
     if (neededElements.length == 0)
       return; //nothing to do
-    this.ngRedux.dispatch({
-      type: PlotActions.ADDING_NAV_DATA
-    });
+    this.store.dispatch(PlotActions.addingNavData());
+
     this.dataService.loadData(
       timeRange.min, timeRange.max, neededElements, resolution)
-      .subscribe(data => {
-        this.ngRedux.dispatch({
-          type: PlotActions.ADD_NAV_DATA,
-          payload: data
-        })
-      },
-      error => {
-        this.ngRedux.dispatch({
-          type: PlotActions.ADD_NAV_DATA,
-          payload: neededElements.reduce((acc,e) => {
+      .subscribe(
+        data => {this.store.dispatch(PlotActions.addNavData({data}));},
+        error => {
+          this.store.dispatch(PlotActions.addNavData({
+           data: neededElements.reduce((acc,e) => {
             acc[e.id] = {
               'element_id': e.id,
               'type': 'error',
@@ -178,80 +142,56 @@ export class PlotService {
             }
             return acc
           },{}) //nothing came back so create dummy error entries
-        })
+        }))
       })
   }
 
   public toggleNavZoomLock() {
-    this.ngRedux.dispatch({
-      type: PlotActions.TOGGLE_ZOOM_LOCK
-    });
+    this.store.dispatch(PlotActions.toggleZoomLock());
+
   }
   public disableNavZoomLock() {
-    this.ngRedux.dispatch({
-      type: PlotActions.DISABLE_ZOOM_LOCK
-    });
+    this.store.dispatch(PlotActions.disableZoomLock());
+
   }
   public toggleDataCursor() {
-    this.ngRedux.dispatch({
-      type: PlotActions.TOGGLE_DATA_CURSOR
-    });
+    this.store.dispatch(PlotActions.toggleDataCursor());
+
   }
   public disableDataCursor() {
-    this.ngRedux.dispatch({
-      type: PlotActions.DISABLE_DATA_CURSOR
-    });
+    this.store.dispatch(PlotActions.disableDataCursor());
+
   }
   public setLiveUpdateInterval(rate: number){
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_LIVE_UPDATE_INTERVAL,
-      payload: rate
-    });
+    this.store.dispatch(PlotActions.setLiveUpdateInterval({rate}));
   }
   public toggleLiveUpdate() {
-    this.ngRedux.dispatch({
-      type: PlotActions.TOGGLE_LIVE_UPDATE
-    });
+    this.store.dispatch(PlotActions.toggleLiveUpdate());
+
   }
   public disableLiveUpdate() {
-    this.ngRedux.dispatch({
-      type: PlotActions.DISABLE_LIVE_UPDATE
-    });
+    this.store.dispatch(PlotActions.disableLiveUpdate());
   }
+
   public toggleShowDataEnvelope() {
-    this.ngRedux.dispatch({
-      type: PlotActions.TOGGLE_SHOW_DATA_ENVELOPE
-    });
+    this.store.dispatch(PlotActions.toggleDataEnvelope());
+
   }
   public setPlotTimeRange(range: IRange) {
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_PLOT_TIME_RANGE,
-      payload: range
-    })
+    this.store.dispatch(PlotActions.setPlotTimeRange({range}));
   }
   public setNavTimeRange(range: IRange) {
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_NAV_TIME_RANGE,
-      payload: range
-    })
+    this.store.dispatch(PlotActions.setNavTimeRange({range}));
   }
   public setNavRangeToPlotRange() {
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_NAV_RANGE_TO_PLOT_RANGE
-    })
+    this.store.dispatch(PlotActions.setNavRangeToPlotRange());
   }
   public autoScaleAxis(axis: string) {
-    this.ngRedux.dispatch({
-      type: PlotActions.AUTO_SCALE_AXIS,
-      payload: axis
-    })
+    this.store.dispatch(PlotActions.autoScaleAxis({axis}));
   }
 
   public resetTimeRanges() {
-    //remove main plot time range
-    this.ngRedux.dispatch({
-      type: PlotActions.RESET_TIME_RANGES
-    })
+    this.store.dispatch(PlotActions.resetTimeRanges());
   }
 
   public setTimeRangeToNow(){
@@ -268,77 +208,50 @@ export class PlotService {
     });
   }
   public autoScaleTime() {
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_PLOT_TIME_RANGE,
-      payload: {min: null, max: null}
-    })
+    this.store.dispatch(PlotActions.setPlotTimeRange({range: {min: null, max:null}}));
   }
 
-  public setDataViewFilterText(text: string) {
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_DATA_VIEW_FILTER_TEXT,
-      payload: text
-    })
+  public setDataViewFilterText(filter: string) {
+    this.store.dispatch(PlotActions.setDataViewFilterText({filter}));
   }
+
   public setShowPublicDataViews(show: boolean) {
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_SHOW_PUBLIC_DATA_VIEWS,
-      payload: show
-    })
+    this.store.dispatch(PlotActions.showPublicDataViews({show}));
   }
 
   public setLeftAxisSettings(settings: IAxisSettings){
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_LEFT_AXIS_SETTINGS,
-      payload: settings
-    })
+    this.store.dispatch(PlotActions.setLeftAxisSettings({settings}));
   }
 
   public toggleLeftAxisSettings(){
-    this.ngRedux.dispatch({
-      type: PlotActions.TOGGLE_LEFT_AXIS_SETTINGS
-    })
+    this.store.dispatch(PlotActions.toggleLeftAxisSettings());
   }
 
   public setRightAxisSettings(settings: IAxisSettings){
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_RIGHT_AXIS_SETTINGS,
-      payload: settings
-    })
+    this.store.dispatch(PlotActions.setRightAxisSettings({settings}));
   }
 
   public toggleRightAxisSettings(){
-    this.ngRedux.dispatch({
-      type: PlotActions.TOGGLE_RIGHT_AXIS_SETTINGS
-    })
+    this.store.dispatch(PlotActions.toggleRightAxisSettings());
   }
 
   public setTimeAxisSettings(settings: IAxisSettings){
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_TIME_AXIS_SETTINGS,
-      payload: settings
-    })
+    this.store.dispatch(PlotActions.setTimeAxisSettings({settings}));
   }
 
   public toggleTimeAxisSettings(){
-    this.ngRedux.dispatch({
-      type: PlotActions.TOGGLE_TIME_AXIS_SETTINGS
-    })
+    this.store.dispatch(PlotActions.toggleTimeAxisSettings());
   }
 
   //set flag to indicate nilms have been loaded
   //
   public setNilmsLoaded(){
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_NILMS_LOADED
-    })
+    this.store.dispatch(PlotActions.setNilmLoaded());
   }
   //set flag to indicate data views have been loaded
   //
   public setDataViewsLoaded(){
-    this.ngRedux.dispatch({
-      type: PlotActions.SET_DATA_VIEWS_LOADED
-    })
+    this.store.dispatch(PlotActions.setDataViewsLoaded());
   }
 
 
@@ -434,8 +347,10 @@ export class PlotService {
   // (if units match an existing axis or an axis is empty)
   //
   isPlottable(units: string){
-    let state = this.ngRedux.getState();
-    let plotState = state.ui.explorer.plot;
+    let plotState:plotStore.IState;
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot))
+      .pipe(take(1)).subscribe(state => plotState=state);
     if (plotState.left_units == units ||
       plotState.right_units == units ||
       plotState.left_elements.length == 0 ||
@@ -448,8 +363,10 @@ export class PlotService {
   //isPlotted: return true if the element is currently 
   // shown on the plot
   isPlotted(element: IDbElement){
-    let state = this.ngRedux.getState();
-    let plotState = state.ui.explorer.plot;
+    let plotState:plotStore.IState;
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot))
+      .pipe(take(1)).subscribe(state => plotState=state);   
     if (_.includes(plotState.left_elements, element.id) ||
       _.includes(plotState.right_elements, element.id)) {
       return true;
@@ -460,9 +377,11 @@ export class PlotService {
   //getPlotData: return IDataSet of plot data
   //
   getPlotData(){
-    let state = this.ngRedux.getState();
-    let plotState = state.ui.explorer.plot;
-    return plotState.plot_data;
+    let plotData:IDataSet
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot.nav_data))
+      .pipe(take(1)).subscribe(state => plotData=state); 
+    return plotData;
   }
   //PRIVATE
   private findNeededElements(

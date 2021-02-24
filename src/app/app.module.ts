@@ -2,15 +2,17 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { NgReduxModule, NgRedux } from '@angular-redux/store';
 import { appRoutes, JwtInterceptor } from './app.routes';
 import { AppComponent } from './app.component';
 import { SERVICE_PROVIDERS } from './services';
-import { EPIC_PROVIDERS } from './epics';
+import { PageEffects } from './effects/page.effects';
 import { AuthGuard } from './app.guards';
 import { AlertModule } from 'ngx-bootstrap/alert';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {ProgressbarModule } from 'ngx-bootstrap/progressbar';
+import './rxjs-operators';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { StoreModule } from '@ngrx/store';
 
 import { AccountModule } from './account/account.module';
 import { InstallationModule } from './installation/installation.module';
@@ -21,9 +23,16 @@ import {
   SessionComponent,
 } from './components';
 
-import './rxjs-operators';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
+import {
+  IAppState,
+  uiReducer,
+} from './app.store';
+import {
+  reducer
+} from './store/data'
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { EffectsModule } from '@ngrx/effects';
 
 
 @NgModule({
@@ -37,7 +46,6 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
-    NgReduxModule,
     RouterModule,
     AlertModule.forRoot(),
     ProgressbarModule.forRoot(),
@@ -45,7 +53,16 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
     AccountModule,
     InstallationModule,
     ExplorerModule,
-    appRoutes
+    appRoutes,
+    StoreModule.forRoot({
+      ui: uiReducer,
+      data: reducer
+    }),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25, //retain last 25 states
+      logOnly: false
+    }),
+    EffectsModule.forRoot([PageEffects])
   ],
   providers: [
     AuthGuard,
@@ -55,7 +72,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
       multi: true
     },
     SERVICE_PROVIDERS,
-    EPIC_PROVIDERS
+    //EPIC_PROVIDERS
   ],
   bootstrap: [AppComponent]
 })

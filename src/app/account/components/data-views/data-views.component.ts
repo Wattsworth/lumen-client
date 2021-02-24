@@ -1,33 +1,37 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
 import { ModalDirective } from 'ngx-bootstrap/modal';
+import * as _ from 'lodash-es';
 
 import {
   DataViewService
 } from '../../../services';
 import {
   IDataView,
-  IDataViewRecords
 } from '../../../store/data';
+import { Store, createSelector, select } from '@ngrx/store';
+import { dataViews_ } from 'app/selectors';
 
 @Component({
   selector: 'app-data-views',
   templateUrl: './data-views.component.html',
   styleUrls: ['./data-views.component.css']
 })
-export class DataViewsComponent implements OnInit {
+export class DataViewsComponent{
   @ViewChild('editDataViewModal', {static: false}) public editViewModal: ModalDirective;
-  @select(['data', 'dataViews']) dataViews$: Observable<IDataViewRecords>;
   
-  public myDataViewArray$: Observable<IDataView[]>
+  public dataViews$ = this.store.pipe(
+    select(dataViews_),
+    map(dataViews => Object.values(dataViews).filter(view => view.owner)));
   
   //the current view being editted
   public activeView: IDataView;
 
   constructor(
-    public dataViewService: DataViewService
+    private store: Store,
+    public dataViewService: DataViewService,
+    
   ) {
   }
 
@@ -38,7 +42,7 @@ export class DataViewsComponent implements OnInit {
   }
 
   editDataView(view){
-    this.activeView = view.toJS();
+    this.activeView = _.cloneDeep(view);
     this.editViewModal.show();
   }
   updateDataView(view){
@@ -46,15 +50,4 @@ export class DataViewsComponent implements OnInit {
       .subscribe( success => this.editViewModal.hide(),
       _ => console.log('error updating view'))
   }
-  ngOnInit() {
-     this.myDataViewArray$ = this.dataViews$.pipe(
-      map(dataViews => {
-        return Object.keys(dataViews)
-          .map(id => dataViews[id])
-          .filter(dataView => {
-            return dataView.owner
-          });
-      }));
-  }
-
 }

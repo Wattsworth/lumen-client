@@ -6,7 +6,7 @@ import {
   AbstractControl
 } from '@angular/forms';
 
-import { IDataViewRecord } from '../../../store/data/'
+import { IDataView } from '../../../store/data/'
 import { DataViewService } from '../../../services';
 
 @Component({
@@ -16,8 +16,8 @@ import { DataViewService } from '../../../services';
 })
 export class DataViewFormComponent implements OnInit, OnChanges {
 
-  @Input() view: IDataViewRecord;
-  @Output() save: EventEmitter<IDataViewRecord>;
+  @Input() view: IDataView;
+  @Output() save: EventEmitter<IDataView>;
   @Output() cancel: EventEmitter<any>;
 
   public myForm: FormGroup;

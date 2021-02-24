@@ -1,12 +1,14 @@
-export const MeasurementActions = {
-  'ENABLE': 'EXPLORER_MEASUREMENT_ENABLE',
-  'DISABLE': 'EXPLORER_MEASUREMENT_DISABLE',
-  'SET_RANGE': 'EXPLORER_MEASUREMENT_SET_RANGE',
-  'CLEAR_RANGE': 'EXPLORER_MEASUREMENT_CLEAR_RANGE',
-  'SET_ZERO': 'EXPLORER_MEASUREMENT_SET_ZERO',
-  'SET_DIRECT_MEASUREMENTS': 'EXPLORER_MEASUREMENT_SET_DIRECT_MEASUREMENTS',
-  'SET_RELATIVE_MEASUREMENTS': 'EXPLORER_MEASUREMENT_SET_RELATIVE_MEASUREMENTS',
-  'CLEAR_ZERO': 'EXPLORER_MEASUREMENT_CLEAR_ZERO',
-  'ADD_ZERO_MEASUREMENTS': 'EXPLORER_MEASUREMENT_ADD_ZERO_MEASUREMENTS',
-  'SET_RELATIVE': 'EXPLORER_MEASUREMENT_SET_RELATIVE'
-}
+import {createAction, props} from '@ngrx/store'
+import {IRange} from '../helpers'
+import {IMeasurementSet} from './types'
+
+export const enableMeasurements = createAction('[EXPLORER: MEASUREMENT] Enable measurements')
+export const disableMeasurements = createAction('[EXPLORER: MEASUREMENT] Disable measurements')
+export const setMeasurementRange = createAction('[EXPLORER: MEASUREMENT] Set range', props<{range: IRange}>())
+export const clearMeasurementRange = createAction('[EXPLORER: MEASUREMENT] Clear range')
+export const setMeasurementZero = createAction('[EXPLORER: MEASUREMENT] Set zero')
+export const clearMeasurementZero = createAction('[EXPLORER: MEASUREMENT] Clear zero')
+export const setDirectMeasurements = createAction('[EXPLORER: MEASUREMENT] Set direct measurements', props<{measurements: IMeasurementSet}>())
+export const setRelativeMeasurements = createAction('[EXPLORER: MEASUREMENT] Set relative measurements', props<{measurements: IMeasurementSet}>())
+export const addZeroMeasurements = createAction('[EXPLORER: MEASUREMENT] Add zero measurements', props<{measurements: IMeasurementSet}>())
+export const setRelativeMeasurementMode = createAction('[EXPLORER: MEASUREMENT] Set relative mode', props<{relative: boolean}>())

@@ -1,24 +1,17 @@
-import { TypedRecord } from 'typed-immutable-record';
 
 // ---- Installtions ----
 export interface IUI {
-  messages: IStatusMessagesRecord;
+  errors: string[];
+  warnings: string[];
+  notices: string[];
   page_header: string,
   email_enabled: boolean
 }
 
-export interface IUIRecord extends
-  TypedRecord<IUIRecord>, IUI { };
-
-
-
-// ---- StatusMessages ---
-export interface IStatusMessages {
-  errors: string[];
-  warnings: string[];
-  notices: string[];
+export interface IAPIMessages{
+  errors: string[],
+  notices: string[],
+  warnings: string[]
 }
 
-export interface IStatusMessagesRecord extends
-  TypedRecord<IStatusMessagesRecord>, IStatusMessages { };
 

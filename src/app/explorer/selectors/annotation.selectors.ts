@@ -1,31 +1,32 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
+import { Store, createSelector } from '@ngrx/store';
 import { Observable, combineLatest } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
-import * as _ from 'lodash';
 
 import { IAppState } from '../../app.store';
 import {
   IRange,
 } from '../store';
-import { IAnnotationRecords, IAnnotation } from 'app/store/data';
+import { IAnnotation } from 'app/store/data';
 
 export const ANNOTATION_REDUX= ['ui','explorer','annotation'];
 
 @Injectable()
 export class AnnotationSelectors {
-  @select(['data', 'annotations']) annotations$: Observable<IAnnotationRecords>;
-  @select(_.concat(ANNOTATION_REDUX, 'enabled')) enabled$: Observable<boolean>
-  @select(_.concat(ANNOTATION_REDUX, 'selection_range')) selectionRange$: Observable<IRange>
-  @select(_.concat(ANNOTATION_REDUX, 'selected_annotation')) selectedAnnotationId$: Observable<string>
+  annotations_ = (state:IAppState)=>state.data.annotations
+  annotationsUI_ = (state:IAppState)=>state.ui.explorer.annotation
 
+  annotations$ = this.store.select(createSelector(this.annotations_, state=>state.entities));
+  enabled$ = this.store.select(createSelector(this.annotationsUI_,state=>state.enabled));
+  selectionRange$ =  this.store.select(createSelector(this.annotationsUI_,state=>state.selection_range));
+  selectedAnnotationId$ = this.store.select(createSelector(this.annotationsUI_,state=>state.selected_annotation));
+  
   public annotationType$: Observable<string>
   public annotatedRange$: Observable<IRange>
-  public selectedAnnotation$: Observable<IAnnotation>
-
+  selectedAnnotation$: Observable<IAnnotation>
+    
   constructor(
-    private ngRedux: NgRedux<IAppState>
+    private store: Store
   ){
     //string for annotation dialog title
     this.annotationType$ = this.selectionRange$
@@ -38,7 +39,7 @@ export class AnnotationSelectors {
       }));
     
     // currently selected annotation
-    this.selectedAnnotation$ = combineLatest(this.annotations$, this.selectedAnnotationId$).pipe(
+    this.selectedAnnotation$ = combineLatest([this.annotations$, this.selectedAnnotationId$]).pipe(
       map(([annotations, id]) => {
         if(id==null)
           return null;

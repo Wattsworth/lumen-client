@@ -26,8 +26,9 @@
           <ng-template #loadingTemplate><fa-icon [icon]="['fas', 'spinner']" [spin]="true"></fa-icon> loading</ng-template>
         </tree-root>
       </div>
+      <!--TODO: (click)="console.log('TODO: installationService.refresh()')"-->
       <button class="btn btn-primary btn-block refresh" 
-        (click)="installationService.refresh()"
+        
         [disabled]="installationSelectors.refreshing$ | async">
         <fa-icon [icon]="['fas', 'sync-alt']" [spin]="true" *ngIf="installationSelectors.refreshing$ | async"></fa-icon>
         Refresh<span *ngIf="installationSelectors.refreshing$ | async">ing</span></button>

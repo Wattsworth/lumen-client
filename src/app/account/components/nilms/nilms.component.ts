@@ -3,22 +3,18 @@ import {
   ViewChild,
   OnInit 
 } from '@angular/core';
-import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
+import { Store, createSelector, select } from '@ngrx/store';
+import {nilms_} from 'app/selectors';
 
 import {
   NilmService,
   UserService
 } from '../../../services';
 
-import {
-  INilm
-} from '../../../store/data';
 
-import {AccountService} from '../../account.service';
 import { AccountSelectors } from '../../account.selectors';
 
 @Component({
@@ -28,19 +24,19 @@ import { AccountSelectors } from '../../account.selectors';
 })
 export class NilmsComponent implements OnInit {
   @ViewChild('nilmModal', {static: false}) public nilmModal: ModalDirective;
-  @select(['data','nilms']) nilms$: Observable<INilm[]>;
 
-  public nilmArray$: Observable<INilm[]>;
+  nilms$ = this.store.pipe(select(nilms_),
+    map(nilms => _.sortBy(Object.values(nilms),['name'])))
+
   constructor(
     private nilmService: NilmService,
     private userService: UserService,
-    public accountSelectors: AccountSelectors
+    public accountSelectors: AccountSelectors,
+    private store:Store
   ) { }
 
   ngOnInit() {
     this.nilmService.loadNilms();   
-    this.nilmArray$ = this.nilms$.pipe(
-      map(nilms => _.sortBy(nilms,['name'])))
   }
 
   addNilm(){

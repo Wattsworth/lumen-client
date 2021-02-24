@@ -1,30 +1,22 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
-import { IAppState } from '../../app.store';
+import { Store } from '@ngrx/store';
 import{ ColorService } from './color.service';
 
 import {
-  DbElementActions,
   IDbElement,
-  IDbElementRecords
 } from '../../store/data';
+import * as actions from '../../store/data/actions';
 
 @Injectable()
 export class DbElementService {
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private colorService: ColorService
   ) { }
 
   public setDisplayName(element: IDbElement, name: string){
-     this.ngRedux.dispatch({
-      type: DbElementActions.SET_DISPLAY_NAME,
-      payload: {
-        id: element.id,
-        name: name
-      }
-    })  
+    this.store.dispatch(actions.setDbElementName({name, id: element.id}));
   }
   public setColor(element: IDbElement, color: string){
     if(element.color == color)
@@ -32,50 +24,28 @@ export class DbElementService {
     if(element.color!=null){
       this.colorService.returnColor(element.color);
     }
-    this.ngRedux.dispatch({
-      type: DbElementActions.SET_COLOR,
-      payload: {
-        id: element.id,
-        color: color
-      }
-    })  
+    this.store.dispatch(actions.setDbElementColor({color, id: element.id})); 
   }
   
   public assignColor(element: IDbElement){
     if(element.color!=null)
       return; //already has a color so nothing to do
-    this.ngRedux.dispatch({
-      type: DbElementActions.SET_COLOR,
-      payload: {
-        id: element.id,
-        color: this.colorService.requestColor()
-      }
-    })    
+    this.store.dispatch(actions.setDbElementColor({
+      color: this.colorService.requestColor(), id: element.id})); 
   }
 
   public removeColor(element: IDbElement){
     if(element.color==null)
       return; //no color associated with this element
     this.colorService.returnColor(element.color);
-    this.ngRedux.dispatch({
-      type: DbElementActions.SET_COLOR,
-      payload: {
-        id: element.id,
-        color: null
-      }
-    })
+    this.store.dispatch(actions.setDbElementColor({color: null, id: element.id})); 
   }
 
-  public restoreElements(elements: IDbElementRecords){
-    this.ngRedux.dispatch({
-      type: DbElementActions.RESTORE,
-      payload: elements
-    })
+  public restoreElements(elements: IDbElement[]){
+    this.store.dispatch(actions.restoreDbElement({elements})); 
   }
   public resetElements(){
-    this.ngRedux.dispatch({
-      type: DbElementActions.RESET
-    })
+    this.store.dispatch(actions.resetDbElement()); 
   }
 }
 

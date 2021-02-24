@@ -1,14 +1,6 @@
-import {
-  IState,
-  IStateRecord
-} from './types';
+import { IInterfaceState } from './types';
 
-import {makeTypedFactory} from 'typed-immutable-record';
-
-export const InterfaceFactory = 
-makeTypedFactory<IState, IStateRecord>({
+export const defaultInterfaceState: IInterfaceState = {
   displayed: [],
   selected: null
-});
-
-export const INITIAL_STATE = InterfaceFactory();
+};

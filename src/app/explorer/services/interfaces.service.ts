@@ -1,16 +1,16 @@
 import { Injectable} from '@angular/core';
 import { HttpClient } from '@angular/common/http'
-import { NgRedux } from '@angular-redux/store';
-import { map } from 'rxjs/operators'
-import * as _ from 'lodash';
-import {
-  InterfaceActions,
-} from '../store';
+import { Store, createSelector } from '@ngrx/store';
+import { take } from 'rxjs/operators'
+import * as InterfaceActions from '../store/interfaces/actions';
 import { IAppState } from '../../app.store';
 import * as schema from '../../api';
 import { normalize } from 'normalizr';
-import { DataAppActions } from '../../store/data';
+import { IDataApp } from '../../store/data';
+import * as actions from '../../store/data/actions';
 import { MessageService } from 'app/services';
+import { IInterfaceState } from '../store/interfaces';
+import { defaultDataApp } from 'app/store/data/initial-state';
 
 
 @Injectable()
@@ -19,7 +19,7 @@ export class InterfacesService {
 
   constructor(
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store<IAppState>,
     private messageService: MessageService
   ) {}
 
@@ -28,29 +28,25 @@ export class InterfacesService {
   public add_internal(id: number) {
     //if the id is already displayed just select it
     //otherwise display it and request the index page
-    let state = this.ngRedux.getState()
-    let displayed = state.ui.explorer.interfaces.displayed;
-    if (displayed.indexOf(id) == -1){
+    let interfaceState: IInterfaceState;
+    let selectInterfaceState = createSelector(
+      (state: IAppState) => state.ui.explorer.interfaces, x=>x);
+    this.store.select(selectInterfaceState).pipe(take(1)).subscribe(
+      s => interfaceState = s
+    );
+    if (interfaceState.displayed.indexOf(id) == -1){
       this.http
       .get(`app/${id}.json`)
       .subscribe(
       json => {
-        let entities = normalize(json, schema.dataApp).entities;
-        this.ngRedux.dispatch({
-          type: DataAppActions.RECEIVE,
-          payload: entities.dataApps
-        })
-        this.ngRedux.dispatch({
-          type: InterfaceActions.ADD,
-          payload: +id
-        })
-    },
-    error => this.messageService.setError("App not available"))}
-    else {
-      this.ngRedux.dispatch({
-        type: InterfaceActions.ADD,
-        payload: +id
-      })
+        let normalized = normalize(json, schema.dataApp);
+        let dataApps: IDataApp[] = normalized.result.map(id => ({...defaultDataApp, ...normalized.entities[id]}))
+        this.store.dispatch(actions.receiveDataApp({apps: dataApps}));
+        this.store.dispatch(InterfaceActions.addInterface({id: +id}))
+      },
+      error => this.messageService.setError("App not available"))
+    } else {
+        this.store.dispatch(InterfaceActions.addInterface({id: +id}))
     }
   }
 
@@ -65,12 +61,10 @@ export class InterfacesService {
     .subscribe(
     json => {
       let entities = normalize(json, schema.dataApp).entities;
-      this.ngRedux.dispatch({
-        type: DataAppActions.RECEIVE,
-        payload: entities.dataApps
-      })
-      let state = this.ngRedux.getState()
-      window.open(state.data.dataApps[id].url, '_blank')
+      let normalized = normalize(json, schema.dataApp);
+      let dataApps: IDataApp[] = normalized.result.map(id => ({...defaultDataApp, ...normalized.entities[id]}))
+      this.store.dispatch(actions.receiveDataApp({apps: dataApps}));
+      window.open(entities[id].url, '_blank')
     },
     error => this.messageService.setError("App not available"))
   }
@@ -78,10 +72,7 @@ export class InterfacesService {
   //hide a joule module interface
   //
   public remove(id: number) {
-    this.ngRedux.dispatch({
-      type: InterfaceActions.REMOVE,
-      payload: +id
-    })
+    this.store.dispatch(InterfaceActions.removeInterface({id}))
   }
 
   //set the displayed interface
@@ -89,15 +80,9 @@ export class InterfacesService {
   //
   public select(id: number) {
     if(id==null){
-      this.ngRedux.dispatch({
-        type: InterfaceActions.SELECT,
-        payload: null
-      })
-      return;
+      this.store.dispatch(InterfaceActions.selectInterface({id: null}))
+    } else {
+      this.store.dispatch(InterfaceActions.selectInterface({id: +id}))
     }
-    this.ngRedux.dispatch({
-      type: InterfaceActions.SELECT,
-      payload: +id //this converts a null into 0 :(
-    })
   }
 }

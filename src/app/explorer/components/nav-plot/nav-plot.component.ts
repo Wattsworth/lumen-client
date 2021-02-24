@@ -21,7 +21,7 @@ import {
   MeasurementSelectors
 } from '../../selectors';
 import { FLOT_OPTIONS } from './flot.options';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 
 declare var $: any;
 @Component({

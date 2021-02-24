@@ -1,5 +1,5 @@
 
-import {combineLatest} from 'rxjs/operators';
+import {combineLatest} from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -14,12 +14,9 @@ import {
   IDbFolder,
   IDbStream,
   IDbElement,
-  IDataAppRecords,
-  IDbFolderRecords,
-  IDbStreamRecords,
-  IDbElementRecords
+  IDataApp,
+  IData
 } from '../../../store/data';
-import * as _ from 'lodash';
 import { 
   PlotService,
   InterfacesService 
@@ -27,6 +24,7 @@ import {
 import { 
   PlotSelectors,
 } from '../../selectors';
+import { Dictionary } from '@ngrx/entity';
 
 @Component({
   selector: 'app-file-tree',
@@ -52,14 +50,19 @@ export class FileTreeComponent implements OnInit {
       () => { },
       () => this.plotService.setNilmsLoaded());
 
-    this.dbNodes$ = this.plotSelectors.data$.pipe(
-      combineLatest(this.plotSelectors.plottedElements$))
+    
+    this.dbNodes$ = combineLatest([
+      this.plotSelectors.data$,
+      this.plotSelectors.plottedElements$])
       .pipe(map(([data,elements]) => {
-        let nilms = _.toArray(data.nilms);
+        let nilms = Object.values(data.nilms.entities);
         return nilms.map(nilm => {
-          return this.mapNilm(nilm, data.dbFolders[nilm.root_folder],
-            data.dataApps,
-            data.dbFolders, data.dbStreams, data.dbElements)
+          return this.mapNilm(nilm, 
+            data.dbFolders.entities[nilm.root_folder],
+            data.dataApps.entities,
+            data.dbFolders.entities, 
+            data.dbStreams.entities, 
+            data.dbElements.entities)
         }).sort((a,b) => a.name > b.name ? 1:-1)
       }));
   }
@@ -87,10 +90,10 @@ export class FileTreeComponent implements OnInit {
   mapNilm(
     nilm: INilm,
     rootDbFolder: IDbFolder,
-    dataApps: IDataAppRecords,
-    folders: IDbFolderRecords,
-    streams: IDbStreamRecords,
-    elements: IDbElementRecords,
+    dataApps: Dictionary<IDataApp>,
+    folders: Dictionary<IDbFolder>,
+    streams: Dictionary<IDbStream>,
+    elements: Dictionary<IDbElement>,
   ): DbTreeNode {
     let children = null
     if (rootDbFolder !== undefined) {
@@ -123,7 +126,7 @@ export class FileTreeComponent implements OnInit {
 
   mapJouleModules(
     appIds: Array<number>,
-    dataApps: IDataAppRecords
+    dataApps: Dictionary<IDataApp>
   ): DbTreeNode[]{
     return appIds.map(id => dataApps[id])
     .filter(app => app !== undefined)
@@ -141,9 +144,9 @@ export class FileTreeComponent implements OnInit {
 
   mapFolder(
     folder: IDbFolder,
-    folders: IDbFolderRecords,
-    streams: IDbStreamRecords,
-    elements: IDbElementRecords,
+    folders: Dictionary<IDbFolder>,
+    streams: Dictionary<IDbStream>,
+    elements: Dictionary<IDbElement>,
   ): DbTreeNode {
     let children = null;
     //if folder is loaded, map children
@@ -175,7 +178,7 @@ export class FileTreeComponent implements OnInit {
 
   mapStream(
     stream: IDbStream,
-    elements: IDbElementRecords
+    elements: Dictionary<IDbElement>
   ): DbTreeNode {
     let children = stream.elements
       .map(id => elements[id])

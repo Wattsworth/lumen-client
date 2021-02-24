@@ -1,5 +1,3 @@
-
-import {combineLatest, distinctUntilChanged} from 'rxjs/operators';
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import {
   trigger, animate, style, transition
@@ -7,8 +5,8 @@ import {
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { TabsetComponent } from 'ngx-bootstrap/tabs';
 import { Observable, Subscription } from 'rxjs';
-import { map, filter } from 'rxjs/operators';
-import * as _ from 'lodash';
+import { map, filter, distinctUntilChanged } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 import {environment } from '../../../../environments/environment'
 
 import { 
@@ -105,7 +103,7 @@ export class ExplorerPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  createDataView(view: IDataView) {
+  createDataView(view: IDataView) {    
     this.dataViewService.create(
       view.name,
       view.description,
@@ -154,8 +152,8 @@ export class ExplorerPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     
     /* sync the tab selection to the redux state */
-    this.subs.push(this.interfacesSelectors.displayedIds$.pipe(
-      combineLatest(this.interfacesSelectors.selectedId$),
+    this.subs.push(combineLatest([this.interfacesSelectors.displayedIds$,
+      this.interfacesSelectors.selectedId$]).pipe(
       map(([ids,id])=> ids.indexOf(id)+1))
       .subscribe(tabIndex => {
         setTimeout( _ => {this.interfaceTabs.tabs[tabIndex].active=true;}, 100); 

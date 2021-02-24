@@ -1,309 +1,179 @@
 
 import * as actions from './actions';
-import * as factories from './initial-state';
-import * as _ from 'lodash';
 
-import {
-  recordify,
-  removeByKey,
-  removeByValue,
-  IPayloadAction
-} from '../helpers';
+import { createReducer, on} from '@ngrx/store';
+import {EntityAdapter, createEntityAdapter} from '@ngrx/entity';
 
-import * as records from './types';
 
-export function nilmReducer(
-  state: records.INilmRecords = {},
-  action: IPayloadAction): records.INilmRecords {
-  switch (action.type) {
-    //RECEIVE: update Nilm with server data (implicitly clears "refreshing")
-    //
-    case actions.NilmActions.RECEIVE:
-      return Object.assign({},
-        state,
-        recordify(action.payload, factories.NilmFactory));
-    //REFRESHING: set UI state of Nilm to indicate new data is requested
-    //
-    case actions.NilmActions.REFRESHING:
-      return Object.assign({}, state,
-        { [action.payload]: state[action.payload].set('refreshing', true) })
-    //REFRESHED: clear "refreshing" UI state (whether or not new data was received)
-    //
-    case actions.NilmActions.REFRESHED:
-      return Object.assign({}, state,
-        { [action.payload]: state[action.payload].set('refreshing', false) })
-    //REMOVE: remove Nilm from store
-    //
-    case actions.NilmActions.REMOVE:
-      return removeByKey(state, action.payload)
-    default:
-      return state;
-  }
-}
+import * as types from './types';
 
-export function dataAppReducer(
-  state: records.IDataAppRecords = {},
-  action: IPayloadAction): records.IDataAppRecords {
-  switch (action.type) {
-    case actions.DataAppActions.RECEIVE:
-      return Object.assign({},
-        state,
-        recordify(action.payload, factories.DataAppFactory));
-    default:
-      return state;
-  }
-}
+export const nilmAdapter: EntityAdapter<types.INilm> = createEntityAdapter<types.INilm>()
+export const dataAppAdapter: EntityAdapter<types.IDataApp> = createEntityAdapter<types.IDataApp>()
+export const dbFolderAdapter: EntityAdapter<types.IDbFolder> = createEntityAdapter<types.IDbFolder>()
+export const dbStreamAdapter: EntityAdapter<types.IDbStream> = createEntityAdapter<types.IDbStream>()
+export const annotationAdapter: EntityAdapter<types.IAnnotation> = createEntityAdapter<types.IAnnotation>()
+export const dbElementAdapter: EntityAdapter<types.IDbElement> = createEntityAdapter<types.IDbElement>()
+export const userAdapter: EntityAdapter<types.IUser> = createEntityAdapter<types.IUser>()
+export const userGroupAdapter: EntityAdapter<types.IUserGroup> = createEntityAdapter<types.IUserGroup>()
+export const permissionAdapter: EntityAdapter<types.IPermission> = createEntityAdapter<types.IPermission>()
+export const dataViewAdapter: EntityAdapter<types.IDataView> = createEntityAdapter<types.IDataView>()
 
-export function dbFolderReducer(
-  state: records.IDbFolderRecords = {},
-  action: IPayloadAction): records.IDbFolderRecords {
-  switch (action.type) {
-    case actions.DbFolderActions.RECEIVE:
-      return Object.assign({},
-        state,
-        recordify(action.payload, factories.DbFolderFactory));
-    default:
-      return state;
-  }
-}
+//  -----------  Nilm Reducer --------------
+export const nilmReducer = createReducer(
+  nilmAdapter.getInitialState(),
+  //RECEIVE: update Nilm with server data (implicitly clears "refreshing")
+  on(actions.receiveNilm, (state: types.INilmState, {nilms}) => nilmAdapter.upsertMany(nilms, state)),
+  //REFRESHING: set UI state of Nilm to indicate new data is requested
+  on(actions.refreshingNilm, (state, {id}) => nilmAdapter.updateOne({id, changes: {refreshing: true}},state)),
+  //REFRESHED: clear "refreshing" UI state (whether or not new data was received)
+  on(actions.refreshedNilm, (state, {id}) => nilmAdapter.updateOne({id: id, changes: {refreshing: false}},state)),
+  //REMOVE: remove Nilm from store
+  on(actions.removeNilm, (state, {id}) => nilmAdapter.removeOne(id,state))
+);
 
-export function dbStreamReducer(
-  state: records.IDbStreamRecords = {},
-  action: IPayloadAction): records.IDbStreamRecords {
-  switch (action.type) {
-    case actions.DbStreamActions.RECEIVE:
-      return Object.assign({},
-        state,
-        recordify(action.payload, factories.DbStreamFactory));
+//  -----------  Data App Reducer --------------
+export const dataAppReducer = createReducer(
+  dataAppAdapter.getInitialState(),
+  //RECEIVE
+  on(actions.receiveDataApp, (state: types.IDataAppState, {apps}) => dataAppAdapter.upsertMany(apps, state))
+);
 
-    case actions.DbStreamActions.RELOAD_ANNOTATIONS:
-        return Object.assign({}, state,
-          { [action.payload]: state[action.payload].set('reloading_annotations', true) })
-    
-    case actions.DbStreamActions.REFRESHED_ANNOTATIONS:
-        return Object.assign({}, state,
-          { [action.payload]: state[action.payload].set('reloading_annotations', false) })
+//  -----------  DbFolder Reducer --------------
+export const dbFolderReducer = createReducer(
+  dbFolderAdapter.getInitialState(),
+  //RECEIVE
+  on(actions.receiveDbFolder, (state: types.IDbFolderState, {folders}) => dbFolderAdapter.upsertMany(folders, state))
+);
 
-    default:
-      return state;
-  }
-}
+//  -----------  DbStream Reducer --------------
+export const dbStreamReducer = createReducer(
+  dbStreamAdapter.getInitialState(),
+  //RECEIVE
+  on(actions.receiveDbStream, (state: types.IDbStreamState, {streams}) => dbStreamAdapter.upsertMany(streams, state)),
+  //SET reloading annotations attribute
+  on(actions.reloadStreamAnnotations, (state: types.IDbStreamState, {id})=> dbStreamAdapter
+    .updateOne({id: id, changes:{reloading_annotations: true}}, state)),
+  //CLEAR reloading annotations attribute
+  on(actions.refreshedAnnotations, (state: types.IDbStreamState, {id})=> dbStreamAdapter
+    .updateOne({id: id, changes:{reloading_annotations: false}}, state))
+);
 
-export function annotationReducer(
-  state: records.IAnnotationRecords = {},
-  action: IPayloadAction): records.IAnnotationRecords {
-    switch(action.type) {
-      case actions.DbStreamActions.RELOAD_ANNOTATIONS:
-        return _.filter(state, item=>item.db_stream_id!= action.payload)
-          .reduce((obj, item) =>{ obj[item.id]=item; return obj;}, {});
-      case actions.AnnotationActions.RECEIVE:
-        return Object.assign({},
-          state,
-          recordify(action.payload, factories.AnnotationFactory));
-      case actions.AnnotationActions.REMOVE:
-          return removeByKey(state, action.payload)
-      default:
-        return state;
+//  -----------  Annotation Reducer --------------
+export const annotationReducer = createReducer(
+  annotationAdapter.getInitialState(),
+  //RECEIVE
+  on(actions.receiveAnnotation, (state: types.IAnnotationState, {annotations}) => annotationAdapter.upsertMany(annotations, state)),
+  //RELOAD: remove all annotations associated with this stream id
+  on(actions.reloadStreamAnnotations, (state: types.IAnnotationState, {id})=>{
+    let ids:any[]= state.ids; //force type to array to avoid type error
+    let target_ids = ids.filter(id => state.entities[id].db_stream_id==id)
+    return annotationAdapter.removeMany(target_ids,state);
+   }),
+  //REMOVE
+  on(actions.removeAnnotation, (state, {id}) => annotationAdapter.removeOne(id,state))
+)
+
+//  -----------  DbElement Reducer --------------
+export const dbElementReducer = createReducer(
+  dbElementAdapter.getInitialState(),
+   //RECEIVE (this respects local settings)
+   on(actions.receiveDbElement, (state: types.IDbElementState, {elements}) => {
+     elements = elements.map(element => {
+       //keep local values if they have been customized
+       if(state.entities[element.id]!==undefined){
+         return {...element, 
+          display_name:state.entities[element.id].display_name, 
+          color:  state.entities[element.id].color }
+       }
+       return element;
+      });
+     return dbElementAdapter.upsertMany(elements, state)}),
+   //SET element color
+   on(actions.setDbElementColor, (state: types.IDbElementState, {id, color})=> dbElementAdapter
+     .updateOne({id: id, changes:{color: color}}, state)),
+   //SET display name
+   on(actions.setDbElementName, (state: types.IDbElementState, {id, name})=> dbElementAdapter
+     .updateOne({id, changes:{name}}, state)),
+   //RESTORE: replace elements with new objects
+   on(actions.restoreDbElement, (state: types.IDbElementState, {elements})=> dbElementAdapter.upsertMany(elements,state)),
+   //RESET: remove display name and color setting
+   on(actions.resetDbElement, (state: types.IDbElementState)=> {
+     let ids:any[]= state.ids; //force type to array to avoid type error
+     let changes = ids.map(id=>({id, changes:{color: '', display_name: ''}}))
+     return dbElementAdapter.updateMany(changes,state)
+  })
+)
+
+//  -----------  User Reducer --------------
+export const userReducer = createReducer(
+  userAdapter.getInitialState(),
+  //RECEIVE
+  on(actions.receiveUser, (state: types.IUserState, {users}) => {
+    //current user has more data fields, don't 
+    //overwrite it with this limited 'public' view
+    users = users.filter(user => user.id!=state.current)
+    return userAdapter.upsertMany(users, state)}),
+  //SET current
+  on(actions.setCurrentUser, (state: types.IUserState, {user}) => {
+    let new_state = userAdapter.upsertOne(user, state);
+    return { ...new_state, current: user.id };
+  }),
+  //SET Installation Token
+  on(actions.receiveUserInstallationToken, (state: types.IUserState, {token}) => {
+    return { ...state, new_installation_token: token, installation_token_available: true };
+  }),
+  //SET Installation Token Unavailable
+  on(actions.installationTokensUnavailable, (state: types.IUserState) => {
+    return { ...state, new_installation_token: null, installation_token_available: false };
+  })
+)
+
+// ------ User Group Reducer -----
+export const userGroupReducer = createReducer(
+  userGroupAdapter.getInitialState(),
+  //RECEIVE generic groups
+  on(actions.receiveGroups, (state: types.IUserGroupState, {groups}) => userGroupAdapter.upsertMany(groups, state)),
+  //RECEIVE owner group
+  on(actions.receiveOwnerGroups, (state: types.IUserGroupState, {groups}) => {
+    let new_state = userGroupAdapter.upsertMany(groups, state)
+    return {...new_state, owner: groups.map(group=>group.id)}
+  }),
+  //RECEIVE member group
+  on(actions.receiveMemberGroups, (state: types.IUserGroupState, {groups}) => {
+    let new_state = userGroupAdapter.upsertMany(groups, state)
+    return {...new_state, member: groups.map(group=>group.id)}
+  }),
+  //REMOVE group and remove it's id from the owner array (only an owner can remove a group)
+  on(actions.removeUserGroup, (state: types.IUserGroupState, {id}) => {
+    let new_state = userGroupAdapter.removeOne(id, state);
+    return {...new_state, owner: state.owner.filter(gid=>gid!=id)}
+  })
+)
+
+// ------ Permission Reducer -----
+export const permissionReducer = createReducer(
+  permissionAdapter.getInitialState(),
+  //RECEIVE
+  on(actions.receivePermission, (state: types.IPremissionState, {permissions}) => permissionAdapter.upsertMany(permissions, state)),
+  //REMOVE
+  on(actions.removePermission, (state, {id}) => permissionAdapter.removeOne(id,state))
+);
+
+// ------ DataView Reducer -----
+export const dataViewReducer = createReducer(
+  dataViewAdapter.getInitialState(),
+  //RECEIVE
+  on(actions.receiveDataView, (state: types.IDataViewState, {views}) =>{
+    //check if one of the new views is the home view, if so clear the flags from existing ones
+    let isNewHome = views.map(view=>view.home).reduce((home_set, is_home)=>home_set||is_home, false);
+    if (isNewHome){
+      let ids:any[]= state.ids; //force type to array to avoid type error
+      let changes = ids.map(id=>({id, changes:{home: false}}))
+      let new_state =  dataViewAdapter.updateMany(changes, state)
+      return dataViewAdapter.upsertMany(views, new_state);
     }
-  }
-
-export function dbElementReducer(
-  state: records.IDbElementRecords = {},
-  action: IPayloadAction): records.IDbElementRecords {
-  let elemId: number;
-  switch (action.type) {
-
-    //Receive new elements from server
-    //
-    case actions.DbElementActions.RECEIVE:
-      return Object.assign({},
-        state,
-        mergeWithDisplayAttrs(
-          state, recordify(action.payload, factories.DbElementFactory)));
-
-    //Set element color
-    //
-    case actions.DbElementActions.SET_COLOR:
-      elemId = action.payload.id;
-      let color = action.payload.color;
-      return Object.assign({}, state,
-        { [elemId]: state[elemId].set('color', color) })
-
-    //Set element display name
-    //
-    case actions.DbElementActions.SET_DISPLAY_NAME:
-      elemId = action.payload.id;
-      let name = action.payload.name;
-      return Object.assign({}, state,
-        { [elemId]: state[elemId].set('display_name', name) })
-
-    //Restore elements from a data view (do not merge with display attrs)
-    //
-    case actions.DbElementActions.RESTORE:
-      let data = <records.IDbElementRecords>action.payload;
-      let elements = Object.keys(data).reduce((acc, id) => {
-        //make sure element JSON corresponds to valid element attributes
-        //ensures data views do not corrupt the store if attributes change
-        //in future versions
-        acc[id] = factories.DbElementFactory(data[id]);
-        return acc;
-      }, {});
-      return Object.assign({}, state, elements);
-
-    //Remove all display attribute settings from elements
-    // (color and display name)
-    //
-    case actions.DbElementActions.RESET:
-      return Object.keys(state).reduce((acc, id) => {
-        acc[id] = state[id].remove('color').remove('display_name')
-        return acc
-      }, {})
-
-    default:
-      return state;
-  }
-  /*if this is an update to an existing element, 
-    respect the local attributes by merging them in*/
-  function mergeWithDisplayAttrs(
-    elements: records.IDbElementRecords,
-    serverValues: records.IDbElementRecords): records.IDbElementRecords {
-
-    let x = Object.keys(serverValues)
-      .map(id => {
-        if (elements[id] === undefined)
-          return serverValues[id];
-        let e = elements[id];
-        return serverValues[id]
-          .set('display_name', e.display_name)
-          .set('color', e.color)
-      })
-      .reduce((acc: records.IDbElementRecords, element: records.IDbElementRecord) => {
-        acc[element.id] = element;
-        return acc;
-      }, {});
-    return x;
-  }
-
-}
-
-export function userReducer(
-  state: records.IUserStoreRecord = factories.UserStoreFactory(),
-  action: IPayloadAction): records.IUserStoreRecord {
-  switch (action.type) {
-    case actions.UserActions.RECEIVE:
-      //current user has more data fields, don't 
-      //overwrite it with this limited 'public' view
-      let others = Object.keys(action.payload)
-        .filter(id => +id != state.current)
-        .reduce((acc, id: string) => {
-          acc[id] = factories.UserFactory(action.payload[id]);
-          return acc;
-        }, {});
-      return state.set('entities', Object.assign({},
-        state.entities,
-        others));
-    case actions.UserActions.SET_CURRENT:
-      //let user = factories.UserFactory(action.payload);
-      let entity = {};
-      entity[action.payload.id] = factories.UserFactory(action.payload);
-      return state
-        .set('current', action.payload.id)
-        .set('entities', Object.assign({},
-          state.entities,
-          entity));
-    case actions.UserActions.RECEIVE_INSTALLATION_TOKEN:
-      return state
-        .set('new_installation_token', action.payload)
-        .set('installation_token_available', true)
-    case actions.UserActions.INSTALLATION_TOKENS_UNAVAILABLE:
-      return state
-        .set('new_installation_token', null)
-        .set('installation_token_available', false)
-    default:
-      return state;
-  }
-}
-
-export function userGroupReducer(
-  state: records.IUserGroupStoreRecord = factories.UserGroupStoreFactory(),
-  action: IPayloadAction): records.IUserGroupStoreRecord {
-  switch (action.type) {
-    case actions.UserGroupActions.RECEIVE_OWNER_GROUPS:
-      return state
-        .set('owner', state.owner.concat(action.payload.result))
-        .set('entities', mergeGroupEntities(state.entities, action.payload))
-    case actions.UserGroupActions.RECEIVE_MEMBER_GROUPS:
-      return state
-        .set('member', state.member.concat(action.payload.result))
-        .set('entities', mergeGroupEntities(state.entities, action.payload))
-    case actions.UserGroupActions.RECEIVE_GROUPS:
-      return state
-        .set('entities', mergeGroupEntities(state.entities, action.payload))
-    case actions.UserGroupActions.REMOVE:
-      return state
-        .set('entities', removeByKey(state.entities, action.payload))
-        .set('owner', removeByValue(state.owner, action.payload))
-    default:
-      return state;
-  }
-}
-
-export function mergeGroupEntities(currentEntities, payload): any {
-  if (payload.entities.user_groups === undefined) {
-    return currentEntities;
-  }
-  return Object.assign({},
-    currentEntities,
-    recordify(payload.entities.user_groups,
-      factories.UserGroupFactory));
-}
-export function permissionReducer(
-  state: records.IPermissionRecords = {},
-  action: IPayloadAction): records.IPermissionRecords {
-  switch (action.type) {
-    case actions.PermissionActions.RECEIVE:
-      return Object.assign({},
-        state,
-        recordify(action.payload, factories.PermissionFactory));
-    case actions.PermissionActions.REMOVE:
-      let new_state = removeByKey(state, action.payload)
-      return new_state;
-    default:
-      return state;
-  }
-}
-
-export function dataViewReducer(
-  state: records.IDataViewRecords = {},
-  action: IPayloadAction): records.IDataViewRecords {
-  switch (action.type) {
-    case actions.DataViewActions.RECEIVE:
-      //convert the json data into records
-      let newViews =
-        recordify(action.payload, factories.DataViewFactory);
-      //check if any of the new records is a home view
-      let newHomeView = Object
-        .keys(newViews)
-        .map(id => newViews[id])
-        .reduce((isSet, view) => isSet || view.home, false)
-      if (newHomeView) {
-        //the home view changed, clear flag from existing records
-        let newState = Object.keys(state)
-          .map(id => state[id])
-          .map(view => view.set('home', false))
-          .reduce((s, view) => {
-            s[view.id] = view;
-            return s;
-          }, <records.IDataViewRecords>{})
-        return Object.assign({}, newState, newViews);
-      } else {
-        //home view not set or unchanged, just add newViews
-        return Object.assign({}, state, newViews);
-      }
-    case actions.DataViewActions.REMOVE:
-      let new_state = removeByKey(state, action.payload)
-      return new_state;
-    default:
-      return state;
-  }
-}
+    return dataViewAdapter.upsertMany(views, state)
+  } ),
+  //REMOVE
+  on(actions.removeDataView, (state, {id}) => dataViewAdapter.removeOne(id,state))
+);

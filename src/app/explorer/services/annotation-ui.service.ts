@@ -1,19 +1,17 @@
 import { Injectable, OnInit, OnDestroy } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
-import * as _ from 'lodash';
-import {
-  AnnotationUIActions, IRange, MeasurementActions,
-} from '../store';
-import { IAppState } from '../../app.store';
-import { IDbElement, IAnnotation } from 'app/store/data';
+import { Store } from '@ngrx/store';
+import { IRange } from '../store';
+import * as MeasurementActions from '../store/measurement/actions';
+import * as AnnotationActions from '../store/annotations/actions';
 import { HttpClient } from '@angular/common/http';
+import {IAnnotation} from '../../store/data'
 
 @Injectable()
 export class AnnotationUIService {
 
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private http: HttpClient
   ) {
   }
@@ -21,53 +19,35 @@ export class AnnotationUIService {
   //start measurement mode
   //
   public startAnnotation() {
-    this.ngRedux.dispatch({
-      type: AnnotationUIActions.ENABLE
-    })
+    this.store.dispatch(AnnotationActions.enableAnnotations())
   }
 
   //exit measurement mode
   //
   public cancelAnnotation() {
-    this.ngRedux.dispatch({
-      type: AnnotationUIActions.DISABLE
-    })
+    this.store.dispatch(AnnotationActions.disableAnnotations())
   }
 
   //set the range or point to annotate
   //
   public setRange(range: IRange) {
-    this.ngRedux.dispatch({
-      type: AnnotationUIActions.SET_RANGE,
-      payload: range
-    })
+    this.store.dispatch(AnnotationActions.setAnnotationRange({range}))
   }
   //set the range or point to annotate
   //
   public clearRange() {
-    this.ngRedux.dispatch({
-      type: AnnotationUIActions.CLEAR_RANGE
-    })
+    this.store.dispatch(AnnotationActions.clearAnnotationRange())
   }
 
   //select an annotation to display
   //
   public selectAnnotation(annotation: IAnnotation){
-    //remove zero if set because annotation will be displayed instead
-    this.ngRedux.dispatch({
-      type: MeasurementActions.CLEAR_ZERO
-    })
-    this.ngRedux.dispatch({
-      type: AnnotationUIActions.SHOW_ANNOTATION,
-      payload: annotation.id
-    })
-    
+    this.store.dispatch(MeasurementActions.clearMeasurementZero())
+    this.store.dispatch(AnnotationActions.showAnnotation({id: annotation.id}))
   }
 
   //hide annotation
   public hideAnnotation(){
-    this.ngRedux.dispatch({
-      type: AnnotationUIActions.HIDE_ANNOTATION
-    })
+    this.store.dispatch(AnnotationActions.hideAnnotation())
   }
 }

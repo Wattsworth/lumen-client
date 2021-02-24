@@ -1,56 +1,17 @@
-import { IPayloadAction } from '../../../store/helpers';
-import { AnnotationUIActions } from './actions';
-import {
-  IStateRecord
-} from './types';
+import { createReducer, on } from '@ngrx/store';
 
+import * as actions from './actions';
+import { IAnnotationState } from './types';
 import {
-  INITIAL_STATE
+  defaultAnnotationState
 } from './initial-state';
 
-import * as _ from 'lodash';
-
-
-export function reducer(
-  state: IStateRecord = INITIAL_STATE,
-  action: IPayloadAction): IStateRecord {
-
-  switch (action.type) {
-    //enter measurement mode
-    //
-    case AnnotationUIActions.ENABLE:
-      return state
-        .set('enabled', true);
-
-    //cancel measurement mode
-    //
-    case AnnotationUIActions.DISABLE:
-      return state
-        .set('enabled', false);
-
-
-    //set the selected range
-    case AnnotationUIActions.SET_RANGE:
-      return state
-        .set('selection_range', action.payload)
-    
-    //clear the range
-    case AnnotationUIActions.CLEAR_RANGE:
-      return state
-        .set('selection_range', null)
-
-    //select an annotation to display
-    case AnnotationUIActions.SHOW_ANNOTATION:
-      return state
-        .set('selected_annotation', action.payload)
-
-    //hide the selected annotation (if any)
-    case AnnotationUIActions.HIDE_ANNOTATION:
-      return state
-        .set('selected_annotation', null)
-
-    
-    default:
-      return state;
-  }
-}
+export const reducer = createReducer(
+  defaultAnnotationState,
+  on(actions.enableAnnotations, (state: IAnnotationState)=>({...state, enabled: true})),
+  on(actions.disableAnnotations, (state: IAnnotationState,)=>({...state, enabled: false})),
+  on(actions.setAnnotationRange, (state: IAnnotationState, {range})=>({...state, selection_range: range})),
+  on(actions.clearAnnotationRange, (state: IAnnotationState)=>({...state, selection_range: null})),
+  on(actions.showAnnotation, (state: IAnnotationState, {id})=>({...state, selected_annotation: id})),
+  on(actions.hideAnnotation, (state: IAnnotationState)=>({...state, selected_annotation: null}))
+)

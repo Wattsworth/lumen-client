@@ -1,20 +1,15 @@
+import { createSelector, Store, select } from '@ngrx/store';
 import { Component } from '@angular/core';
-import { createLogger } from 'redux-logger'
-import { NgRedux, DevToolsExtension } from '@angular-redux/store';
-import { createEpicMiddleware } from 'redux-observable-es6-compat';
 import { Observable } from 'rxjs';
-import { select } from '@angular-redux/store';
+import { IAppState } from './app.store';
+import { global_UI_ } from 'app/selectors';
 
-import {AppEpics} from './epics';
+//import {AppEpics} from './epics';
 
 import {
   SessionService
 } from './services';
 
-import {
-  IAppState,
-  rootReducer
-} from './app.store';
 
 @Component({
   selector: 'app-root',
@@ -23,43 +18,31 @@ import {
 })
 export class AppComponent {
 
-  @select(['ui', 'global', 'page_header']) pageHeader$: Observable<string>;
+  uiSelect = (state: IAppState) => state.ui.global
+  
+  public pageHeader$ = this.store.pipe(select(createSelector(global_UI_, state=>state.page_header)));
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
-    private devTools: DevToolsExtension,
-    private epics: AppEpics,
-    private sessionService: SessionService
+    //private epics: AppEpics,
+    private sessionService: SessionService,
+    private store: Store
   ) {
-
-
+    /*
     //configure redux
     const epicMiddleware = createEpicMiddleware();
 
     const middleware = [
       createLogger({collapsed: true}),
       epicMiddleware
-    ]
+    ]*/
 
     
 
-    ngRedux.configureStore(rootReducer,
-      {},
-      middleware,
-      devTools.isEnabled() ?
-        [devTools.enhancer()] : 
-        []
-    );
-    epicMiddleware.run(this.epics.root);
-    //todo: add interceptor to insert API URL
-    /*
-    //configure angular2-token
-    tokenService.init({
-     
-    })*/
-
+    
+    //epicMiddleware.run(this.epics.root);
+    
     sessionService.retrieveSiteSettings();
-    //sessionService.validateToken();
+    
   }
 
 }

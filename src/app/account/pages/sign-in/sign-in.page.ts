@@ -1,21 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { select } from '@angular-redux/store';
-
-import {
-  SessionService
-} from "../../../services";
-/*https://github.com/yuyang041060120/ng2-validation*/
-import { CustomValidators } from 'ng2-validation';
+import { Store, select, createSelector } from '@ngrx/store';
 import {
   FormBuilder,
   FormGroup,
   Validators
 } from '@angular/forms';
-import { environment } from '../../../../environments/environment';
+
+import { SessionService } from "../../../services";
+/*https://github.com/yuyang041060120/ng2-validation*/
+import { CustomValidators } from 'ng2-validation';
+
 import { AccountService } from 'app/account/account.service';
 import { AccountSelectors } from 'app/account/account.selectors';
-
+import { global_UI_ } from 'app/selectors';
 
 @Component({
   selector: 'app-sign-in',
@@ -27,13 +24,14 @@ export class SignInPageComponent implements OnInit {
   public form: FormGroup;
   public slides: ISlide[];
 
-  @select(['ui', 'global', 'email_enabled']) emailEnabled$: Observable<string>;
+  emailEnabled$ = this.store.pipe(select(createSelector(global_UI_, state=>state.email_enabled)));
 
   constructor(
     private fb: FormBuilder,
     private sessionService: SessionService,
     private accountService: AccountService,
-    public accountSelectors: AccountSelectors
+    public accountSelectors: AccountSelectors,
+    private store: Store
   ) {
     
     this.slides = [

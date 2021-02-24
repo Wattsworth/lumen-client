@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
+import { Store } from '@ngrx/store';
 import { TreeNode } from 'angular-tree-component';
 
 import { normalize } from 'normalizr';
@@ -9,10 +9,11 @@ import {
 
 import * as schema from '../api';
 
-import { InstallationActions } from './store';
-import { DataAppActions } from '../store/data';
-
+import * as uiActions from './store/actions';
+import * as appActions from '../store/data/actions';
+import {defaultDataApp} from '../store/data/initial-state'
 import {
+
   INilm,
   IDbFolder,
   IDbStream,
@@ -28,7 +29,7 @@ import { HttpClient } from '@angular/common/http';
 export class InstallationService {
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private messageService: MessageService,
     private nilmService: NilmService,
     private http: HttpClient
@@ -36,32 +37,19 @@ export class InstallationService {
 
   // ---selectDbRoot: pick the root from tree -----
   public selectDbRoot() {
-    this.ngRedux.dispatch({
-      type: InstallationActions.SELECT_DB_ROOT,
-      payload: {}
-    });
-    //this.messageService.clearMessages();
+    console.log("ERROR: SELECT DB ROOT NOT IMPLEMENTED")
+    this.store.dispatch(uiActions.selectDbRoot());
   }
 
   // ---selectDbFolder: pick folder from tree -----
   public selectDbFolder(id: number) {
-    this.ngRedux.dispatch({
-      type: InstallationActions.SELECT_DB_FOLDER,
-      payload: {
-        id: id,
-      }
-    });
+    this.store.dispatch(uiActions.selectDbFolder({id}));
     this.messageService.clearMessages();
   }
 
   // ---selectDbStream: pick a stream from tree---
   public selectDbStream(id: number) {
-    this.ngRedux.dispatch({
-      type: InstallationActions.SELECT_DB_STREAM,
-      payload: {
-        id: id,
-      }
-    });
+    this.store.dispatch(uiActions.selectDbStream({id}));
     this.messageService.clearMessages();
   }
 
@@ -72,40 +60,25 @@ export class InstallationService {
       .subscribe(
       json => {
         let entities = normalize(json, schema.dataApp).entities;
-        this.ngRedux.dispatch({
-          type: DataAppActions.RECEIVE,
-          payload: entities.dataApps
-        })
+        let apps = entities.values.map(e=>({...defaultDataApp, ...e}))
+        this.store.dispatch(appActions.receiveDataApp({apps}));
       })
-      this.ngRedux.dispatch({
-        type: InstallationActions.SELECT_DATA_APP,
-        payload: {
-          id: id,
-        }
-      });
+      this.store.dispatch(uiActions.selectDataApp({id}));;
     this.messageService.clearMessages();
   }
 
   // ---setNilm: work on specified NILM -----
   public setNilm(id: number) {
     // set the new db id
-    this.ngRedux.dispatch({
-      type: InstallationActions.SET_NILM,
-      payload: {
-        id: id
-      }
-    });
+    this.store.dispatch(uiActions.setNilm({id}));;
   }
 
   // ---refreshInstallation: refresh current installation ----
-  public refresh(){
-    this.ngRedux.dispatch({
-      type: InstallationActions.REFRESHING
-    })
-    let nilm = this.ngRedux.getState().ui.installation.nilm;
-    this.nilmService.refreshNilm(nilm).subscribe(
-      success => this.ngRedux.dispatch({type: InstallationActions.REFRESHED}),
-      error => this.ngRedux.dispatch({type: InstallationActions.REFRESHED})
+  public refresh(nilm: INilm){
+    this.store.dispatch(uiActions.refreshing());;
+    this.nilmService.refreshNilm(nilm.id).subscribe(
+      success => this.store.dispatch(uiActions.refreshed()),
+      error => this.store.dispatch(uiActions.refreshed()),
     );
   }
 

@@ -29,7 +29,7 @@ import {
 
 import { FLOT_OPTIONS } from './flot.options';
 
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 
 declare var $: any;
 
@@ -83,7 +83,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     let newPlottedElements = this.plotSelectors.plottedElements$.pipe(
       distinctUntilChanged((x,y) => _.isEqual(x,y)));
     this.subs.push(combineLatest(
-      newTimeRange, newPlottedElements).pipe(
+      [newTimeRange, newPlottedElements]).pipe(
         withLatestFrom(this.plotSelectors.addingPlotData$),
         filter(([[timeRange, elements], busy]) => !busy && elements.length!=0))
       .subscribe(([[timeRange, elements], busy]) => {
@@ -123,7 +123,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subs.push(
       
       combineLatest(
-        this.measurementSelectors.enabled$, this.annotationSelectors.enabled$).pipe(
+        [this.measurementSelectors.enabled$, this.annotationSelectors.enabled$]).pipe(
         map(([measure, annotate]) => measure || annotate),
         distinctUntilChanged())
       .subscribe(val => {
@@ -175,8 +175,9 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     let newLeftElementUnits = this.plotSelectors.leftElementUnits$.pipe(
       distinctUntilChanged((x,y) => _.isEqual(x,y)));
     this.subs.push(combineLatest(
-      this.plotSelectors.leftAxisSettings$,newLeftElementUnits)
+      [this.plotSelectors.leftAxisSettings$,newLeftElementUnits])
       .subscribe(([settings,units]) => {
+        console.log("here?")
         let options = this.flot_options.yaxes[0];
         this.flot_options.legend.left_font_size=settings.legend_font_size;
         if(this.plot!=null){
@@ -193,7 +194,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     let newRightElementUnits = this.plotSelectors.rightElementUnits$.pipe(
       distinctUntilChanged((x,y) => _.isEqual(x,y)));
     this.subs.push(combineLatest(
-      this.plotSelectors.rightAxisSettings$, newRightElementUnits)
+      [this.plotSelectors.rightAxisSettings$, newRightElementUnits])
       .subscribe(([settings,units]) => {
         let options = this.flot_options.yaxes[1];
         this.flot_options.legend.right_font_size=settings.legend_font_size;
@@ -369,12 +370,12 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     let elementsByAxis = combineLatest(
-      this.plotSelectors.leftElements$,this.plotSelectors.rightElements$)
+      [this.plotSelectors.leftElements$,this.plotSelectors.rightElements$])
       .pipe(map(([left, right]) => { return { left: left, right: right } }));
     this.subs.push(combineLatest(
-        elementsByAxis,
+        [elementsByAxis,
         this.plotSelectors.plotData$, 
-        this.plotSelectors.showDataEnvelope$)
+        this.plotSelectors.showDataEnvelope$])
       .subscribe(([elementsByAxis, data, showEnvelope]) => {
         //build data structure
         let leftAxis = this.plotService

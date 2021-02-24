@@ -1,28 +1,20 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
 import { TreeNode } from 'angular-tree-component';
+import { Store, select, createSelector} from '@ngrx/store';
 import {
-  IDbFolderRecords,
-  IDbFolderRecord,
-  IDbStreamRecords,
-  IDbStreamRecord,
-  IDbElementRecords,
-  IDbElementRecord,
   IState,
   IDbFolder,
+  IDbElement,
   IDbStream,
   IDataApp,
-  IDataAppRecords,
   INilm,
-  INilmRecords
 } from '../store/data';
 
 import {IInstallation} from './store';
 import {IAppState} from '../app.store';
 import { Observable, combineLatest } from 'rxjs';
-import { map, filter, distinctUntilChanged } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
-
+import { map, filter, tap, distinctUntilChanged } from 'rxjs/operators';
+import * as selectors from 'app/selectors';
 
 export interface DbTreeNode {
   id: string;
@@ -37,56 +29,59 @@ export interface DbTreeNode {
 @Injectable()
 export class InstallationSelectors {
 
-  @select(['data']) data$: Observable<IState>;
-  @select(['data', 'nilms']) nilms$: Observable<INilmRecords>;
-  @select(['data', 'dbFolders']) dbFolders$: Observable<IDbFolderRecords>;
-  @select(['data', 'dbStreams']) dbStreams$: Observable<IDbStreamRecords>;
-  @select(['data', 'dbElements']) dbElements$: Observable<IDbElementRecords>;
-  @select(['data', 'dataApps']) dataApps$: Observable<IDataAppRecords>;
-  @select(['ui','installation']) dbAdmin$: Observable<IInstallation>;
-  @select(['ui','installation', 'nilm']) nilm_id$: Observable<number>;
-  @select(['ui','installation', 'refreshing']) refreshing$: Observable<boolean>;
-  @select(['ui','installation', 'selectedType']) selectedType$: Observable<string>;
-  @select(['ui','installation', 'rootFolderId']) root_folder_id$: Observable<number>;
-  @select(['ui','installation', 'selectedDbFolder']) dbFolder_id$: Observable<number>;
-  @select(['ui','installation', 'selectedDbStream']) dbStream_id$: Observable<number>;
-  @select(['ui','installation', 'selectedDataApp']) dataApp_id$: Observable<number>;
+  
+  data$ = this.store.pipe(select(selectors.data_));
+  nilms$= this.store.pipe(select(selectors.nilms_));
+  dbFolders$= this.store.pipe(select(selectors.dbFolders_));
+  dbStreams$= this.store.pipe(select(selectors.dbStreams_));
+  dbElements$ = this.store.pipe(select(selectors.dbElements_));
+  dataApps$= this.store.pipe(select(selectors.dataApps_));
+
+  dbAdmin$= this.store.pipe(select(selectors.installation_UI_));
+  nilm_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.nilm)));
+  refreshing$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.refreshing)));
+  selectedType$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedType)));
+  root_folder_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.rootFolderId)));
+  dbFolder_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDbFolder)));
+  dbStream_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDbStream)));
+  dataApp_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDataApp)));
 
   public nilm$: Observable<INilm>;
   public dbNodes$: Observable<DbTreeNode[]>;
-  public rootDbFolder$: Observable<IDbFolderRecord>;
-  public selectedDbFolder$: Observable<IDbFolderRecord>;
-  public selectedDbStream$: Observable<IDbStreamRecord>;
+  public rootDbFolder$: Observable<IDbFolder>;
+  public selectedDbFolder$: Observable<IDbFolder>;
+  public selectedDbStream$: Observable<IDbStream>;
   public selectedDataApp$: Observable<IDataApp>;
-  public selectedDbStreamElements$: Observable<IDbElementRecord[]>;
+  public selectedDbStreamElements$: Observable<IDbElement[]>;
 
 
   constructor(
-    private ngRedux: NgRedux<IAppState>
+    private store: Store
   ) {
     // ---- nilm: INilm ------
     this.nilm$ = combineLatest(
-      this.nilm_id$,this.nilms$).pipe(
+      [this.nilm_id$,this.nilms$]).pipe(
       map(([id, nilms]) => nilms[id]),
       filter(nilm => !(nilm === undefined)));
 
 
     // ---- selectedDbRootFolder: IDbFolderRecord ------
     this.rootDbFolder$ = combineLatest(
-      this.root_folder_id$,this.dbFolders$).pipe(
+      [this.root_folder_id$,this.dbFolders$]).pipe(
       map(([id, folders]) => folders[id]),
       filter(folder => !(folder === undefined)));
 
     // ---- selectedDbFolder: IDbFolderRecord ------
     this.selectedDbFolder$ = combineLatest(
-      this.dbFolders$,this.dbFolder_id$).pipe(
+      [this.dbFolders$,this.dbFolder_id$]).pipe(
       map(([dbFolders, id]) => dbFolders[id]),
       filter(dbFolder => !(dbFolder === undefined)),
       distinctUntilChanged());
+    //this.selectedDbFolder$.subscribe(x=>console.log(x))
 
     // ---- selectedDataApp: IDataAppRecord ------
     this.selectedDataApp$ = combineLatest(
-      this.dataApps$,this.dataApp_id$).pipe(
+      [this.dataApps$,this.dataApp_id$]).pipe(
       map(([dataApps, id]) => dataApps[id]),
       filter(app => !(app === undefined)),
       distinctUntilChanged(),
@@ -94,7 +89,7 @@ export class InstallationSelectors {
 
     // ---- selectedDbStream: IDbStreamRecord ------
     this.selectedDbStream$ = combineLatest(
-      this.dbStreams$, this.dbStream_id$).pipe(
+      [this.dbStreams$, this.dbStream_id$]).pipe(
       map(([dbStreams, id]) => dbStreams[id]),
       filter(dbStream => !(dbStream === undefined)),
       distinctUntilChanged());
@@ -102,7 +97,7 @@ export class InstallationSelectors {
 
     // ---- selectedDbElements: IDbElements[] -----
     this.selectedDbStreamElements$ = combineLatest(
-      this.selectedDbStream$,this.dbElements$).pipe(
+      [this.selectedDbStream$,this.dbElements$]).pipe(
        map(([stream, elements]) => stream.elements.map(id => elements[id])),
        filter(elements =>
         elements.reduce((i, e) => i && !(e === undefined), true)),
@@ -110,7 +105,7 @@ export class InstallationSelectors {
 
     // ---- dbNodes: DbTreeNode[] -----
     this.dbNodes$ = combineLatest(
-      this.root_folder_id$, this.data$).pipe(
+      [this.root_folder_id$, this.data$]).pipe(
       filter(([root_id, data]) => data.dbFolders[root_id] !== undefined),
       map(([root_id, data]) => this._mapRoot(data, data.dbFolders[root_id]))
     );

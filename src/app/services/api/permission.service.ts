@@ -3,34 +3,27 @@ import { Injectable } from '@angular/core';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, share } from 'rxjs/operators';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import {
-  NgRedux,
-  select
-} from '@angular-redux/store';
+import { createSelector, Store, select } from '@ngrx/store';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 import { IAppState } from '../../app.store';
-import {
-  IPermission,
-  IUserRecords,
-  IUserGroupRecords
-} from '../../store/data';
-import {
-  PermissionActions
-} from '../../store/data';
+import { IPermission, IUser, IUserGroup } from '../../store/data';
+import * as actions from '../../store/data/actions';
 import { UserService } from './user.service';
 import { UserGroupService } from './user-group.service';
 
 import {
   MessageService
 } from '../message.service';
+import { users_, userGroups_ } from 'app/selectors';
+import { defaultPermission, entityFactory } from 'app/store/data/initial-state';
 
 
 @Injectable()
 export class PermissionService {
 
-  @select(['data', 'users', 'entities']) users$: Observable<IUserRecords>;
-  @select(['data', 'userGroups', 'entities']) userGroups$: Observable<IUserGroupRecords>;
+  users$ = this.store.pipe(select(createSelector(users_,state=>state.entities)));
+  userGroups$ = this.store.pipe(select(createSelector(userGroups_,state=>state.entities)));
 
   public targets$: Observable<PermissionTarget[]>;
 
@@ -39,7 +32,7 @@ export class PermissionService {
   constructor(
     //private http: Http,
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private messageService: MessageService,
     private userService: UserService,
     private userGroupService: UserGroupService
@@ -47,7 +40,8 @@ export class PermissionService {
     //keep track of NILM's we retrieve permissions for
     this.nilmsWithPermissions = [];
 
-    this.targets$ = combineLatest(this.users$, this.userGroups$).pipe(
+    
+    this.targets$ = combineLatest([this.users$, this.userGroups$]).pipe(
       map(([users, userGroups]) => {
         let targets: PermissionTarget[] = []
         Object.keys(users).reduce((acc: PermissionTarget[], id) => {
@@ -83,10 +77,9 @@ export class PermissionService {
       .subscribe(
       json => {
         this.nilmsWithPermissions.push(nilmId);
-        this.ngRedux.dispatch({
-          type: PermissionActions.RECEIVE,
-          payload: normalize(json, schema.permissions).entities.permissions
-        });
+        let entities = normalize(json, schema.permissions).entities;
+        let permissions = entityFactory(entities['permissions'], defaultPermission);
+        this.store.dispatch(actions.receivePermission({permissions}));
       },
       error => this.messageService.setErrorsFromAPICall(error)
       );
@@ -98,10 +91,7 @@ export class PermissionService {
         params: new HttpParams().set('nilm_id', permission.nilm_id.toString()) })
       .subscribe(
       json => {
-        this.ngRedux.dispatch({
-          type: PermissionActions.REMOVE,
-          payload: permission.id
-        });
+        this.store.dispatch(actions.removePermission({id: permission.id}))
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -123,10 +113,9 @@ export class PermissionService {
 
     o.subscribe(
       json => {
-        this.ngRedux.dispatch({
-          type: PermissionActions.RECEIVE,
-          payload: normalize(json.data, schema.permission).entities.permissions
-        });
+        let entities = normalize(json, schema.permissions).entities;
+        let permissions = entityFactory(entities['permissions'], defaultPermission);
+        this.store.dispatch(actions.receivePermission({permissions}));
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -149,11 +138,9 @@ export class PermissionService {
 
     o.subscribe(
       json => {
-        let data = normalize(json.data, schema.permission)
-        this.ngRedux.dispatch({
-          type: PermissionActions.RECEIVE,
-          payload: data.entities.permissions
-        });
+        let entities = normalize(json.data, schema.permission).entities;
+        let permissions = entityFactory(entities['permissions'], defaultPermission);
+        this.store.dispatch(actions.receivePermission({permissions}));
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -175,11 +162,9 @@ export class PermissionService {
 
       o.subscribe(
       json => {
-        let data = normalize(json.data, schema.permission)
-        this.ngRedux.dispatch({
-          type: PermissionActions.RECEIVE,
-          payload: data.entities.permissions
-        });
+        let entities = normalize(json.data, schema.permission).entities;
+        let permissions = entityFactory(entities['permissions'], defaultPermission);
+        this.store.dispatch(actions.receivePermission({permissions}));
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)

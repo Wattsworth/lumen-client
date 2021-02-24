@@ -1,41 +1,18 @@
+import { createReducer, on } from '@ngrx/store';
 
-import { IPayloadAction } from '../../store/helpers';
-import { InstallationActions } from './actions';
-import { IInstallationRecord } from './types';
+import * as actions from './actions';
+import { IInstallation } from './types';
 import {
-  INITIAL_STATE
+  defaultInstallation
 } from './initial-state';
 
 
-export function reducer(
-  state: IInstallationRecord = INITIAL_STATE,
-  action: IPayloadAction): IInstallationRecord {
-  switch (action.type) {
-    case InstallationActions.SELECT_DB_FOLDER:
-      return state.merge({
-        selectedDbFolder: action.payload.id,
-        selectedType: 'dbFolder'
-      });
-    case InstallationActions.SELECT_DB_STREAM:
-      return state.merge({
-        selectedDbStream: action.payload.id,
-        selectedType: 'dbStream'
-      });
-    case InstallationActions.SELECT_DATA_APP:
-      return state.merge({
-        selectedDataApp: action.payload.id,
-        selectedType: 'dataApp'
-      })
-    case InstallationActions.SET_NILM:
-      return state
-        .set('nilm', action.payload.id);
-    case InstallationActions.REFRESHING:
-      return state
-        .set('refreshing', true)
-    case InstallationActions.REFRESHED:
-      return state
-        .set('refreshing', false)
-    default:
-      return state;
-  }
-}
+export const reducer = createReducer(
+  defaultInstallation,
+  on(actions.selectDbFolder, (state: IInstallation, {id})=>({...state, selectedDbFolder: id, selectedType: 'dbFolder'})),
+  on(actions.selectDbStream, (state: IInstallation, {id})=>({...state, selectedDbStream: id, selectedType: 'dbStream'})),
+  on(actions.selectDataApp, (state: IInstallation, {id})=>({...state, selectedDataApp: id, selectedType: 'dataApp'})),
+  on(actions.setNilm, (state: IInstallation, {id})=>({...state, nilm: id})),
+  on(actions.refreshing, (state: IInstallation)=>({...state, refreshing: true})),
+  on(actions.refreshed, (state: IInstallation)=>({...state, refreshing: false})),
+);

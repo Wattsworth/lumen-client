@@ -1,6 +1,4 @@
-import {IAccount } from './types';
 export * from './types';
 export * from './actions';
-
-export interface IState extends IAccount {}
+export {IState} from './types';
 export {reducer} from './reducer';

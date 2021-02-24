@@ -1,72 +1,93 @@
 
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
 import { Observable, combineLatest } from 'rxjs';
 import { map, distinctUntilChanged, startWith } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
-import * as _ from 'lodash';
+import {createSelector, select, Store} from '@ngrx/store'
+
+import * as _ from 'lodash-es';
 
 import { IAppState } from '../../app.store';
+
 import {
-  IRange,
-  IAxisSettings
-} from '../store';
-import {
-  IState,
-  INilmRecords,
   IDbElement,
-  IDbElementRecords,
   IDbStream,
-  IDbStreamRecords,
-  IDataSet,
-  IDataViewRecords,
   IDataView
 } from '../../store/data';
+import {
+  dataApps_,
+  dataViews_,
+  data_,
+  dbElements_,
+  dbStreams_,
+  nilms_,
+  plot_UI_Ex_
+} from 'app/selectors'
+import { defaultPlotState } from '../store/plot/initial-state';
+import { IAxisSettings } from '../store';
 
-export const PLOT_REDUX= ['ui','explorer','plot'];
+
+const selectElements = (state: IAppState) => state.data.dbElements;
+const selectLeftElementIDs = (state: IAppState) => state.ui.explorer.plot.left_elements;
+
+
+export const leftElements = createSelector(
+  selectElements, selectLeftElementIDs, 
+  (elements, ids)=>{
+    if (ids && elements) {
+      return ids.map((id: number) => elements[id]);
+    } else {
+      return [];
+    }
+  }
+  )
+
 
 @Injectable()
 export class PlotSelectors {
 
-  @select(['data']) data$: Observable<IState>;
-  @select(['data', 'dbElements']) elements$: Observable<IDbElementRecords>;
-  @select(['data', 'dbStreams']) streams$: Observable<IDbStreamRecords>;
-  @select(['data', 'nilms']) nilms$: Observable<INilmRecords>;
+  data$ = this.store.pipe(select(data_));
+  elements$ = this.store.pipe(select(dbElements_))
+  streams$ = this.store.pipe(select(dbStreams_))
+  nilms$ = this.store.pipe(select(nilms_))
+  dataViews$ = this.store.pipe(select(dataViews_))
 
-  @select(['data', 'dataViews']) dataViews$: Observable<IDataViewRecords>;
-
-  @select(_.concat(PLOT_REDUX,'left_elements')) leftElementIDs$: Observable<number[]>;
-  @select(_.concat(PLOT_REDUX,'left_axis_settings')) leftAxisSettings$: Observable<IAxisSettings>;
-  @select(_.concat(PLOT_REDUX,'show_left_axis_settings')) showLeftAxisSettings$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'right_elements')) rightElementIDs$: Observable<number[]>;
-  @select(_.concat(PLOT_REDUX,'right_axis_settings')) rightAxisSettings$: Observable<IAxisSettings>;
-  @select(_.concat(PLOT_REDUX,'show_right_axis_settings')) showRightAxisSettings$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'time_axis_settings')) timeAxisSettings$: Observable<IAxisSettings>;
-  @select(_.concat(PLOT_REDUX,'show_time_axis_settings')) showTimeAxisSettings$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'show_plot')) showPlot$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'show_date_selector')) showDateSelector$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'plot_time')) plotTimeRange$: Observable<IRange>
-  @select(_.concat(PLOT_REDUX,'plot_data')) plotData$: Observable<IDataSet>;
-  @select(_.concat(PLOT_REDUX,'adding_plot_data')) addingPlotData$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'nav_time')) navTimeRange$: Observable<IRange>
-  @select(_.concat(PLOT_REDUX,'nav_data')) navData$: Observable<IDataSet>;
-  @select(_.concat(PLOT_REDUX,'adding_nav_data')) addingNavData$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'nav_zoom_lock')) navZoomLock$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'data_cursor')) dataCursor$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'plot_y1')) plotY1$: Observable<IRange>;
-  @select(_.concat(PLOT_REDUX,'plot_y2')) plotY2$: Observable<IRange>;
-  @select(_.concat(PLOT_REDUX,'live_update')) liveUpdate$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'data_view_filter_text')) dataViewFilterText$: Observable<string>;
-  @select(_.concat(PLOT_REDUX,'show_public_data_views')) showPublicDataViews$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'left_units')) leftElementUnits$: Observable<string>;
-  @select(_.concat(PLOT_REDUX,'right_units')) rightElementUnits$: Observable<string>;
-  @select(_.concat(PLOT_REDUX,'nilms_loaded')) nilmsLoaded$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'data_views_loaded')) dataViewsLoaded$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'show_data_envelope')) showDataEnvelope$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'show_annotations')) showAnnotations$: Observable<boolean>;
-  @select(_.concat(PLOT_REDUX,'live_update_interval')) liveUpdateInterval$: Observable<number>;
+  leftElementIDs$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.left_elements)));
+  leftAxisSettings$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.left_axis_settings)));
+  showLeftAxisSettings$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_left_axis_settings)));
+  rightElementIDs$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.right_elements)));
+  rightAxisSettings$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.right_axis_settings)));
+  showRightAxisSettings$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_right_axis_settings)));
+  timeAxisSettings$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.time_axis_settings)));
+  showTimeAxisSettings$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_time_axis_settings)));
+  showPlot$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_plot)));
+  showDateSelector$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_date_selector)));
+  plotTimeRange$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.plot_time)));
+  plotData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.plot_data)));
+  addingPlotData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.adding_plot_data)));
+  navTimeRange$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nav_time)));
+  navData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nav_data)));
+  addingNavData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.adding_nav_data)));
+  navZoomLock$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nav_zoom_lock)));
+  dataCursor$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.data_cursor)));
+  plotY1$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.plot_y1)));
+  plotY2$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.plot_y2)));
+  liveUpdate$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.live_update)));
+  dataViewFilterText$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.data_view_filter_text)));
+  showPublicDataViews$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_public_data_views)));
+  leftElementUnits$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.left_units)));
+  rightElementUnits$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.right_units)));
+  nilmsLoaded$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nilms_loaded)));
+  dataViewsLoaded$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.data_views_loaded)));
+  showDataEnvelope$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_data_envelope)));
+  showAnnotations$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_annotations)));
+  liveUpdateInterval$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.live_update_interval)));
   public leftElements$: Observable<IDbElement[]>
   public rightElements$: Observable<IDbElement[]>
+
+  //For the axis settings toolbars (can't change the redux state objects)
+  public leftAxisSettingsMutable$: Observable<IAxisSettings>;
+  public rightAxisSettingsMutable$: Observable<IAxisSettings>;
+  public timeAxisSettingsMutable$: Observable<IAxisSettings>;
 
   //both left and right elements
   public plottedElements$: Observable<IDbElement[]>
@@ -88,11 +109,11 @@ export class PlotSelectors {
   public isPlotDataValid$: Observable<boolean>;
 
   constructor(
-    private ngRedux: NgRedux<IAppState>
+    private store: Store
   ) {
 
     this.leftElements$ = combineLatest(
-      this.elements$,this.leftElementIDs$).pipe(
+      [this.elements$,this.leftElementIDs$]).pipe(
       map(([elements, ids]) => {
         return ids.map(id => elements[id]);
       }),
@@ -102,7 +123,7 @@ export class PlotSelectors {
 
 
     this.rightElements$ = combineLatest(
-      this.elements$, this.rightElementIDs$).pipe(
+      [this.elements$, this.rightElementIDs$]).pipe(
       map(([elements, ids]) => {
         return ids.map(id => elements[id])
       }),
@@ -112,14 +133,14 @@ export class PlotSelectors {
 
 
     this.plottedElements$ = combineLatest(
-      this.leftElements$, this.rightElements$).pipe(
+      [this.leftElements$, this.rightElements$]).pipe(
       map(([left, right]) => left.concat(right)),
       distinctUntilChanged((x, y) => _.isEqual(x, y)),
       //.share()
       startWith([]));
 
     this.plottedStreams$ = combineLatest(
-      this.plottedElements$, this.streams$).pipe(
+      [this.plottedElements$, this.streams$]).pipe(
       map(([elements, streams]) => {
         return _.uniq(elements.map(e => e.db_stream_id))
           .map(id => streams[id])
@@ -129,13 +150,13 @@ export class PlotSelectors {
 
 
     this.isPlotEmpty$ = combineLatest(
-      this.leftElementIDs$,this.rightElementIDs$).pipe(
+      [this.leftElementIDs$,this.rightElementIDs$]).pipe(
       map(([left, right]) => ((left.length == 0) && (right.length == 0))));
       //.share()
       //.startWith(true)
 
     this.isDataLoading$ = combineLatest(
-      this.addingNavData$,this.addingPlotData$).pipe(
+      [this.addingNavData$,this.addingPlotData$]).pipe(
       map(([nav, plot]) => nav && plot))
       //.share()
     
@@ -149,7 +170,7 @@ export class PlotSelectors {
       }));
     
     this.filteredDataViews$ = combineLatest(
-      viewArray,this.dataViewFilterText$, this.showPublicDataViews$).pipe(
+      [viewArray,this.dataViewFilterText$, this.showPublicDataViews$]).pipe(
       map(([views, filterText, includePublic]) => {
         return views
           //include public views only if includePublic is true
@@ -168,7 +189,7 @@ export class PlotSelectors {
       //.share()
 
     this.isIntervalDataDisplayed$ = combineLatest(
-      this.plottedElements$, this.plotData$).pipe(
+      [this.plottedElements$, this.plotData$]).pipe(
       map(([elements, data]) => elements
         .map(e => data[e.id])
         .filter(data => data !== undefined)),
@@ -180,7 +201,7 @@ export class PlotSelectors {
       //.share()
 
     this.isPlotDataValid$ = combineLatest(
-      this.plottedElements$,this.plotData$).pipe(
+      [this.plottedElements$,this.plotData$]).pipe(
       map(([elements, data]) => elements
         .map(e => data[e.id])
         .filter(data => data !== undefined)),
@@ -190,5 +211,11 @@ export class PlotSelectors {
           .reduce((isValid, id) => isValid && dataset[id].valid, true)
       }));
       //.share()
+
+      //For the axis settings toolbars (can't change the redux state objects)
+      this.leftAxisSettingsMutable$ = this.leftAxisSettings$.pipe(map(state=>Object.assign({},state)));
+      this.rightAxisSettingsMutable$ = this.rightAxisSettings$.pipe(map(state=>Object.assign({},state)));
+      this.timeAxisSettingsMutable$ = this.timeAxisSettings$.pipe(map(state=>Object.assign({},state)));
+
   }
 }

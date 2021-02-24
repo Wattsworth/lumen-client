@@ -1,37 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { NgRedux } from '@angular-redux/store';
+import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
-import { IAppState } from '../app.store';
-import {
-  UIActions,
-  IStatusMessages
-} from '../store/ui';
+import * as actions from '../store/ui/actions';
+import {IUI, IAPIMessages} from '../store/ui/types'
 import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 @Injectable()
 export class MessageService {
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private router: Router
   ) { }
 
-  public setMessages(messages: IStatusMessages): void {
-    this.ngRedux.dispatch({
-      type: UIActions.SET_MESSAGES,
-      payload: messages
-    });
+  public setMessages(messages: IAPIMessages){
+    if(messages.errors.length>0){this.setErrors(messages.errors);}
+    if(messages.warnings.length>0){this.setWarnings(messages.warnings);}
+    if(messages.notices.length>0){this.setNotices(messages.notices);}
   }
   public setError(error: string): void {
     this.setErrors([error]);
   }
-  public setErrors(errors: string[]): void {
-    this.setMessages({
-      notices: [],
-      warnings: [],
-      errors: errors
-    })
+  public setErrors(messages: string[]): void {
+    this.store.dispatch(actions.setErrorMessages({messages}));
   }
   public setErrorsFromAPICall(error): void {
     let errors = this.parseAPIErrors(error)
@@ -41,28 +33,20 @@ export class MessageService {
   public setWarning(warning: string): void {
     this.setWarnings([warning]);
   }
-  public setWarnings(warnings: string[]): void {
-    this.setMessages({
-      notices: [],
-      warnings: warnings,
-      errors: []
-    })
+  public setWarnings(messages: string[]): void {
+    this.store.dispatch(actions.setWarningMessages({messages}));
+
   }
   public setNotice(notice: string): void {
     this.setNotices([notice]);
   }
-  public setNotices(notices: string[]): void {
-    this.setMessages({
-      notices: notices,
-      warnings: [],
-      errors: []
-    })
+  public setNotices(messages: string[]): void {
+    this.store.dispatch(actions.setNoticeMessages({messages}));
+
   }
   public clearMessages(): void {
-    this.ngRedux.dispatch({
-      type: UIActions.CLEAR_MESSAGES,
-      payload: null
-    });
+    this.store.dispatch(actions.clearMessages());
+
   }
 
   private parseAPIErrors(response: HttpErrorResponse): string[] {

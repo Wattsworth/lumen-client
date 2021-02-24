@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { IAnnotation } from '../../store/data';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 
 @Pipe({
     name: 'annotationFilter'

@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { TreeNode } from 'angular-tree-component';
 import { Observable, Subscription } from 'rxjs';
-import { select } from '@angular-redux/store';
 
 import {
   DbFolderService,
@@ -11,14 +10,13 @@ import { InstallationSelectors } from '../../installation.selectors';
 import {
   INilm,
   IDbFolder,
-  IDbFolderRecords,
-  IDataAppRecords,
-  IDbStreamRecords,
-  IDbStream
+  IDbStream,
+  IDataApp
 } from '../../../store/data';
 import { combineLatest } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 import { data } from '../../../api';
+import { EntityState } from '@ngrx/entity';
 
 @Component({
   selector: 'installation-database-tab',
@@ -27,10 +25,7 @@ import { data } from '../../../api';
 })
 export class DatabaseTabComponent {
 
-  //@Input() nilm: INilm;
-
   private subs: Subscription[];
-  //public myNilm: INilm;
   public nilmTree$: Observable<DbTreeNode[]>
 
   constructor(
@@ -39,12 +34,16 @@ export class DatabaseTabComponent {
     public installationSelectors: InstallationSelectors,
   ) {
     this.subs = [];
+   
     this.nilmTree$ = combineLatest(
-      this.installationSelectors.nilm$,
-      this.installationSelectors.data$).pipe(
+      [this.installationSelectors.nilm$,
+      this.installationSelectors.data$]).pipe(
+        
         map(([nilm, data]) => this.mapNilm(nilm, 
-          data.dataApps,
-          data.dbFolders, data.dbStreams)));
+          data.dataApps.entities,
+          data.dbFolders.entities,
+          data.dbStreams.entities)));
+      
     
   };
 
@@ -74,43 +73,31 @@ export class DatabaseTabComponent {
     }
   }
 
-  /*ngOnInit() {
-    this.installationService.setRootFolderId(this.nilm.root_folder)
-    this.installationService.selectDbRoot();
-  }*/
-
   mapNilm(
     nilm: INilm,
-    data_apps: IDataAppRecords,
-    folders: IDbFolderRecords,
-    streams: IDbStreamRecords,
+    data_apps: {[id: number]: IDataApp },
+    folders: {[id: number]: IDbFolder },
+    streams: {[id: number]: IDbStream },
   ): DbTreeNode[] {
 
     
     //first map folders
     let root = folders[nilm.root_folder]
+    if(root===undefined){
+      return [] //waiting on the root node
+    }
     let folder_nodes = root.subfolders
       .filter(id => folders[id] !== undefined)
       .map(id => this.mapFolder(
         folders[id], folders, streams))
     let module_nodes = this.mapDataApps(nilm.data_apps, data_apps)
     return module_nodes.concat(folder_nodes);
-/*
-    return {
-        id: 'n' + nilm.id,
-        type: 'nilm',
-        refreshing: false,
-        nilmId: nilm.id,
-        name: nilm.name,
-        children: folder_nodes.concat(module_nodes),
-        hasChildren: true
-      }*/
     }
   
 
   mapDataApps(
     moduleIds: Array<number>,
-    dataApps: IDataAppRecords
+    dataApps:  {[id: number]: IDataApp },
   ): DbTreeNode[]{
     return moduleIds.map(id => dataApps[id])
     .filter(app => app !== undefined)
@@ -128,8 +115,8 @@ export class DatabaseTabComponent {
 
   mapFolder(
     folder: IDbFolder,
-    folders: IDbFolderRecords,
-    streams: IDbStreamRecords,
+    folders:  {[id: number]: IDbFolder },
+    streams:  {[id: number]: IDbStream },
   ): DbTreeNode {
     let children = null;
     //if folder is loaded, map children

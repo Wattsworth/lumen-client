@@ -1,4 +1,4 @@
-import { TypedRecord } from 'typed-immutable-record';
+import { Dictionary, EntityState } from '@ngrx/entity';
 import * as plot from '../../explorer/store/plot';
 
 // ---- Nilm ----
@@ -14,11 +14,8 @@ export interface INilm {
   root_folder: number; //id of database root
   data_apps: Array<number>;
 }
-export interface INilmRecord extends
-  TypedRecord<INilmRecord>, INilm { };
-export interface INilmRecords {
-  [index: string]: INilmRecord;
-}
+export interface INilmState extends EntityState<INilm> { };
+
 
 // ---- DataApp ----
 export interface IDataApp{
@@ -27,11 +24,8 @@ export interface IDataApp{
   url: string;
   nilm_id: number;  //id of the NILM owner
 }
-export interface IDataAppRecord extends
-  TypedRecord<IDataAppRecord>, IDataApp { };
-export interface IDataAppRecords {
-  [index: string]: IDataAppRecord;
-}
+export interface IDataAppState extends EntityState<IDataApp> { };
+
 
 // ---- DbFolder ----
 export interface IDbFolder {
@@ -48,11 +42,7 @@ export interface IDbFolder {
   size_on_disk: number;
   shallow: boolean; // true if contents have not been retrieved from server
 }
-export interface IDbFolderRecord extends
-  TypedRecord<IDbFolderRecord>, IDbFolder { };
-export interface IDbFolderRecords {
-  [index: string]: IDbFolderRecord;
-}
+export interface IDbFolderState extends EntityState<IDbFolder> { };
 
 // ---- DbStream ----
 export interface IDbStream {
@@ -73,11 +63,7 @@ export interface IDbStream {
   nilm_id: number;
   reloading_annotations: boolean;
 }
-export interface IDbStreamRecord extends
-  TypedRecord<IDbStreamRecord>, IDbStream { };
-export interface IDbStreamRecords {
-  [index: string]: IDbStreamRecord;
-}
+export interface IDbStreamState extends EntityState<IDbStream> { };
 
 // ---- DbElements ----
 export interface IDbElement {
@@ -97,15 +83,11 @@ export interface IDbElement {
   color: string;
   display_name: string;
 }
-export interface IDbElementRecord extends
-  TypedRecord<IDbElementRecord>, IDbElement { };
-export interface IDbElementRecords {
-  [index: string]: IDbElementRecord;
-}
+export interface IDbElementState extends EntityState<IDbElement> { };
 
 // --- Stream Annotation ---
 export interface IAnnotation{
-  id: number;
+  id: string;
   joule_id: number;
   db_stream_id: number;
   title: string;
@@ -113,11 +95,7 @@ export interface IAnnotation{
   start: number;
   end: number
 }
-export interface IAnnotationRecord extends
-  TypedRecord<IAnnotationRecord>, IAnnotation { };
-export interface IAnnotationRecords {
-  [index: string]: IAnnotationRecord;
-}
+export interface IAnnotationState extends EntityState<IAnnotation> { };
 
 
 // ---- User ----
@@ -127,20 +105,11 @@ export interface IUser {
   last_name: string;
   email: string;
 }
-export interface IUserRecord extends
-  TypedRecord<IUserRecord>, IUser { };
-export interface IUserRecords {
-    [index: number]: IUserRecord;
-};
-export interface IUserStore {
+export interface IUserState extends EntityState<IUser> { 
   current: number;
   new_installation_token: string;
   installation_token_available: boolean;
-  entities: IUserRecords;
-}
-export interface IUserStoreRecord extends
-  TypedRecord<IUserStoreRecord>, IUserStore { };
-
+};
 
 // ---- UserGroup ----
 export interface IUserGroup {
@@ -149,19 +118,10 @@ export interface IUserGroup {
   description: string;
   members: number[];
 }
-export interface IUserGroupRecord extends
-  TypedRecord<IUserGroupRecord>, IUserGroup { };
-export interface IUserGroupRecords {
-    [index: number]: IUserGroupRecord;
-};
-export interface IUserGroupStore {
+export interface IUserGroupState extends EntityState<IUserGroup>{
   owner: number[];
   member: number[];
-  entities: IUserGroupRecords;
 }
-export interface IUserGroupStoreRecord extends
-  TypedRecord<IUserGroupStoreRecord>, IUserGroupStore { };
-
 
 // ---- Permission ----
 export interface IPermission {
@@ -172,12 +132,8 @@ export interface IPermission {
   role: string;
   removable: boolean
 }
+export interface IPremissionState extends EntityState<IPermission> { };
 
-export interface IPermissionRecord extends
-  TypedRecord<IPermissionRecord>, IPermission { };
-export interface IPermissionRecords {
-  [index: string]: IPermission;
-}
 
 // ---- DataSet ----
 export interface IData {
@@ -189,11 +145,13 @@ export interface IData {
   valid: boolean;
 }
 
-export interface IDataRecord extends
-  TypedRecord<IDataRecord>, IData { };
-
 export interface IDataSet {
   [index: string]: IData; //indexed by DbElement ID
+}
+
+export interface IDataViewRedux{
+  ui_explorer: plot.IState,
+  data_dbElements: Dictionary<IDbElement>
 }
 
 // ---- DataView ----
@@ -208,15 +166,6 @@ export interface IDataView {
   private: boolean;
   home: boolean;
 }
-export interface IDataViewRedux{
-  ui_explorer: plot.IState,
-  data_dbElements: IDbElementRecords
-}
 
 
-export interface IDataViewRecord extends
-  TypedRecord<IDataViewRecord>, IDataView { };
-
-export interface IDataViewRecords {
-  [index: string]: IDataViewRecord;
-}
+export interface IDataViewState extends EntityState<IDataView> { };

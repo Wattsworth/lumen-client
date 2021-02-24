@@ -1,39 +1,36 @@
-import { Injectable } from '@angular/core';
-import { ActionsObservable } from 'redux-observable';
-import { UIActions } from '../store/ui';
-import { Observable } from 'rxjs';
-import { Epic, ofType } from 'redux-observable';
-import { mapTo, delay } from 'rxjs/operators';
 
-import { IPayloadAction } from '../store';
+import { Injectable } from '@angular/core';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { EMPTY, Observable } from 'rxjs';
+import { map, delay, catchError, tap } from 'rxjs/operators';
+
 import { IAppState } from '../app.store';
-import {
-  InterfaceActions,
-  PlotActions,
-} from '../explorer/store';
-import {
-  DbElementActions
-} from '../store/data';
+import * as uiactions from '../explorer/store';
+import * as actions from '../store/ui/actions';
+import { createAction } from '@ngrx/store';
 
 const BASE_URL = '/api';
 
 @Injectable()
-export class PageEpics {
+export class PageEffects {
 
-  public epics: Epic<IPayloadAction>[];
+  clearMessages$ = createEffect(()=>
+  this.actions$.pipe(
+    ofType(
+      actions.setErrorMessages, 
+      actions.setNoticeMessages, 
+      actions.setWarningMessages),
+    delay(5000), 
+    map(()=>actions.clearMessages()),
+    catchError(()=>EMPTY)));
 
-  constructor() {
-    this.epics = [ this.messages, this.interfaceSelection ]
-  }
+  constructor(
+    private actions$: Actions
+  ) {}
 
-  messages = action$ => {
-    return action$.pipe(
-      ofType(UIActions.SET_MESSAGES),
-      delay(5000),
-      mapTo({
-        type: UIActions.CLEAR_MESSAGES
-      }));
-  }
+  
+  //TODO
+  /*
   //When a UI action changes the plot, select the data explorer
   interfaceSelection = action$ => {
     return action$.pipe(
@@ -54,5 +51,5 @@ export class PageEpics {
               type: InterfaceActions.SELECT,
               payload: null
              }));
-  }
+  }*/
 }

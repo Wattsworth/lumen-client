@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 
 import { PlotSelectors } from '../../selectors/plot.selectors';
 import { PlotService, AnnotationUIService } from '../../services';
@@ -16,7 +16,7 @@ import {
 import { distinctUntilChanged, map, filter } from 'rxjs/operators';
 import { AnnotationService } from 'app/services';
 import { AnnotationSelectors, MeasurementSelectors } from 'app/explorer/selectors';
-import { IDbStream, IAnnotation, IAnnotationRecord } from 'app/store/data';
+import { IDbStream, IAnnotation } from 'app/store/data';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -79,10 +79,10 @@ export class PlotTabComponent implements OnInit, OnDestroy {
       })
     )
 
-    this.annotationMap$ = combineLatest(
+    this.annotationMap$ = combineLatest([
         this.annotationSelectors.annotations$,
         this.plotSelectors.nilms$,
-        this.plotSelectors.plottedStreams$).pipe(
+        this.plotSelectors.plottedStreams$]).pipe(
         map(([annotations, nilms, streams]) => {
           return streams.map(stream => {
             let editable = false;
@@ -105,9 +105,9 @@ export class PlotTabComponent implements OnInit, OnDestroy {
     while (this.subs.length > 0)
       this.subs.pop().unsubscribe()
   }
-  public editAnnotation($event, annotation:IAnnotationRecord){
+  public editAnnotation($event, annotation:IAnnotation){
     $event.stopPropagation();
-    this.selectedAnnotation = annotation.asMutable();
+    this.selectedAnnotation = {...annotation};
     this.annotationModal.show();
     //this.annotationService.deleteAnnotation(annotation)
   }

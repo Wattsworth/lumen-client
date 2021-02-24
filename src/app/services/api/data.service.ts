@@ -1,26 +1,23 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
 import {HttpClient, HttpParams} from '@angular/common/http'
 import { Observable } from 'rxjs';
 import { timeout, map, share } from 'rxjs/operators';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 import { MessageService } from '../message.service';
-import { DataViewService } from './data-view.service';
 import { IAppState } from '../../app.store';
 import {
   IDbElement,
   IDbStream
 } from '../../store/data';
+import { entityFactory, defaultData } from 'app/store/data/initial-state';
 
 @Injectable()
 export class DataService {
 
   constructor(
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
     private messageService: MessageService,
-    private dataViewService: DataViewService
   ) { }
 
   public loadData(
@@ -30,7 +27,7 @@ export class DataService {
     resolution: number,
     padding: number = 0
   ): Observable<any> {
-    
+
     let params = new HttpParams()
       .set('elements', JSON.stringify(elements.map(e => e.id)))
        .set('resolution', String(resolution))
@@ -44,7 +41,11 @@ export class DataService {
       {params: params}).pipe(
       timeout(20000), //wait a maximum of 20 seconds
       map(json => normalize(json.data, schema.datas)),
-      map(normalized => normalized.entities.data),
+      map(json => {
+        let raw_data = json.entities['data']
+        return Object.keys(raw_data).reduce((acc,id)=>{
+          acc[id]=Object.assign({},defaultData,raw_data[id]); 
+          return acc}, {})}),
       share())
     o.subscribe(_ => {}, 
     error => {

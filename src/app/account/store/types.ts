@@ -1,7 +1,6 @@
-import { TypedRecord } from 'typed-immutable-record';
 
 // ---- Account ----
-export interface IAccount {
+export interface IState {
  
   //flags to indicate whether data has been retrieved
   nilms_loaded?: boolean;
@@ -9,6 +8,3 @@ export interface IAccount {
   user_groups_loaded?: boolean;
   logging_in?: boolean;
 }
-
-export interface IAccountRecord extends
-  TypedRecord<IAccountRecord>, IAccount { };

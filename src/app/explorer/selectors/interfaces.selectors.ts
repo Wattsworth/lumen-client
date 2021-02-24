@@ -1,31 +1,26 @@
 
 import {withLatestFrom} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
+import { Store, select, createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
-import { select } from '@angular-redux/store';
-import * as _ from 'lodash';
-
-import { IAppState } from '../../app.store';
+import {dataApps_, interfaces_UI_Ex_} from 'app/selectors';
 
 export const INTERFACES_REDUX= ['ui','explorer','interfaces'];
 
-import {
-  IDataApp, IDataAppRecords
-} from '../../store/data';
+import { IDataApp } from '../../store/data';
 
 @Injectable()
 export class InterfacesSelectors {
-  @select(_.concat(INTERFACES_REDUX, 'displayed')) displayedIds$: Observable<number[]>
-  @select(_.concat(INTERFACES_REDUX, 'selected')) selectedId$: Observable<number>
-  @select(['data', 'dataApps']) apps$: Observable<IDataAppRecords>;
 
+  displayedIds$ = this.store.pipe(select(createSelector(interfaces_UI_Ex_, state=>state.displayed)));
+  selectedId$ = this.store.pipe(select(createSelector(interfaces_UI_Ex_, state=>state.selected)));
+  apps$ = this.store.pipe(select(dataApps_));
   public displayed$: Observable<IDataApp[]>
   public noneDisplayed$: Observable<boolean>
 
   constructor(
-    private ngRedux: NgRedux<IAppState>
+    private store: Store
   ){
 
     this.displayed$ = this.displayedIds$.pipe(

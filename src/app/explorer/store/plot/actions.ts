@@ -1,43 +1,48 @@
-export const PlotActions = {
-  //PLOT actions
-  'PLOT_ELEMENT': 'EXPLORER_PLOT_ELEMENT',
-  'HIDE_ELEMENT': 'EXPLORER_HIDE_ELEMENT',
-  'HIDE_ALL_ELEMENTS': 'EXPLORER_HIDE_ALL_ELEMENTS',
-  'SET_ELEMENT_AXIS': 'EXPLORER_SET_ELEMENT_AXIS',
-  'SHOW_PLOT': 'EXPLORER_SHOW_PLOT',
-  'HIDE_PLOT': 'EXPLORER_HIDE_PLOT',
-  'RESET_TIME_RANGES': 'EXPLORER_RESET_TIME_RANGES',
-  'ADD_PLOT_DATA': 'EXPLORER_ADD_PLOT_DATA',
-  'SET_PLOT_TIME_RANGE': 'EXPLORER_SET_PLOT_TIME_RANGE',
-  'ADDING_PLOT_DATA': 'EXPLORER_ADDING_PLOT_DATA',
-  'ADD_NAV_DATA': 'EXPLORER_ADD_NAV_DATA',
-  'SET_NAV_TIME_RANGE': 'EXPLORER_SET_NAV_TIME_RANGE',
-  'ADDING_NAV_DATA': 'EXPLORER_ADDING_NAV_DATA',
-  'SET_NAV_RANGE_TO_PLOT_RANGE': 'EXPLORER_SET_NAV_RANGE_TO_PLOT_RANGE',
-  'TOGGLE_ZOOM_LOCK': 'EXPLORER_TOGGLE_ZOOM_LOCK',
-  'DISABLE_ZOOM_LOCK': 'EXPLORER_DISABLE_ZOOM_LOCK',
-  'TOGGLE_DATA_CURSOR': 'EXPLORER_TOGGLE_DATA_CURSOR',
-  'DISABLE_DATA_CURSOR': 'EXPLORER_DISABLE_DATA_CURSOR',
-  'AUTO_SCALE_AXIS': 'EXPLORER_AUTO_SCALE_AXIS',
-  'SHOW_DATE_SELECTOR': 'EXPLORER_SHOW_DATE_SELECTOR',
-  'HIDE_DATE_SELECTOR': 'EXPLORER_HIDE_DATE_SELECTOR',
-  'TOGGLE_LIVE_UPDATE': 'EXPLORER_TOGGLE_LIVE_UPDATE',
-  'DISABLE_LIVE_UPDATE': 'EXPLORER_DISABLE_LIVE_UPDATE',
-  'TOGGLE_SHOW_DATA_ENVELOPE': 'EXPLORER_TOGGLE_SHOW_DATA_ENVELOPE',
-  'TOGGLE_SHOW_ANNOTATIONS': 'EXPLORER_TOGGLE_SHOW_ANNOTATIONS',
-  'SET_NILMS_LOADED': 'EXPLORER_SET_NILMS_LOADED',
-  'SET_LIVE_UPDATE_INTERVAL': 'EXPLORER_SET_LIVE_UPDATE_INTERVAL',
-  //Axis Settings
-  'SET_LEFT_AXIS_SETTINGS': 'EXPLORER_SET_LEFT_AXIS_SETTINGS',
-  'SET_RIGHT_AXIS_SETTINGS': 'EXPLORER_SET_RIGHT_AXIS_SETTINGS',
-  'SET_TIME_AXIS_SETTINGS': 'EXPLORER_SET_TIME_AXIS_SETTINGS',
-  'TOGGLE_TIME_AXIS_SETTINGS': 'EXPLORER_TOGGLE_TIME_AXIS_SETTINGS',
-  'TOGGLE_RIGHT_AXIS_SETTINGS': 'EXPLORER_TOGGLE_RIGHT_AXIS_SETTINGS',
-  'TOGGLE_LEFT_AXIS_SETTINGS': 'EXPLORER_TOGGLE_LEFT_AXIS_SETTINGS',
-  //Data views
-  'SET_DATA_VIEW_FILTER_TEXT': 'EXPORER_SET_DATA_VIEW_FILTER_TEXT',
-  'SET_SHOW_PUBLIC_DATA_VIEWS': 'EXPLORER_SET_SHOW_PUBLIC_DATA_VIEWS',
-  'SET_DATA_VIEWS_LOADED': 'EXPLORER_SET_DATA_VIEWS_LOADED',
-  'RESTORE_VIEW': 'EXPLORER_RESTORE_VIEW',
+import {createAction, props} from '@ngrx/store'
+import { IDataSet, IDbElement } from 'app/store/data';
+import { IState } from './types';
 
-}
+import { IAxisSettings, IRange } from '../helpers';
+
+//Plot Actions
+export const hideElement = createAction('[EXPLORER: PLOT] Hide element ', props<{id: number}>());
+export const plotElement = createAction('[EXPLORER: PLOT] Show element', props<{element: IDbElement}>());
+export const hideAllElements = createAction('[EXPLORER: PLOT] Hide all elements');
+export const setElementAxis = createAction('[EXPLORER: PLOT] Set element axis', props<{element: IDbElement, axis: string}>());
+export const showPlot = createAction('[EXPLORER: PLOT] Show plot');
+export const hidePlot = createAction('[EXPLORER: PLOT] Hide plot');
+export const showDateSelector = createAction('[EXPLORER: PLOT] Show date selector');
+export const hideDateSelector = createAction('[EXPLORER: PLOT] Hide date selector');
+export const addingPlotData = createAction('[EXPLORER: PLOT] Adding plot data');
+export const addingNavData = createAction('[EXPLORER: PLOT] Adding nav data');
+export const addPlotData = createAction('[EXPLORER: PLOT] Add plot data', props<{data: IDataSet}>());
+export const addNavData = createAction('[EXPLORER: PLOT] Add nav data', props<{data: IDataSet}>());
+export const resetTimeRanges = createAction('[EXPLORER: PLOT] Reset time ranges');
+export const setPlotTimeRange = createAction('[EXPLORER: PLOT] Set plot time range', props<{range: IRange}>());
+export const setNavTimeRange = createAction('[EXPLORER: PLOT] Set nav time range', props<{range: IRange}>());
+export const setNavRangeToPlotRange = createAction('[EXPLORER: PLOT] Set nav range to plot range');
+export const toggleZoomLock = createAction('[EXPLORER: PLOT] Toggle zoom lock');
+export const disableZoomLock = createAction('[EXPLORER: PLOT] Disable zoom lock');
+export const toggleDataCursor = createAction('[EXPLORER: PLOT] Toggle data cursor');
+export const disableDataCursor = createAction('[EXPLORER: PLOT] Disable data cursor');
+export const toggleLiveUpdate = createAction('[EXPLORER: PLOT] Toggle live update');
+export const disableLiveUpdate = createAction('[EXPLORER: PLOT] Disable live update');
+export const toggleDataEnvelope = createAction('[EXPLORER: PLOT] Toggle data envelope');
+export const toggleAnnotations = createAction('[EXPLORER: PLOT] Toggle annotations');
+export const setLiveUpdateInterval = createAction('[EXPLORER: PLOT] Set live update interval', props<{rate: number}>());
+
+//Axis Settings
+export const autoScaleAxis = createAction('[EXPLORER: PLOT] Auto scale axis', props<{axis: String}>());
+export const setNilmLoaded = createAction('[EXPLORER: PLOT] Set nilms loaded');
+export const setLeftAxisSettings = createAction('[EXPLORER: PLOT] Set left axis settings', props<{settings: IAxisSettings}>());
+export const setRightAxisSettings = createAction('[EXPLORER: PLOT] Set right axis settings', props<{settings: IAxisSettings}>());
+export const setTimeAxisSettings = createAction('[EXPLORER: PLOT] Set time axis settings', props<{settings: IAxisSettings}>());
+export const toggleTimeAxisSettings = createAction('[EXPLORER: PLOT] Toggle time axis settings');
+export const toggleLeftAxisSettings = createAction('[EXPLORER: PLOT] Toggle left axis settings');
+export const toggleRightAxisSettings = createAction('[EXPLORER: PLOT] Toggle right axis settings');
+
+//Data Views
+export const setDataViewsLoaded = createAction('[EXPLORER: PLOT] Set data views loaded');
+export const showPublicDataViews = createAction('[EXPLORER: PLOT] Show public data views', props<{show: boolean}>());
+export const setDataViewFilterText = createAction('[EXPLORER: PLOT] Set data view filter text', props<{filter: string}>());
+export const restoreDataView = createAction('[EXPLORER: PLOT] Restore data view', props<{saved_state: IState}>());

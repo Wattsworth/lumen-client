@@ -1,6 +1,5 @@
 import {
   Component,
-  Input,
   ViewChild,
   OnInit
 } from '@angular/core';
@@ -10,9 +9,6 @@ import {
   UserGroupService
 } from '../../../services';
 
-import {
-  IUserGroupRecord,
-} from '../../../store/data';
 import {AccountSelectors} from '../../account.selectors';
 
 @Component({

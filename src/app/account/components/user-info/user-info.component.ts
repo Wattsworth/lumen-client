@@ -2,15 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 /*https://github.com/yuyang041060120/ng2-validation*/
 import { CustomValidators } from 'ng2-validation';
 
 import { SessionService } from '../../../services'
-import { IUserRecord } from '../../../store/data';
+import { IUser } from '../../../store/data';
 import { AccountSelectors } from '../../account.selectors';
 
 @Component({
@@ -34,7 +36,7 @@ export class UserInfoComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub = this.accountSelectors.users$.subscribe(
       users => {
-        if (users.current != null &&
+        if (users != null &&
           users.entities[users.current] !== undefined) {
           this.buildForm(users.entities[users.current]);
         }
@@ -43,11 +45,11 @@ export class UserInfoComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.sub.unsubscribe();
   }
-  buildForm(user: IUserRecord) {
+  buildForm(user: IUser) {
     this.passwords =  this.fb.group({
       password: [""],
       password_confirmation: [""],
-    }, { validator: this.passwordValidator })
+    }, { validators: this.passwordValidator })
     this.form = this.fb.group({
       first_name: [user.first_name, Validators.required],
       last_name: [user.last_name, Validators.required],
@@ -58,15 +60,15 @@ export class UserInfoComponent implements OnInit, OnDestroy {
     
   }
 
-  passwordValidator(group: FormGroup) {
-    const password = group.get('password');
-    const confirm = group.get('password_confirmation');
+  passwordValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password');
+    const confirm = control.get('password_confirmation');
     if (password.value === confirm.value) {
       return null; //ok
     }
-    return {
+    return ({
       areEqual: false
-    }
+    })
   }
   onSubmit(formValues: any) {
     const userParams = {

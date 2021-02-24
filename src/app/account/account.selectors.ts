@@ -1,40 +1,27 @@
 import { Injectable } from '@angular/core';
-import { NgRedux } from '@angular-redux/store';
-import { Observable } from 'rxjs';
-import {map} from 'rxjs/operators';
-import { select } from '@angular-redux/store';
-import * as _ from 'lodash';
+import { Store, select, createSelector} from '@ngrx/store'
 
-import { IAppState } from '../app.store';
-import{
-  IUserRecord,
-  IUserStoreRecord,
-  IUserGroupRecord,
-  IUserGroupStore
-} from '../store/data';
+import { account_UI_, userGroups_, users_ } from 'app/selectors';
 
 @Injectable()
 export class AccountSelectors {
 
-  @select(['ui', 'account', 'nilms_loaded']) nilmsLoaded$: Observable<boolean>;
-  @select(['ui', 'account', 'data_views_loaded']) dataViewsLoaded$: Observable<boolean>;
-  @select(['ui', 'account', 'user_groups_loaded']) userGroupsLoaded$: Observable<boolean>;
-  @select(['ui', 'account', 'logging_in']) loggingIn$: Observable<boolean>;
-  
-  @select(['data', 'userGroups']) userGroups$: Observable<IUserGroupStore>
-  @select(['data','users']) users$: Observable<IUserStoreRecord>
-  @select(['data', 'users','new_installation_token']) installation_token$: Observable<string>
-  @select(['data','users','installation_token_available']) can_add_installations$: Observable<boolean>
-  
-  public ownedGroups$: Observable<IUserGroupRecord[]>;
-  public memberGroups$: Observable<IUserGroupRecord[]>;
+  nilmsLoaded$ = this.store.pipe(select(createSelector(account_UI_,state=>state.nilms_loaded)));
+  dataViewsLoaded$ = this.store.pipe(select(createSelector(account_UI_,state=>state.data_views_loaded)));
+  userGroupsLoaded$ = this.store.pipe(select(createSelector(account_UI_,state=>state.user_groups_loaded)));
+  loggingIn$ = this.store.pipe(select(createSelector(account_UI_,state=>state.logging_in)));
 
-  constructor() {
-    this.ownedGroups$ = this.userGroups$.pipe(map(store => {
-      return store.owner.map(id => store.entities[id]);
-    }));
-    this.memberGroups$ = this.userGroups$.pipe(map(store => {
-      return store.member.map(id => store.entities[id]);
-    }));
-  }
+  ownedGroups$ = this.store.pipe(select(createSelector(userGroups_,
+     state => state.owner.map(id=>state.entities[id]))))
+  memberGroups$ = this.store.pipe(select(createSelector(userGroups_, 
+    state => state.member.map(id=>state.entities[id]))))
+
+  users$ = this.store.pipe(select(users_));
+  installation_token$= this.store.pipe(select(createSelector(users_, state=>state.new_installation_token)));
+  can_add_installations$ = this.store.pipe(select(createSelector(users_, state=>state.installation_token_available)));
+
+
+  constructor(
+    private store:Store
+  ) {}
 }

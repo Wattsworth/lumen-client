@@ -1,21 +1,19 @@
 import { Injectable } from '@angular/core';
-import { Observable, empty } from 'rxjs';
+import { Observable, EMPTY } from 'rxjs';
+import { Store } from '@ngrx/store'
 import { share } from 'rxjs/operators';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { NgRedux } from '@angular-redux/store';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 
 import { IAppState } from '../../app.store';
-import {
-  NilmActions,
-  DbFolderActions,
-  INilm,
-  DataAppActions
-} from '../../store/data';
+import { INilm } from '../../store/data';
+import * as actions from '../../store/data/actions';
+
 import {
   MessageService
 } from '../message.service';
+import { defaultDataApp, defaultDbFolder, defaultNilm, entityFactory } from 'app/store/data/initial-state';
 
 
 @Injectable()
@@ -26,7 +24,7 @@ export class NilmService {
   constructor(
     //private http: Http,
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private messageService: MessageService
   ) {
     this.nilmsLoaded = false;
@@ -34,7 +32,7 @@ export class NilmService {
 
   public loadNilms(): Observable<any> {
     if (this.nilmsLoaded) {
-      return empty();
+      return EMPTY;
     }
 
     let o = this.http
@@ -92,10 +90,8 @@ export class NilmService {
     let o = this.http.get<schema.IApiResponse>(`nilms/${id}.json`, {
       params: new HttpParams().set('refresh', "1")
     }).pipe(share());
-    this.ngRedux.dispatch({
-      type: NilmActions.REFRESHING,
-      payload: id
-    });
+    this.store.dispatch(actions.refreshingNilm({id}));
+    
     o.subscribe(
       json => {
         let data = normalize(json.data, schema.nilm)
@@ -103,10 +99,7 @@ export class NilmService {
         this._dispatch(data.entities);
       },
       error => {
-        this.ngRedux.dispatch({
-          type: NilmActions.REFRESHED,
-          payload: id
-        })
+        this.store.dispatch(actions.refreshedNilm({id}));
         this.messageService.setErrorsFromAPICall(error)
       }
     );
@@ -120,10 +113,8 @@ export class NilmService {
 
     o.subscribe(
       json => {
-        this.ngRedux.dispatch({
-          type: NilmActions.REMOVE,
-          payload: nilm.id
-        });
+        this.store.dispatch(actions.removeNilm({id: nilm.id}));
+
         this.messageService.setMessages(json.messages);
       },
       error => this.messageService.setErrorsFromAPICall(error)
@@ -133,17 +124,12 @@ export class NilmService {
 
   // -------- private helper functions --------
   private _dispatch(entities) {
-    this._receive(NilmActions, entities['nilms']);
-    this._receive(DataAppActions, entities['dataApps']);
-    this._receive(DbFolderActions, entities['dbFolders']);
-  }
-  private _receive(target: any, data: any) {
-    if (!(data === undefined)) {
-      this.ngRedux.dispatch({
-        type: target.RECEIVE,
-        payload: data
-      });
-    }
+    let nilms = entityFactory(entities['nilms'], defaultNilm);
+    this.store.dispatch(actions.receiveNilm({nilms}));
+    let apps = entityFactory(entities['dataApps'], defaultDataApp);
+    this.store.dispatch(actions.receiveDataApp({apps}));
+    let folders = entityFactory(entities['dbFolders'], defaultDbFolder);
+    this.store.dispatch(actions.receiveDbFolder({folders}));
   }
 
 }

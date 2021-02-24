@@ -2,7 +2,6 @@ import { Component, Input, OnInit, ViewChild, EventEmitter } from '@angular/core
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { select } from '@angular-redux/store';
 
 import {
   FormBuilder,
@@ -21,7 +20,8 @@ import {
   IPermission,
   INilm
 } from '../../../store/data';
-import { AccountSelectors } from 'app/account/account.selectors';
+import { Store, select, createSelector } from '@ngrx/store';
+import { global_UI_ } from 'app/selectors';
 
 @Component({
   selector: 'app-edit-permissions',
@@ -37,8 +37,8 @@ export class EditPermissionsComponent implements OnInit {
   @Input() viewers: IPermission[]
   @Input() nilm: INilm
 
-  @select(['ui', 'global', 'email_enabled']) emailEnabled$: Observable<string>;
-
+  emailEnabled$=this.store.pipe(select(createSelector(global_UI_,state=>state.email_enabled)))
+  
   public selectEntries$: Observable<SelectEntry[]>;
 
   public target: any;
@@ -51,8 +51,8 @@ export class EditPermissionsComponent implements OnInit {
 
   constructor(
     private permissionService: PermissionService,
-    private accountSelectors: AccountSelectors,
-    public fb: FormBuilder
+    public fb: FormBuilder,
+    private store: Store,
   ) {
     this.userType = 'select';
 

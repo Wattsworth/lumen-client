@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NgRedux } from '@angular-redux/store';
 import { Router } from '@angular/router';
 import {Observable, empty} from 'rxjs';
 import { share } from 'rxjs/operators';
+import { Store } from '@ngrx/store'
 
 import { environment } from '../../../environments/environment';
 import * as schema from '../../api';
@@ -11,9 +11,12 @@ import { MessageService } from '../message.service';
 import { parseDeviseErrors } from './helpers';
 import { IAppState } from '../../app.store'
 import {
-  UserActions
-} from '../../store/data';
-import { UIActions } from 'app/store/ui';
+  setCurrentUser
+} from '../../store/data/actions';
+
+import * as uiActions from 'app/store/ui/actions';
+import { defaultUser } from 'app/store/data/initial-state';
+import { IUser } from 'app/store/data/types';
 
 @Injectable()
 export class SessionService {
@@ -21,9 +24,8 @@ export class SessionService {
   private settingsLoaded: boolean;
 
   constructor(
-    //private http: Http,
+    private store: Store,
     private http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
     private router: Router,
     private messageService: MessageService,
   ) {
@@ -116,21 +118,13 @@ export class SessionService {
   // ----------private helper functions----------
 
   private setUser(json) {
-    this.ngRedux.dispatch({
-      type: UserActions.SET_CURRENT,
-      payload: json
-    });
+    let user:IUser = {...defaultUser, ...json}
+    this.store.dispatch(setCurrentUser({user}));
   }
 
   private updateSiteSettings(data: schema.ISiteSettings){
-    this.ngRedux.dispatch({
-      type: UIActions.SET_PAGE_HEADER,
-      payload: data.node_name
-    });
-    this.ngRedux.dispatch({
-      type: UIActions.ENABLE_EMAILS,
-      payload: data.send_emails
-    });
+    this.store.dispatch(uiActions.setPageHeader({header: data.node_name}));
+    this.store.dispatch(uiActions.enableEmails({enable: data.send_emails}));
     this.settingsLoaded=true;
   }
 }
