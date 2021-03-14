@@ -10,6 +10,7 @@ export interface IState {
   dataApps: types.IDataAppState;
   dbFolders: types.IDbFolderState;
   dbStreams: types.IDbStreamState;
+  eventStreams: types.IEventStreamState;
   dbElements: types.IDbElementState;
   users: types.IUserState;
   userGroups: types.IUserGroupState;
@@ -23,6 +24,7 @@ export const reducer = combineReducers({
   dataApps: reducers.dataAppReducer,
   dbFolders: reducers.dbFolderReducer,
   dbStreams: reducers.dbStreamReducer,
+  eventStreams: reducers.eventStreamReducer,
   dbElements: reducers.dbElementReducer,
   permissions: reducers.permissionReducer,
   users: reducers.userReducer,

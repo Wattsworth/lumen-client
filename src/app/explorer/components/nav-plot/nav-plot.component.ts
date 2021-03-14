@@ -59,13 +59,17 @@ export class NavPlotComponent implements OnInit, AfterViewInit, OnDestroy {
       distinctUntilChanged((x, y) => _.isEqual(x, y)));
     let elements = this.plotSelectors.plottedElements$.pipe(
       distinctUntilChanged((x,y) => _.isEqual(x,y)));
+    let eventStreams = this.plotSelectors.plottedEventStreams$.pipe(
+      distinctUntilChanged((x,y) => _.isEqual(x,y))
+    )
     this.subs.push(combineLatest(
-      timeRange, elements).pipe(
+      [timeRange, elements,eventStreams]).pipe(
         withLatestFrom(this.plotSelectors.addingNavData$),
-        filter(([[timeRange, elements], busy]) => !busy && elements.length!=0))
-      .subscribe(([[timeRange, elements], busy]) => {
+        filter(([[timeRange, elements, streams], busy]) => !busy && elements.length!=0))
+      .subscribe(([[timeRange, elements, streams], busy]) => {
         let resolution = $(this.plotArea.nativeElement).width()
         this.plotService.loadNavData(elements, timeRange, resolution);
+        this.plotService.loadNavEventData(streams, timeRange)
         if (this.plot != null)
           this.plot.clearSelection(true);
       }));

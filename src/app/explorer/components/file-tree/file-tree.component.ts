@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TreeNode } from 'angular-tree-component';
+import * as _ from 'lodash-es';
 
 import {
   NilmService,
@@ -15,7 +16,8 @@ import {
   IDbStream,
   IDbElement,
   IDataApp,
-  IData
+  IData,
+  IEventStream
 } from '../../../store/data';
 import { 
   PlotService,
@@ -25,6 +27,7 @@ import {
   PlotSelectors,
 } from '../../selectors';
 import { Dictionary } from '@ngrx/entity';
+import { eventStreamAdapter } from 'app/store/data/reducer';
 
 @Component({
   selector: 'app-file-tree',
@@ -53,8 +56,9 @@ export class FileTreeComponent implements OnInit {
     
     this.dbNodes$ = combineLatest([
       this.plotSelectors.data$,
-      this.plotSelectors.plottedElements$])
-      .pipe(map(([data,elements]) => {
+      this.plotSelectors.plottedElements$,
+      this.plotSelectors.plottedEventStreamIDs$])
+      .pipe(map(([data,elements,plotted_event_streams]) => {
         let nilms = Object.values(data.nilms.entities);
         return nilms.map(nilm => {
           return this.mapNilm(nilm, 
@@ -62,7 +66,9 @@ export class FileTreeComponent implements OnInit {
             data.dataApps.entities,
             data.dbFolders.entities, 
             data.dbStreams.entities, 
-            data.dbElements.entities)
+            data.eventStreams.entities,
+            data.dbElements.entities,
+            plotted_event_streams)
         }).sort((a,b) => a.name > b.name ? 1:-1)
       }));
   }
@@ -93,13 +99,15 @@ export class FileTreeComponent implements OnInit {
     dataApps: Dictionary<IDataApp>,
     folders: Dictionary<IDbFolder>,
     streams: Dictionary<IDbStream>,
+    eventStreams: Dictionary<IEventStream>,
     elements: Dictionary<IDbElement>,
+    plottedEventStreams: number[]
   ): DbTreeNode {
     let children = null
     if (rootDbFolder !== undefined) {
       //nilm is loaded, map it out
       let root = this.mapFolder(rootDbFolder,
-        folders, streams, elements);
+        folders, streams, eventStreams, elements, plottedEventStreams);
       //add the Joule Modules to the top of the folder listing
       root.children.unshift(...this.mapJouleModules(
         nilm.data_apps, dataApps));
@@ -146,7 +154,9 @@ export class FileTreeComponent implements OnInit {
     folder: IDbFolder,
     folders: Dictionary<IDbFolder>,
     streams: Dictionary<IDbStream>,
+    eventStreams: Dictionary<IEventStream>,
     elements: Dictionary<IDbElement>,
+    plottedEventStreams: number[]
   ): DbTreeNode {
     let children = null;
     //if folder is loaded, map children
@@ -156,15 +166,21 @@ export class FileTreeComponent implements OnInit {
         folder.subfolders
           .filter(id => folders[id] !== undefined)
           .map(id => this.mapFolder(
-            folders[id], folders, streams, elements))
+            folders[id], folders, streams, eventStreams, 
+            elements, plottedEventStreams))
           .sort((a,b) => a.name > b.name ? 1:-1),
         //now map streams
         folder.streams
           .filter(id => streams[id] !== undefined)
           .map(id => this.mapStream(
-            streams[id], elements)))
+            streams[id], elements))
+          .sort((a,b) => a.name > b.name ? 1:-1),
+        //now map event streams
+        folder.event_streams
+          .filter(id => eventStreams[id] !== undefined)
+          .map(id => this.mapEventStream(eventStreams[id],_.includes(plottedEventStreams, id)))
           .sort((a,b) => a.name > b.name ? 1:-1)
-
+          )
     }
     //create the DbNode and return it
     return {
@@ -196,11 +212,31 @@ export class FileTreeComponent implements OnInit {
     }
   }
 
+  mapEventStream(
+    stream: IEventStream,
+    plotted: boolean,
+  ): IEventStreamNode {
+    //let plotted = this.plotService.isEventStreamPlotted(stream);
+
+    //create the DbNode and return it
+    return {
+      id: 'v' + stream.id, //e is  taken by elements
+      name: stream.name,
+      stream: stream,
+      type: 'eventStream',
+      plotted: plotted,
+      children: [],
+      hasChildren: false,
+      color: null,
+      tooltip: "",
+    }
+  }
+
   mapElement(
     element: IDbElement,
   ): IDbElementNode {
-    let plotted = this.plotService.isPlotted(element);
-    let plottable = this.plotService.isPlottable(element.units);
+    let plotted = this.plotService.isElementPlotted(element);
+    let plottable = this.plotService.isElementPlottable(element.units);
 
     let tooltip = "";
     if (plottable == false) {
@@ -234,6 +270,13 @@ export interface DbTreeNode {
   priveleged?: boolean;
   nilmId?: number;
 };
+export interface IEventStreamNode 
+  extends DbTreeNode{
+  stream: IEventStream;
+  plotted: boolean;
+  tooltip: string;
+  color: string;
+}
 export interface IDbElementNode
   extends DbTreeNode {
   element: IDbElement;

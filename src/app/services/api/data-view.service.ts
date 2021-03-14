@@ -11,6 +11,8 @@ import { MessageService } from '../message.service';
 import { DbElementService } from './db-element.service';
 import { DbStreamService } from './db-stream.service';
 import { ColorService } from './color.service';
+import { EventStreamService } from './event-stream.service';
+
 import {
   IDataView,
   IData,
@@ -18,12 +20,13 @@ import {
   IDbElementState,
   IDbElement,
   IDbStream,
+  IEventStream
 } from '../../store/data';
 import * as actions from '../../store/data/actions';
 import * as plotActions from '../../explorer/store/plot/actions'
 import * as plot from '../../explorer/store/plot';
-import { defaultDataView, entityFactory } from 'app/store/data/initial-state';
-import { dbElements_, dbStreams_, plot_UI_Ex_ } from 'app/selectors';
+import { defaultDataView, entityFactory, defaultDataViewRedux } from 'app/store/data/initial-state';
+import { dbElements_, dbStreams_, eventStreams_, plot_UI_Ex_ } from 'app/selectors';
 import { Dictionary } from '@ngrx/entity';
 
 export const MAX_SAVE_DATA_LENGTH = 200;
@@ -42,6 +45,7 @@ export class DataViewService {
     private elementService: DbElementService,
     private streamService: DbStreamService,
     private colorService: ColorService,
+    private eventStreamService: EventStreamService
   ) {
     this.dataViewsLoaded = false;
   }
@@ -169,24 +173,38 @@ export class DataViewService {
     //first clear the plot
     this.elementService.resetElements();
     this.store.dispatch(plotActions.hideAllElements())
+    this.store.dispatch(plotActions.hideAllEvents())
+
+    //add any missing keys to redux (compatibility with previous data view formats)
+    let redux = {...defaultDataViewRedux, ...view.redux}
     //now set the plot & nav time ranges so we don't reload the data 
     //(they are null after HIDE_ALL_ELEMENTS)
-    this.store.dispatch(plotActions.setPlotTimeRange({range: view.redux.ui_explorer.plot_time}))
+    this.store.dispatch(plotActions.setPlotTimeRange({range: redux.ui_explorer.plot_time}))
 
-    this.store.dispatch(plotActions.setNavTimeRange({range: view.redux.ui_explorer.nav_time}))
+    this.store.dispatch(plotActions.setNavTimeRange({range: redux.ui_explorer.nav_time}))
 
     //now load the data elements
-    this.elementService.restoreElements(Object.values(view.redux.data_dbElements))
+    this.elementService.restoreElements(Object.values(redux.data_dbElements))
+
+    //now load the event streams
+    this.eventStreamService.restoreEventStreams(Object.values(redux.data_eventStreams))
 
     //register colors with color service
-    let newElements = view.redux.data_dbElements;
+    let newElements = redux.data_dbElements;
     Object.keys(newElements)
       .map(id => newElements[id])
       .map(element => {
         this.colorService.checkoutColor(element.color);
       })
+    let newEventStreams = redux.data_eventStreams;
+    console.log("here")
+    Object.keys(newEventStreams)
+      .map(id => newEventStreams[id])
+      .map(stream => {
+        this.colorService.checkoutEventColor(stream.color);
+      })
     //restore the plot
-    this.store.dispatch(plotActions.restoreDataView({saved_state: view.redux.ui_explorer}))
+    this.store.dispatch(plotActions.restoreDataView({saved_state: redux.ui_explorer}))
 
     //load the associated streams if they haven't been retrieved already
     let dbStreams: Dictionary<IDbStream>;
@@ -210,6 +228,11 @@ export class DataViewService {
     let allElements:Dictionary<IDbElement>
     this.store.select(dbElements_)
       .pipe(take(1)).subscribe(state => allElements=state);
+
+    let eventStreams:Dictionary<IEventStream>
+    this.store.select(eventStreams_)
+      .pipe(take(1)).subscribe(state => eventStreams=state);
+    
   
     let explorerState: plot.IState;
     this.store.select(plot_UI_Ex_)
@@ -220,12 +243,18 @@ export class DataViewService {
       .reduce((acc, id) => {
         acc[id] = allElements[id];
         return acc
-      }, {})
+      }, {});
+    let plottedEventStreams = explorerState.event_streams.reduce((acc,id)=>{
+      acc[id]=eventStreams[id];
+      return acc
+    }, {});
 
     //compute array of unique stream ids so we can organize
     //data views by permission on the server
     let stream_ids = _.uniq(Object.keys(plottedElements)
       .map(id => plottedElements[id].db_stream_id))
+    
+    let event_stream_ids = Object.keys(plottedEventStreams).map(id=>+id);
     //sanitize explorer ui state
     explorerState.show_date_selector = false; //hide in case it is visible
     if (includeData) {
@@ -248,16 +277,38 @@ export class DataViewService {
           acc[id] = this.decimateDataset(dataset);
           return acc;
         }, {})
+        explorerState.plot_event_data = Object.keys(plottedEventStreams)
+        .reduce((acc,id) =>{
+          let dataset = explorerState.plot_event_data[id];
+          if (dataset === undefined) {
+            return acc; //data is missing we can't save it
+          }
+          acc[id] = dataset
+          return acc;
+        },{})
+        explorerState.nav_event_data = Object.keys(plottedEventStreams)
+        .reduce((acc,id) =>{
+          let dataset = explorerState.nav_event_data[id];
+          if (dataset === undefined) {
+            return acc; //data is missing we can't save it
+          }
+          acc[id] = dataset
+          return acc;
+        },{})
     } else {
       explorerState.plot_data = {};
       explorerState.nav_data = {};
+      explorerState.plot_event_data = {};
+      explorerState.nav_event_data = {};
     }
     return {
       redux: {
         ui_explorer: explorerState,
-        data_dbElements: plottedElements
+        data_dbElements: plottedElements,
+        data_eventStreams: plottedEventStreams
       },
-      stream_ids: stream_ids
+      stream_ids: stream_ids,
+      event_stream_ids: event_stream_ids
     }
   }
 
@@ -293,5 +344,11 @@ export class DataViewService {
 export interface IDataViewState {
   redux: IDataViewRedux
   stream_ids: Array<number>
+  event_stream_ids: Array<number>
+}
+export const defaultDataViewState: IDataViewState = {
+  redux: defaultDataViewRedux,
+  stream_ids: [],
+  event_stream_ids: []
 }
 

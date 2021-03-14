@@ -13,6 +13,8 @@ export const dataApps_ = createSelector(data_, (state) => state.dataApps.entitie
 export const dbFolders_ = createSelector(data_, (state) => state.dbFolders.entities);
 export const dbStreams_ = createSelector(data_, (state) => state.dbStreams.entities);
 export const dbElements_ = createSelector(data_, (state) => state.dbElements.entities);
+export const eventStreams_ = createSelector(data_, (state) => state.eventStreams.entities);
+
 export const users_ = createSelector(data_, (state) => state.users);
 export const userGroups_ = createSelector(data_, (state) => state.userGroups);
 export const permissions_ = createSelector(data_, (state) => state.permissions.entities);

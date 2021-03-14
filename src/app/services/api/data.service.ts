@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http'
 import { Observable } from 'rxjs';
-import { timeout, map, share } from 'rxjs/operators';
+import { timeout, map, share, tap } from 'rxjs/operators';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 import { MessageService } from '../message.service';
 import { IAppState } from '../../app.store';
 import {
   IDbElement,
-  IDbStream
+  IDbStream,
+  IEventStream
 } from '../../store/data';
-import { entityFactory, defaultData } from 'app/store/data/initial-state';
+import { defaultData, defaultEvent } from 'app/store/data/initial-state';
 
 @Injectable()
 export class DataService {
@@ -46,6 +47,34 @@ export class DataService {
         return Object.keys(raw_data).reduce((acc,id)=>{
           acc[id]=Object.assign({},defaultData,raw_data[id]); 
           return acc}, {})}),
+      share())
+    o.subscribe(_ => {}, 
+    error => {
+      this.messageService.setErrorsFromAPICall(error)
+    });
+    return o;
+  }
+
+  public loadEvents(
+    startTime: number, //values in milliseconds!
+    endTime: number,
+    streams: IEventStream[],
+    padding: number = 0
+  ): Observable<any> {
+    let params = new HttpParams()
+      .set('streams', JSON.stringify(streams.map(s => s.id)))
+      .set('padding', String(padding))
+    if(startTime!=null)
+      params = params.set('start_time',(startTime * 1e3).toString())
+    if(endTime!=null)
+      params = params.set('end_time',(endTime * 1e3).toString())
+     
+    let o = this.http.get<schema.IApiResponse>('events/data.json', 
+      {params: params}).pipe(
+      timeout(20000), //wait a maximum of 20 seconds
+      map(json => normalize(json.data, schema.events)),
+
+      map(json =>  json.entities['event']),
       share())
     o.subscribe(_ => {}, 
     error => {

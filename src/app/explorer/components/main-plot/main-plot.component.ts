@@ -30,6 +30,8 @@ import {
 import { FLOT_OPTIONS } from './flot.options';
 
 import * as _ from 'lodash-es';
+import { isLabeledStatement } from 'typescript';
+import { EventStreamService } from 'app/services';
 
 declare var $: any;
 
@@ -63,6 +65,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     private measurementSelectors: MeasurementSelectors,
     private annotationSelectors: AnnotationSelectors,
     private plotService: PlotService,
+    private eventService: EventStreamService,
     private measurementService: MeasurementService,
     private annotationUIService: AnnotationUIService
   ) {
@@ -82,14 +85,18 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
       distinctUntilChanged((x, y) => _.isEqual(x, y)))
     let newPlottedElements = this.plotSelectors.plottedElements$.pipe(
       distinctUntilChanged((x,y) => _.isEqual(x,y)));
+    let newPlottedEventStreams = this.plotSelectors.plottedEventStreams$.pipe(
+      distinctUntilChanged((x,y) => _.isEqual(x,y))
+    )
     this.subs.push(combineLatest(
-      [newTimeRange, newPlottedElements]).pipe(
+      [newTimeRange, newPlottedElements, newPlottedEventStreams]).pipe(
         withLatestFrom(this.plotSelectors.addingPlotData$),
-        filter(([[timeRange, elements], busy]) => !busy && elements.length!=0))
-      .subscribe(([[timeRange, elements], busy]) => {
+        filter(([[timeRange, elements, streams], busy]) => !busy && (elements.length!=0 ||  streams.length!=0)))
+      .subscribe(([[timeRange, elements, streams], busy]) => {
         //retrieve current width of plot to determine the appropriate resolution
         let resolution = $(this.plotArea.nativeElement).width();
         this.plotService.loadPlotData(elements, timeRange, resolution*2)
+        this.plotService.loadEventData(streams, timeRange)
       }));
     /* set the plotTimeRange based on changes to xbounds */
     this.subs.push(this.xBounds.pipe(
@@ -177,7 +184,6 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subs.push(combineLatest(
       [this.plotSelectors.leftAxisSettings$,newLeftElementUnits])
       .subscribe(([settings,units]) => {
-        console.log("here?")
         let options = this.flot_options.yaxes[0];
         this.flot_options.legend.left_font_size=settings.legend_font_size;
         if(this.plot!=null){
@@ -372,17 +378,23 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     let elementsByAxis = combineLatest(
       [this.plotSelectors.leftElements$,this.plotSelectors.rightElements$])
       .pipe(map(([left, right]) => { return { left: left, right: right } }));
+    
+    // Plot Data
     this.subs.push(combineLatest(
         [elementsByAxis,
+          this.plotSelectors.plottedEventStreams$,
+        this.plotSelectors.plotEventData$,
         this.plotSelectors.plotData$, 
         this.plotSelectors.showDataEnvelope$])
-      .subscribe(([elementsByAxis, data, showEnvelope]) => {
+      .subscribe(([elementsByAxis, eventStreams, eventsSet, data, showEnvelope]) => {
         //build data structure
         let leftAxis = this.plotService
           .buildDataset(elementsByAxis.left, data, 1, showEnvelope);
         let rightAxis = this.plotService
           .buildDataset(elementsByAxis.right, data, 2, showEnvelope);
-        let dataset = leftAxis.concat(rightAxis);
+        let eventData = this.plotService
+          .buildEventDataset(eventStreams, eventsSet)
+        let dataset = [...leftAxis, ...rightAxis, ...eventData]
         if (dataset.length == 0) {
           this.plotService.hidePlot();
           return; //no data to plot
@@ -397,6 +409,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
           $(this.plotArea.nativeElement).bind('plotzoom', this.updateAxes.bind(this))
           $(this.plotArea.nativeElement).bind('plotselected', this.updateMeasurement.bind(this))
           $(this.plotArea.nativeElement).bind('plotclicked', this.updatePlotSelection.bind(this))
+          $(this.plotArea.nativeElement).bind('eventSettingsChanged', this.updateEventSettings.bind(this))
           setTimeout(()=>this.plotService.disableDataCursor(),0);
         
         } else {
@@ -422,6 +435,14 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
         val = (val/(10**settings.scale));
       return val;
     };
+  }
+
+  //flot hook to listen for event settings changes
+  updateEventSettings(event, settings){
+    this.eventService.setPlotSettings(settings.stream_id, 
+      settings.offset, 
+      settings.height,
+      settings.selected);
   }
   //flot hook to listen for zoom/scroll events
   updateAxes() {

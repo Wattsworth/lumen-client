@@ -6,10 +6,12 @@ import { take } from 'rxjs/operators'
 import * as PlotActions from '../store/plot/actions';
 import { IAppState } from '../../app.store';
 import * as plotStore from '../store/plot/types';
-import { MessageService } from '../../services/';
+import { EventStreamService, MessageService } from '../../services/';
 import {
   IDbElement,
-  IDataSet
+  IDataSet,
+  IEventStream,
+  IEventsSet
 } from '../../store/data';
 import {
   IAxisSettings
@@ -29,7 +31,8 @@ export class PlotService {
     private store: Store<IAppState>,
     private messageService: MessageService,
     private dataService: DataService,
-    private elementService: DbElementService
+    private elementService: DbElementService,
+    private eventStreamService: EventStreamService
   ) { }
 
   // add element to specified axis
@@ -46,6 +49,15 @@ export class PlotService {
     this.elementService.removeColor(element);
   }
 
+  // add events to the plot
+  public plotEvents(stream: IEventStream){
+    this.eventStreamService.assignColor(stream);
+    this.store.dispatch(PlotActions.plotEvents({stream}))
+  }
+  public hideEvents(stream: IEventStream){
+    this.store.dispatch(PlotActions.hideEvents({id: stream.id}));
+  }
+  
   // remove all elements from the plot
   public hideAllElements() {
     let elements: Dictionary<IDbElement>
@@ -74,6 +86,52 @@ export class PlotService {
 
   public hidePlot() {
     this.store.dispatch(PlotActions.hidePlot());
+  }
+  public loadEventData(
+    streams: IEventStream[],
+    timeRange: IRange
+  ){
+    let existingData:IEventsSet
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot.plot_event_data))
+      .pipe(take(1)).subscribe(state => existingData=state);
+    let neededStreams = this.findNeededElements(streams, existingData, timeRange);
+    if (neededStreams.length == 0)
+      return; //nothing to do
+    neededStreams.map(stream=>console.log(`loading event stream ${stream.name}`))
+
+    this.store.dispatch(PlotActions.addingPlotData());
+    //add padding to plot data if ranges are not null
+    this.dataService.loadEvents(
+      timeRange.min, timeRange.max, 
+      neededStreams, 0.25)
+      .subscribe(
+        data=>{this.store.dispatch(PlotActions.addPlotEventData({data}))}
+      )
+    
+  }
+  public loadNavEventData(
+    streams: IEventStream[],
+    timeRange: IRange
+  ){
+    let existingData:IEventsSet
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot.nav_event_data))
+      .pipe(take(1)).subscribe(state => existingData=state);
+    let neededStreams = this.findNeededElements(streams, existingData, timeRange);
+    if (neededStreams.length == 0)
+      return; //nothing to do
+    neededStreams.map(stream=>console.log(`loading event stream ${stream.name} for nav plot`))
+
+    this.store.dispatch(PlotActions.addingNavData());
+    //add padding to plot data if ranges are not null
+    this.dataService.loadEvents(
+      timeRange.min, timeRange.max, 
+      neededStreams, 0.25)
+      .subscribe(
+        data=>{this.store.dispatch(PlotActions.addNavEventData({data}))}
+      )
+    
   }
   public loadPlotData(
     elements: IDbElement[],
@@ -257,6 +315,39 @@ export class PlotService {
 
   ///------ helpers ------------
 
+  buildEventDataset(
+    eventStreams: IEventStream[],
+    eventsSet: IEventsSet
+  ){
+    return eventStreams.map(stream => {
+      if(eventsSet[stream.id]===undefined||eventsSet[stream.id]==null)
+        return null;
+      //use custom display_name if present
+      let label = stream.name;
+      if (stream.display_name != "")
+        label = stream.display_name;
+      //if the data is corrupt add a warning icon
+      if (eventsSet[stream.id].valid == false) {
+        // add SVG icon to legend (not managed by Angular)
+        label += ' <svg aria-hidden="true" data-prefix="fas" data-icon="exclamation-circle" class="svg-inline--fa fa-exclamation-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zm-248 50c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"></path></svg>';
+      }
+      return {
+        label: label,
+        yaxis: 5, //this is the event y-axis (not shown on plot)
+        //bars: { show: false, barWidth: 2 },
+        //points: { show: false },
+        lines: { show: false },
+        events: {
+          show: true, 
+          selected: stream.selected,
+          height: stream.height,
+          offset: stream.offset, 
+          stream_id: stream.id},
+        color: stream.color,
+        data: eventsSet[stream.id].events,
+      }
+    }).filter(data => data != null)
+  }
   //PUBLIC: 
   buildDataset(
     elements: IDbElement[],
@@ -282,6 +373,7 @@ export class PlotService {
         //bars: { show: false, barWidth: 2 },
         //points: { show: false },
         lines: { show: false },
+        events: { show: false },
         color: element.color,
         data: data[element.id].data,
         default_min: element.default_min,
@@ -343,10 +435,10 @@ export class PlotService {
     }).filter(data => data != null)
   }
 
-  //isPlottable: return true if units can be plotted
+  //isElementPlottable: return true if units can be plotted
   // (if units match an existing axis or an axis is empty)
   //
-  isPlottable(units: string){
+  isElementPlottable(units: string){
     let plotState:plotStore.IState;
     this.store.select(
       createSelector(explorer_UI_,state=>state.plot))
@@ -360,15 +452,28 @@ export class PlotService {
     return false;
   }
 
-  //isPlotted: return true if the element is currently 
+  //isElementPlotted: return true if the element is currently 
   // shown on the plot
-  isPlotted(element: IDbElement){
+  isElementPlotted(element: IDbElement){
     let plotState:plotStore.IState;
     this.store.select(
       createSelector(explorer_UI_,state=>state.plot))
       .pipe(take(1)).subscribe(state => plotState=state);   
     if (_.includes(plotState.left_elements, element.id) ||
       _.includes(plotState.right_elements, element.id)) {
+      return true;
+    }
+    return false;
+  }
+
+  //isEventStreamPlotted: return true if the element is currently 
+  // shown on the plot
+  isEventStreamPlotted(stream: IEventStream){
+    let plotState:plotStore.IState;
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot))
+      .pipe(take(1)).subscribe(state => plotState=state);   
+    if (_.includes(plotState.event_streams, stream.id)) {
       return true;
     }
     return false;
@@ -385,8 +490,8 @@ export class PlotService {
   }
   //PRIVATE
   private findNeededElements(
-    elements: IDbElement[],
-    existingData: IDataSet,
+    elements: Array<any>,
+    existingData: IDataSet|IEventsSet,
     timeRange: IRange
   ) {
     return elements

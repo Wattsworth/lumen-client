@@ -37,6 +37,7 @@ export interface IDbFolder {
   locked: boolean;
   subfolders: Array<number>;
   streams: Array<number>;
+  event_streams: Array<number>;
   start_time: number;
   end_time: number;
   size_on_disk: number;
@@ -64,6 +65,26 @@ export interface IDbStream {
   reloading_annotations: boolean;
 }
 export interface IDbStreamState extends EntityState<IDbStream> { };
+
+export interface IEventStream {
+  id: number;
+  name: string;
+  description: string;
+  path: string;
+  start_time: number;
+  end_time: number;
+  size_on_disk: number;
+  total_rows: number;
+  total_time: number;
+  nilm_id: number;
+  //dynamically managed by the client
+  color: string;
+  display_name: string;
+  offset: number;
+  height: number;
+  selected: boolean;
+}
+export interface IEventStreamState extends EntityState<IEventStream> { };
 
 // ---- DbElements ----
 export interface IDbElement {
@@ -134,8 +155,20 @@ export interface IPermission {
 }
 export interface IPremissionState extends EntityState<IPermission> { };
 
+// --- Event ---
+export interface IEvents{
+  valid: boolean
+  start_time: number;
+  end_time: number;
+  events: any; //just key, value pairs
+}
 
-// ---- DataSet ----
+// ---- EventSet ----
+export interface IEventsSet {
+  [index: string]: IEvents; //indexed by EventStream ID
+}
+
+// --- Data ---
 export interface IData {
   start_time: number;
   end_time: number;
@@ -145,13 +178,15 @@ export interface IData {
   valid: boolean;
 }
 
+// ---- DataSet ----
 export interface IDataSet {
   [index: string]: IData; //indexed by DbElement ID
 }
 
 export interface IDataViewRedux{
   ui_explorer: plot.IState,
-  data_dbElements: Dictionary<IDbElement>
+  data_dbElements: Dictionary<IDbElement>,
+  data_eventStreams: Dictionary<IEventStream>
 }
 
 // ---- DataView ----

@@ -11,7 +11,8 @@ import { IAppState } from '../../app.store';
 import {
   IDbElement,
   IDbStream,
-  IDataView
+  IDataView,
+  IEventStream
 } from '../../store/data';
 import {
   dataApps_,
@@ -19,6 +20,7 @@ import {
   data_,
   dbElements_,
   dbStreams_,
+  eventStreams_,
   nilms_,
   plot_UI_Ex_
 } from 'app/selectors'
@@ -47,6 +49,7 @@ export class PlotSelectors {
 
   data$ = this.store.pipe(select(data_));
   elements$ = this.store.pipe(select(dbElements_))
+  eventStreams$ = this.store.pipe(select(eventStreams_))
   streams$ = this.store.pipe(select(dbStreams_))
   nilms$ = this.store.pipe(select(nilms_))
   dataViews$ = this.store.pipe(select(dataViews_))
@@ -63,9 +66,11 @@ export class PlotSelectors {
   showDateSelector$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_date_selector)));
   plotTimeRange$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.plot_time)));
   plotData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.plot_data)));
+  plotEventData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.plot_event_data)))
   addingPlotData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.adding_plot_data)));
   navTimeRange$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nav_time)));
   navData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nav_data)));
+  navEventData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nav_event_data)))
   addingNavData$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.adding_nav_data)));
   navZoomLock$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.nav_zoom_lock)));
   dataCursor$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.data_cursor)));
@@ -81,6 +86,9 @@ export class PlotSelectors {
   showDataEnvelope$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_data_envelope)));
   showAnnotations$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_annotations)));
   liveUpdateInterval$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.live_update_interval)));
+  plottedEventStreamIDs$ =  this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.event_streams)));
+  
+  public plottedEventStreams$: Observable<IEventStream[]>
   public leftElements$: Observable<IDbElement[]>
   public rightElements$: Observable<IDbElement[]>
 
@@ -111,6 +119,16 @@ export class PlotSelectors {
   constructor(
     private store: Store
   ) {
+
+    this.plottedEventStreams$ = combineLatest(
+      [this.eventStreams$,this.plottedEventStreamIDs$]).pipe(
+      map(([streams, ids]) => {
+        return ids.map(id => streams[id]);
+      }),
+      distinctUntilChanged((x, y) => _.isEqual(x, y)),
+      //.share()
+      startWith([]));
+
 
     this.leftElements$ = combineLatest(
       [this.elements$,this.leftElementIDs$]).pipe(

@@ -28,6 +28,9 @@ export const dbStream = new schema.Entity('dbStreams',
   { elements: [dbElement] });
 export const dbStreams = new schema.Array(dbStream)
 
+export const eventStream = new schema.Entity('eventStreams')
+export const eventStreams = new schema.Array(eventStream)
+
 export const dbFolder = new schema.Entity('dbFolders',
   {}, {
     processStrategy: (entity) => {
@@ -42,7 +45,8 @@ export const dbFolder = new schema.Entity('dbFolders',
 export const dbFolders = new schema.Array(dbFolder);
 dbFolder.define({
   subfolders: dbFolders,
-  streams: [dbStream]
+  streams: [dbStream],
+  event_streams: [eventStream]
 });
 
 export const annotation = new schema.Entity('annotations', {}, {
@@ -86,6 +90,31 @@ export const data = new schema.Entity('data', {},
     }
   })
 export const datas = new schema.Array(data);
+
+//convert all unix microsecond times to ms times
+export const event = new schema.Entity('event', {},
+  {
+    idAttribute: 'id',
+    processStrategy: (entity) => {
+      if (entity.events != null) {
+        entity.events = entity.events.map(e => {
+          if (e.end_time!= null) {
+            e.end_time  = Math.round(e.end_time / 1e3); //convert to ms
+          }
+          e.start_time  = Math.round(e.start_time / 1e3); 
+          return e;
+        })
+      }
+      if (entity.start_time != null) {
+        entity.start_time = Math.round(entity.start_time / 1e3);
+      }
+      if (entity.end_time != null) {
+        entity.end_time = Math.round(entity.end_time / 1e3);
+      }
+      return entity;
+    }
+  })
+export const events = new schema.Array(event);
 
 export const nilm = new schema.Entity('nilms',
   { root_folder: dbFolder,

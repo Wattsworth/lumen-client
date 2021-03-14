@@ -39,6 +39,7 @@ export const defaultDbFolder: types.IDbFolder = {
   hidden: false,
   subfolders: [],
   streams: [],
+  event_streams: [],
   shallow: true,
   start_time: null,
   end_time: null,
@@ -64,6 +65,25 @@ export const defaultDbStream: types.IDbStream = {
   size_on_disk: 0,
   nilm_id: null,
   reloading_annotations: false
+};
+
+// ---- EventStream ----
+export const defaultEventStream: types.IEventStream = {
+  id: null,
+  name: '',
+  description: '',
+  path: '',
+  start_time: null,
+  end_time: null,
+  total_rows: 0,
+  total_time: 0,
+  size_on_disk: 0,
+  nilm_id: null,
+  color: null,
+  height: 20,
+  offset: null,
+  selected: false,
+  display_name: ''
 };
 
 // ---- DbElement ----
@@ -102,6 +122,14 @@ export const defaultData: types.IData = {
   data: [],
   type: 'unknown',
   valid: true
+};
+
+// ---- Event ----
+export const defaultEvent: types.IEvents = {
+  start_time: null,
+  end_time: null,
+  valid: true,
+  events: [],
 };
 
 // ---- User ----
@@ -144,3 +172,10 @@ export const defaultDataView: types.IDataView = {
   private: false,
   home: false
 };
+
+// --- DataViewRedux ----
+export const defaultDataViewRedux: types.IDataViewRedux = {
+  ui_explorer: null,
+  data_dbElements: {},
+  data_eventStreams: {}
+}

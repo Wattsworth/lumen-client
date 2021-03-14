@@ -6,10 +6,12 @@ import {EntityAdapter, createEntityAdapter} from '@ngrx/entity';
 
 
 import * as types from './types';
+import { eventStream } from 'app/api';
 
 export const nilmAdapter: EntityAdapter<types.INilm> = createEntityAdapter<types.INilm>()
 export const dataAppAdapter: EntityAdapter<types.IDataApp> = createEntityAdapter<types.IDataApp>()
 export const dbFolderAdapter: EntityAdapter<types.IDbFolder> = createEntityAdapter<types.IDbFolder>()
+export const eventStreamAdapter: EntityAdapter<types.IEventStream> = createEntityAdapter<types.IEventStream>()
 export const dbStreamAdapter: EntityAdapter<types.IDbStream> = createEntityAdapter<types.IDbStream>()
 export const annotationAdapter: EntityAdapter<types.IAnnotation> = createEntityAdapter<types.IAnnotation>()
 export const dbElementAdapter: EntityAdapter<types.IDbElement> = createEntityAdapter<types.IDbElement>()
@@ -44,6 +46,41 @@ export const dbFolderReducer = createReducer(
   //RECEIVE
   on(actions.receiveDbFolder, (state: types.IDbFolderState, {folders}) => dbFolderAdapter.upsertMany(folders, state))
 );
+
+//  -----------  EventStream Reducer --------------
+export const eventStreamReducer = createReducer(
+  eventStreamAdapter.getInitialState(),
+  //RECEIVE (this respects local settings)
+  on(actions.receiveEventStream, (state: types.IEventStreamState, {streams}) => {
+    streams = streams.map(stream => {
+      //keep local values if they have been customized
+      if(state.entities[stream.id]!==undefined){
+        return {...stream, 
+        display_name:state.entities[stream.id].display_name, 
+        color:  state.entities[stream.id].color }
+      }
+      return stream;
+    });
+    return eventStreamAdapter.upsertMany(streams, state)}),
+  //SET stream color
+  on(actions.setEventStreamColor, (state: types.IEventStreamState, {id, color})=> eventStreamAdapter
+    .updateOne({id: id, changes:{color: color}}, state)),
+  //SET plot settings (offset and height)
+  on(actions.setEventStreamPlotSettings, (state: types.IEventStreamState, {id, offset, height, selected})=> 
+    eventStreamAdapter.updateOne({id: id, changes:{offset: offset, height: height, selected: selected}}, state)),
+  //SET display name
+  on(actions.setEventStreamName, (state: types.IEventStreamState, {id, name})=> eventStreamAdapter
+    .updateOne({id, changes:{name}}, state)),
+  //RESTORE: replace event streams with new objects
+  on(actions.restoreEventStream, (state: types.IEventStreamState, {streams})=> eventStreamAdapter.upsertMany(streams,state)),
+  //RESET: remove display name and color setting
+  on(actions.resetEventStream, (state: types.IEventStreamState)=> {
+    let ids:any[]= state.ids; //force type to array to avoid type error
+    let changes = ids.map(id=>({id, changes:{color: '', display_name: ''}}))
+    return eventStreamAdapter.updateMany(changes,state)
+  })
+);
+
 
 //  -----------  DbStream Reducer --------------
 export const dbStreamReducer = createReducer(

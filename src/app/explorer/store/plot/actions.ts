@@ -1,5 +1,5 @@
 import {createAction, props} from '@ngrx/store'
-import { IDataSet, IDbElement } from 'app/store/data';
+import { IDataSet, IEventsSet, IDbElement, IEventStream } from 'app/store/data';
 import { IState } from './types';
 
 import { IAxisSettings, IRange } from '../helpers';
@@ -7,7 +7,11 @@ import { IAxisSettings, IRange } from '../helpers';
 //Plot Actions
 export const hideElement = createAction('[EXPLORER: PLOT] Hide element ', props<{id: number}>());
 export const plotElement = createAction('[EXPLORER: PLOT] Show element', props<{element: IDbElement}>());
+export const hideEvents = createAction('[EXPLORER: PLOT] Hide events ', props<{id: number}>());
+export const plotEvents = createAction('[EXPLORER: PLOT] Show events', props<{stream: IEventStream}>());
 export const hideAllElements = createAction('[EXPLORER: PLOT] Hide all elements');
+export const hideAllEvents = createAction('[EXPLORER: PLOT] Hide all events');
+
 export const setElementAxis = createAction('[EXPLORER: PLOT] Set element axis', props<{element: IDbElement, axis: string}>());
 export const showPlot = createAction('[EXPLORER: PLOT] Show plot');
 export const hidePlot = createAction('[EXPLORER: PLOT] Hide plot');
@@ -16,7 +20,9 @@ export const hideDateSelector = createAction('[EXPLORER: PLOT] Hide date selecto
 export const addingPlotData = createAction('[EXPLORER: PLOT] Adding plot data');
 export const addingNavData = createAction('[EXPLORER: PLOT] Adding nav data');
 export const addPlotData = createAction('[EXPLORER: PLOT] Add plot data', props<{data: IDataSet}>());
+export const addPlotEventData = createAction('[EXPLORER: PLOT] Add plot event data', props<{data: IEventsSet}>());
 export const addNavData = createAction('[EXPLORER: PLOT] Add nav data', props<{data: IDataSet}>());
+export const addNavEventData = createAction('[EXPLORER: PLOT] Add nav event data', props<{data: IEventsSet}>());
 export const resetTimeRanges = createAction('[EXPLORER: PLOT] Reset time ranges');
 export const setPlotTimeRange = createAction('[EXPLORER: PLOT] Set plot time range', props<{range: IRange}>());
 export const setNavTimeRange = createAction('[EXPLORER: PLOT] Set nav time range', props<{range: IRange}>());

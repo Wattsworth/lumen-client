@@ -1,9 +1,10 @@
-import { IDataSet } from '../../../store/data';
+import { IDataSet, IEventsSet } from '../../../store/data';
 import { IRange, IAxisSettings } from '../helpers';
 
 export interface IState {
   left_elements?: number[];
   right_elements?: number[];
+  event_streams?: number[];
   left_units?: string;
   right_units?: string;
   show_plot?: boolean;
@@ -12,12 +13,14 @@ export interface IState {
   nav_y2?: IRange;
   nav_time?: IRange;
   nav_data?: IDataSet;
+  nav_event_data?: IEventsSet;
   adding_nav_data?: boolean,
   nav_zoom_lock?: boolean;
   plot_y1?: IRange;
   plot_y2?: IRange;
   plot_time?: IRange;
   plot_data?: IDataSet;
+  plot_event_data?: IEventsSet;
   adding_plot_data?: boolean;
   data_cursor?: boolean;
   live_update?: boolean;

@@ -22,6 +22,7 @@ export const FLOT_OPTIONS = {
 			color: "#00b33c"
 		},
 		tooltip: true,
+		eventInfoOverlay: true,
 		canvas: true,
 		tooltipOpts:{
 			content: "<strong>%s</strong> %y.2",
@@ -88,6 +89,10 @@ export const FLOT_OPTIONS = {
 			{ //left axis interval data
 				position: "right", 
 				show: false
+			},
+			{//events axis
+				position: "right",
+				show:false
 			}],
 		zoom: {
 			interactive: true,

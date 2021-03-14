@@ -7,7 +7,8 @@ import { MessageService } from '../message.service';
 import { entityFactory, 
   defaultDbFolder, 
   defaultDbStream, 
-  defaultDbElement } from 'app/store/data/initial-state'
+  defaultDbElement, 
+  defaultEventStream} from 'app/store/data/initial-state'
 import { IDbFolder } from '../../store/data';
 import * as actions from '../../store/data/actions';
 
@@ -46,6 +47,8 @@ export class DbFolderService {
     let entities = normalize(json, schema.dbFolder).entities;
     let folders = entityFactory(entities['dbFolders'], defaultDbFolder);
     this.store.dispatch(actions.receiveDbFolder({folders}));
+    let eventStreams = entityFactory(entities['eventStreams'], defaultEventStream);
+    this.store.dispatch(actions.receiveEventStream({streams: eventStreams}))
     let streams = entityFactory(entities['dbStreams'], defaultDbStream);
     this.store.dispatch(actions.receiveDbStream({streams}));
     let elements = entityFactory(entities['dbElements'], defaultDbElement);

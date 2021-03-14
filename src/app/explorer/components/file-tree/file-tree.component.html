@@ -32,6 +32,20 @@
         <fa-icon [icon]="['fas', 'folder']" *ngIf="!node.isExpanded" class="folder"></fa-icon>
         {{ node.data.name }}
       </span>
+      <!-- eventStream -->
+      <span *ngSwitchCase="'eventStream'">
+        <!--plot events button-->
+        <span class="tree-button plot"
+        *ngIf="node.data.plotted==false"
+        (click)="plotService.plotEvents(node.data.stream)">
+        <fa-icon [icon]="['fas', 'chart-bar']"></fa-icon> add </span>
+        <!--hide plotted events button -->
+        <span class="tree-button unplot" 
+          *ngIf="node.data.plotted==true"
+          (click)="plotService.hideEvents(node.data.stream)">
+          <fa-icon [icon]="['fas', 'chart-bar']"></fa-icon> hide </span>
+        {{ node.data.name }}
+      </span>
       <!-- dbStream -->
       <span *ngSwitchCase="'dbStream'">
         <fa-icon [icon]="['fas', 'database']"></fa-icon>

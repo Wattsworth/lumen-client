@@ -14,6 +14,14 @@ export const receiveDbStream = createAction('[STREAM] Receive', props<{streams: 
 export const reloadStreamAnnotations = createAction('[STREAM] Reload Annotations', props<{id: number}>());
 export const refreshedAnnotations = createAction('[STREAM] Refreshed Annotations', props<{id: number}>());
 
+export const receiveEventStream= createAction('[EVENTS] Receive', props<{streams: types.IEventStream[]}>());
+export const setEventStreamColor = createAction('[EVENTS] Set Color', props<{id: number, color: string}>());
+export const setEventStreamPlotSettings = createAction('[EVENTS] Set Plot Settings', props<{id: number, offset: number, height: number, selected: boolean}>());
+
+export const setEventStreamName = createAction('[EVENTS] Set Display Name', props<{id: number, name: string}>());
+export const restoreEventStream = createAction('[EVENTS] Restore', props<{streams: types.IEventStream[]}>());
+export const resetEventStream = createAction('[EVENTS] Reset');
+
 export const receiveDbElement = createAction('[ELEMENT] Receive', props<{elements: types.IDbElement[]}>());
 export const setDbElementColor = createAction('[ELEMENT] Set Color', props<{id: number, color: string}>());
 export const setDbElementName = createAction('[ELEMENT] Set Display Name', props<{id: number, name: string}>());

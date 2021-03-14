@@ -10,6 +10,7 @@ import { UserGroupService } from './user-group.service';
 import { UserService } from './user.service';
 import { ColorService } from './color.service';
 import { AnnotationService } from './annotation.service';
+import { EventStreamService } from './event-stream.service';
 
 export {
   NilmService,
@@ -23,5 +24,6 @@ export {
   UserGroupService,
   UserService,
   ColorService,
-  AnnotationService
+  AnnotationService,
+  EventStreamService
 }

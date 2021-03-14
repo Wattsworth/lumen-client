@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import * as actions from './actions' ;
 import { IState } from './types';
 import {
-  IDataSet,
+  IDataSet, IEventsSet, IEvents
 } from '../../../store/data'
 import {
   defaultPlotState
@@ -36,6 +36,18 @@ export const reducer = createReducer(
     console.log('error cannot plot unit:', element.units);
     return state;
   }),
+  //display an event stream
+  on(actions.plotEvents, (state: IState, {stream}) => {
+    return {...state,
+        event_streams:[...state.event_streams, stream.id]
+      }
+  }),
+  //hide an event stream
+  on(actions.hideEvents, (state: IState, {id}) => {
+    return {...state,
+        event_streams:state.event_streams.filter(stream_id=>stream_id!=id)
+      }
+  }),
   //hide a plotted element
   on(actions.hideElement, (state: IState, {id}) => {
     return {...state, 
@@ -45,6 +57,8 @@ export const reducer = createReducer(
   }),
   //hide all elements (clear left_elements and right_elements)
   on(actions.hideAllElements, (state: IState) => ({...state, leftElements: [], right_elements: []})),
+  //hide all event streams
+  on(actions.hideAllEvents, (state: IState) => ({...state, event_streams: []})),
   //change a plotted element's axis
   on(actions.setElementAxis, (state: IState, {element, axis}) => {
       if (axis == 'right') {
@@ -94,7 +108,6 @@ export const reducer = createReducer(
   on(actions.addingPlotData,(state: IState) => ({...state, adding_plot_data: true})),
   //add data retrieved from server to the plot dataset
   on(actions.addPlotData,(state: IState, {data})=>{
-    console.log("here?")
     let _data = handleMissingData(
       state.plot_data,
       data,
@@ -104,6 +117,13 @@ export const reducer = createReducer(
     return {...state,
       plot_time: setTimeRange(state.plot_time, _data),
       plot_data: {...state.plot_data, ..._data},
+      adding_plot_data: false};
+  }),
+  //add event data retrieved from server to the plot dataset
+  on(actions.addPlotEventData,(state: IState, {data})=>{
+    return {...state,
+      plot_time: setTimeRange(state.plot_time, data),
+      plot_event_data: {...state.plot_event_data, ...data},
       adding_plot_data: false};
   }),
   //adding nav data: indicate a server request has been made
@@ -121,6 +141,13 @@ export const reducer = createReducer(
       nav_time: setTimeRange(state.nav_time, _data),
       adding_nav_data: false
     }
+  }),
+  //add event data retrieved from server to the nav dataset
+  on(actions.addNavEventData,(state: IState, {data})=>{
+    return {...state,
+      plot_time: setTimeRange(state.plot_time, data),
+      nav_event_data: {...state.nav_event_data, ...data},
+      adding_nav_data: false};
   }),
   //reset the plot time ranges
   on(actions.resetTimeRanges,(state: IState) => ({...state, 
@@ -192,9 +219,8 @@ export const reducer = createReducer(
    
 // ----- Helper Functions ------
 
-function setTimeRange(range: IRange, data: IDataSet) {
+function setTimeRange(range: IRange, data: IDataSet|IEventsSet) {
   let autoRange = { min: range.min, max: range.max }
-  console.log("set range")
   if (data == {})
     return range;
   if (range.min == null && data != {}) {
@@ -213,7 +239,6 @@ function setTimeRange(range: IRange, data: IDataSet) {
     if(possibleMaxTimes.length>0) 
       autoRange.max = possibleMaxTimes[0]
   }
-  console.log("computed: ", autoRange)
   return autoRange;
 }
 
