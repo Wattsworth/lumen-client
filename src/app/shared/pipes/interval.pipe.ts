@@ -7,7 +7,6 @@ export class IntervalPipe implements PipeTransform {
 
   transform(value: number): any {
       let seconds = +value;
-      console.log("got this: ", value)
       if(seconds<60)
         return Math.floor(seconds).toString()+"sec ";
       else{

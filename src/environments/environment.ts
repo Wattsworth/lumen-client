@@ -10,3 +10,4 @@ export const environment = {
   //apiUrl: '/lumen/',
   appUrl: 'http://localhost'
 };
+

@@ -6,7 +6,7 @@ import {EntityAdapter, createEntityAdapter} from '@ngrx/entity';
 
 
 import * as types from './types';
-import { eventStream } from 'app/api';
+import {defaultEventStreamPlotSettings} from './initial-state';
 
 export const nilmAdapter: EntityAdapter<types.INilm> = createEntityAdapter<types.INilm>()
 export const dataAppAdapter: EntityAdapter<types.IDataApp> = createEntityAdapter<types.IDataApp>()
@@ -56,27 +56,23 @@ export const eventStreamReducer = createReducer(
       //keep local values if they have been customized
       if(state.entities[stream.id]!==undefined){
         return {...stream, 
-        display_name:state.entities[stream.id].display_name, 
-        color:  state.entities[stream.id].color }
+          plot_settings: state.entities[stream.id].plot_settings}
       }
       return stream;
     });
     return eventStreamAdapter.upsertMany(streams, state)}),
-  //SET stream color
-  on(actions.setEventStreamColor, (state: types.IEventStreamState, {id, color})=> eventStreamAdapter
-    .updateOne({id: id, changes:{color: color}}, state)),
-  //SET plot settings (offset and height)
-  on(actions.setEventStreamPlotSettings, (state: types.IEventStreamState, {id, offset, height, selected})=> 
-    eventStreamAdapter.updateOne({id: id, changes:{offset: offset, height: height, selected: selected}}, state)),
-  //SET display name
-  on(actions.setEventStreamName, (state: types.IEventStreamState, {id, name})=> eventStreamAdapter
-    .updateOne({id, changes:{name}}, state)),
+  //SET stream default color
+  on(actions.setEventStreamColor, (state: types.IEventStreamState, {id, color})=> {
+    return eventStreamAdapter.updateOne({id: id, changes:{default_color: color}}, state)}),
+  //SET plot settings
+  on(actions.setEventStreamPlotSettings, (state: types.IEventStreamState, {id, settings})=> 
+    eventStreamAdapter.updateOne({id: id, changes:{plot_settings: settings}}, state)),
   //RESTORE: replace event streams with new objects
   on(actions.restoreEventStream, (state: types.IEventStreamState, {streams})=> eventStreamAdapter.upsertMany(streams,state)),
-  //RESET: remove display name and color setting
+  //RESET: remove plot settings
   on(actions.resetEventStream, (state: types.IEventStreamState)=> {
     let ids:any[]= state.ids; //force type to array to avoid type error
-    let changes = ids.map(id=>({id, changes:{color: '', display_name: ''}}))
+    let changes = ids.map(id=>({id, changes:{plot_settings: defaultEventStreamPlotSettings}}))
     return eventStreamAdapter.updateMany(changes,state)
   })
 );

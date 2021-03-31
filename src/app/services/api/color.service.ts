@@ -61,7 +61,7 @@ export class ColorService {
     this.availableColors.splice(i,1);
   }
   public checkoutEventColor(color: string): void {
-    if(color===undefined)
+    if(color===undefined || color==null)
       return;
     //remove alpha value
     color = color.slice(0,7)

@@ -25,7 +25,7 @@ import {
 import * as actions from '../../store/data/actions';
 import * as plotActions from '../../explorer/store/plot/actions'
 import * as plot from '../../explorer/store/plot';
-import { defaultDataView, entityFactory, defaultDataViewRedux } from 'app/store/data/initial-state';
+import { defaultDataView, entityFactory, defaultDataViewRedux, defaultEventStreamPlotSettings, defaultEventStream } from 'app/store/data/initial-state';
 import { dbElements_, dbStreams_, eventStreams_, plot_UI_Ex_ } from 'app/selectors';
 import { Dictionary } from '@ngrx/entity';
 
@@ -186,8 +186,7 @@ export class DataViewService {
     //now load the data elements
     this.elementService.restoreElements(Object.values(redux.data_dbElements))
 
-    //now load the event streams
-    this.eventStreamService.restoreEventStreams(Object.values(redux.data_eventStreams))
+    
 
     //register colors with color service
     let newElements = redux.data_dbElements;
@@ -196,13 +195,21 @@ export class DataViewService {
       .map(element => {
         this.colorService.checkoutColor(element.color);
       })
-    let newEventStreams = redux.data_eventStreams;
-    console.log("here")
-    Object.keys(newEventStreams)
-      .map(id => newEventStreams[id])
+    //fill in any missing plot_settings keys with defaults
+    let eventStreams = Object.values(redux.data_eventStreams)
       .map(stream => {
-        this.colorService.checkoutEventColor(stream.color);
+        let new_stream = {...defaultEventStream, ...stream};
+        new_stream.plot_settings = {...defaultEventStreamPlotSettings, ...stream.plot_settings}
+        this.colorService.checkoutEventColor(new_stream.default_color);
+        //if the stream is missing a fixed color use the default color
+        if(new_stream.plot_settings.color.value.fixed==null){
+          new_stream.plot_settings.color.value.fixed = new_stream.default_color;
+        }
+        return new_stream;
       })
+    //now load the event streams
+    this.eventStreamService.restoreEventStreams(Object.values(eventStreams))
+
     //restore the plot
     this.store.dispatch(plotActions.restoreDataView({saved_state: redux.ui_explorer}))
 

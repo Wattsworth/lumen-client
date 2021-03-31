@@ -3,10 +3,10 @@ import { Store } from '@ngrx/store';
 import{ ColorService } from './color.service';
 
 import {
-  IEventStream,
+  IEventStream, IEventStreamPlotSettings,
 } from '../../store/data';
 import * as actions from '../../store/data/actions';
-
+import * as _ from 'lodash-es';
 @Injectable()
 export class EventStreamService {
 
@@ -15,32 +15,36 @@ export class EventStreamService {
     private colorService: ColorService
   ) { }
 
-  public setDisplayName(stream: IEventStream, name: string){
-    this.store.dispatch(actions.setEventStreamName({name, id: stream.id}));
-  }
-  public setPlotSettings(stream_id: number, offset: number, height: number, selected: boolean){
-    this.store.dispatch(actions.setEventStreamPlotSettings({id: stream_id, offset, height, selected}))
+  public setPlotSettings(stream_id: number, settings: IEventStreamPlotSettings){
+    this.store.dispatch(actions.setEventStreamPlotSettings({id: stream_id, settings}))
   }
   public setColor(stream: IEventStream, color: string){
-    if(stream.color == color)
+    if(stream.default_color == color)
       return; //nothing to do
-    if(stream.color!=null){
-      this.colorService.returnEventColor(stream.color);
+    if(stream.default_color!=null){
+      this.colorService.returnEventColor(stream.default_color);
     }
     this.store.dispatch(actions.setEventStreamColor({color, id: stream.id})); 
   }
   
   public assignColor(stream: IEventStream){
-    if(stream.color!=null)
-      return; //already has a color so nothing to do
-    this.store.dispatch(actions.setEventStreamColor({
-      color: this.colorService.requestEventColor(), id: stream.id})); 
+    let color = stream.default_color;
+    if(color==null){
+      color = this.colorService.requestEventColor()
+      this.store.dispatch(actions.setEventStreamColor({color, id: stream.id})); 
+    }
+    //make sure the fixed color is not null
+    if(stream.plot_settings.color.value.fixed==null){
+      let settings: IEventStreamPlotSettings = _.cloneDeep(stream.plot_settings)
+      settings.color.value.fixed = color;
+      this.store.dispatch(actions.setEventStreamPlotSettings({id: stream.id, settings}))
+    }
   }
 
   public removeColor(stream: IEventStream){
-    if(stream.color==null)
+    if(stream.default_color==null)
       return; //no color associated with this element
-    this.colorService.returnEventColor(stream.color);
+    this.colorService.returnEventColor(stream.default_color);
     this.store.dispatch(actions.setEventStreamColor({color: null, id: stream.id})); 
   }
 

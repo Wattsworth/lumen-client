@@ -50,6 +50,13 @@
             ]
           },
           "configurations": {
+            "nginxdev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.nginxdev.ts"
+                }]
+            },
             "production": {
               "budgets": [
                 {
@@ -104,6 +111,9 @@
           "configurations": {
             "production": {
               "browserTarget": "frontend:build:production"
+            },
+            "nginxdev":{
+              "browserTarget": "frontend:build:nginxdev"
             },
             "local": {
               "browserTarget": "frontend:build:local"

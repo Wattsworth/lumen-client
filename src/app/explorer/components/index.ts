@@ -10,10 +10,11 @@ import { DownloadDataComponent } from './download-data/download-data.component';
 import { MeasurementResultsComponent } from './measurement-results/measurement-results.component';
 import { NewAnnotationComponent } from './new-annotation/new-annotation.component';
 import { AxisSettingsComponent } from './axis-settings/axis-settings.component';
+import { PlottedEventsComponent } from './plotted-events/plotted-events.component';
 
 export const COMPONENTS = [
   MainPlotComponent, FileTreeComponent, LoadDataViewComponent,
   PlottedElementsComponent, PlotTabComponent, DownloadDataComponent,
   NavPlotComponent, ToolTabComponent, DatePickerComponent, MeasurementResultsComponent,
-  AxisSettingsComponent, NewAnnotationComponent
+  AxisSettingsComponent, NewAnnotationComponent, PlottedEventsComponent
 ];

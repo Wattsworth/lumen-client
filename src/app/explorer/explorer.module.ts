@@ -36,11 +36,23 @@ import {
   faArrowRight,
   faCaretRight,
   faCaretDown,
+  faCaretUp,
+  faCaretLeft,
   faCommentAlt,
   faTrashAlt,
   faFilter,
   faEdit,
+  faStarOfLife,
+  faCircle,
+  faAdjust,
+  faBan,
+  faAnkh,
+  faRulerHorizontal,
+  faRulerVertical
 } from '@fortawesome/free-solid-svg-icons'
+import{
+  faCircle as farCircle
+} from '@fortawesome/free-regular-svg-icons'
 
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {ModalModule} from 'ngx-bootstrap/modal';
@@ -133,9 +145,20 @@ export class ExplorerModule {
       faArrowRight,
       faCaretRight,
       faCaretDown,
+      faCaretLeft,
+      faCaretUp,
+      farCircle,
+      faStarOfLife,
       faCommentAlt,
       faTrashAlt,
       faFilter,
-      faEdit);
+      faEdit,
+      faTimes,
+      faCircle,
+      faAdjust,
+      faBan,
+      faAnkh,
+      faRulerHorizontal,
+      faRulerVertical);
   }
  }

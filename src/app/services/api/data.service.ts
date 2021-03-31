@@ -88,7 +88,6 @@ export class DataService {
     endTime: number,
     resolution: number,
     stream: IDbStream): Observable<any> {
-      console.log('at resolution: ', resolution)
     return this.http
       .post(`db_streams/${stream.id}/data.csv`,
       {

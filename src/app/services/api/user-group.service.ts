@@ -43,7 +43,6 @@ export class UserGroupService {
     o.subscribe(
       json => {
         this.groupsLoaded = true;
-        console.log("here!")
         //load owned groups (contains user data)
         let entities = normalize(json['owner'], schema.userGroups).entities;
         let groups = entityFactory(entities['user_groups'], defaultUserGroup);

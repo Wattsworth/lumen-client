@@ -52,7 +52,6 @@ export class DownloadDataComponent implements OnInit {
   }
   setResolution(value: number){
     this.resolution = value;
-    console.log('resolution=',this.resolution);
   }
 
   download(stream: IDbStream){

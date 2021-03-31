@@ -1,0 +1,47 @@
+.green{
+  color: green;
+}
+.icon-button.fa-close{
+  padding-top: 13px;
+  margin-right: 10px;
+}
+.icon-button{
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .2;
+    margin-top: 0.3em;
+}
+.lead.name{
+  vertical-align: super;
+}
+.left-button{
+  padding-left: 0.5em;
+  margin-right: 0.5em;
+}
+.right-button{
+  padding-right: 0.5em;
+}
+.icon-button:hover{
+  cursor: pointer;
+  opacity: 0.5;
+  vertical-align: middle;
+}
+
+.plotted-event-stream { 
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-color: #bbb;
+  
+  /*border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-color: #bbb;
+  background:#ddd; */
+}
+.row-section{
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-color: #bbb;
+}
+.label-name{
+  font-size: 1.2em;
+}

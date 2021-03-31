@@ -68,6 +68,53 @@ export const defaultDbStream: types.IDbStream = {
 };
 
 // ---- EventStream ----
+
+export const defaultEventStreamPlotSettings: types.IEventStreamPlotSettings = {
+  color: {
+    type: 'fixed', //fixed, attribute, numeric
+    value: {
+      fixed: null,     //initialized to default_color
+      attribute: 'color',   //use this attribute as CSS color
+      numeric: {       //apply a color map
+        attribute: '', //  use this attribute as the numeric value for the event
+        min: 0,        //  left end of color map
+        max: 0         //  right end of color map
+      }
+    }
+  },
+  marker: {
+    type: 'fixed',
+    size: 12,
+    value: {
+      fixed: '.',
+      attribute: 'marker'
+    }
+  },
+  label: {
+    type: 'none',
+    size: 12,
+    value: {
+      fixed: '',
+      attribute: 'label'
+    }
+  },
+  position: {
+    type: 'fixed',
+    axis: 'float',
+    value: {
+      fixed: '0',
+      attribute: 'position'
+    }
+  },
+  height: {
+    type: 'fixed',
+    value: {
+      fixed: '0.25',
+      attribute: 'height'
+    }
+  }
+}
+
 export const defaultEventStream: types.IEventStream = {
   id: null,
   name: '',
@@ -79,13 +126,10 @@ export const defaultEventStream: types.IEventStream = {
   total_time: 0,
   size_on_disk: 0,
   nilm_id: null,
-  color: null,
-  height: 20,
-  offset: null,
-  selected: false,
-  display_name: ''
+  //managed by the client
+  default_color: null,
+  plot_settings: defaultEventStreamPlotSettings
 };
-
 // ---- DbElement ----
 export const defaultDbElement: types.IDbElement = {
   id: null,

@@ -102,6 +102,19 @@
   </app-axis-settings>
 </div>
 
+<!-- Events -->
+<div *ngIf="(plotSelectors.plottedEventStreams$ | async)?.length>0">
+  <div class="row justify-content-between section-title top lead no-gutters">
+    <div class="col">Events</div>
+  </div>
+
+  <app-plotted-events
+    class="plotted-element"
+    *ngFor="let eventStream of plotSelectors.plottedEventStreams$ | async"
+    [eventStream]="eventStream">
+  </app-plotted-events>
+</div>
+
 <!-- Plot Annotations -->
 <div class="row justify-content-between section-title lead no-gutters">
   <div class="col">

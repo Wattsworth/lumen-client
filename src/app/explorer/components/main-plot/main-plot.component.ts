@@ -439,10 +439,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //flot hook to listen for event settings changes
   updateEventSettings(event, settings){
-    this.eventService.setPlotSettings(settings.stream_id, 
-      settings.offset, 
-      settings.height,
-      settings.selected);
+    console.log(settings)
   }
   //flot hook to listen for zoom/scroll events
   updateAxes() {

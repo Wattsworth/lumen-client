@@ -16,7 +16,7 @@ export const refreshedAnnotations = createAction('[STREAM] Refreshed Annotations
 
 export const receiveEventStream= createAction('[EVENTS] Receive', props<{streams: types.IEventStream[]}>());
 export const setEventStreamColor = createAction('[EVENTS] Set Color', props<{id: number, color: string}>());
-export const setEventStreamPlotSettings = createAction('[EVENTS] Set Plot Settings', props<{id: number, offset: number, height: number, selected: boolean}>());
+export const setEventStreamPlotSettings = createAction('[EVENTS] Set Plot Settings', props<{id: number, settings: types.IEventStreamPlotSettings}>());
 
 export const setEventStreamName = createAction('[EVENTS] Set Display Name', props<{id: number, name: string}>());
 export const restoreEventStream = createAction('[EVENTS] Restore', props<{streams: types.IEventStream[]}>());

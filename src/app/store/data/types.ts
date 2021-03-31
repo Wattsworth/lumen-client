@@ -78,11 +78,53 @@ export interface IEventStream {
   total_time: number;
   nilm_id: number;
   //dynamically managed by the client
-  color: string;
-  display_name: string;
-  offset: number;
-  height: number;
-  selected: boolean;
+  default_color: string; //assigned by color service
+  plot_settings: IEventStreamPlotSettings
+}
+export interface IEventStreamPlotSettings{
+  color: {
+    type: string; //fixed, attribute, numeric
+    value: {
+      fixed: string;     //use this color (initialized to default)
+      attribute: string; //use this attribute as CSS color
+      numeric: {         //apply a color map
+        attribute: string; //use this attribute as the numeric value for the event
+        min: number;     //left end of color map
+        max: number      //right end of color map
+      }
+    }
+  },
+  marker: {
+    type: string; //fixed, attribute
+    size: number;
+    value: {
+      fixed: string;
+      attribute: string;
+    }
+  },
+  label: {
+    type: string; //fixed, attribute
+    size: number;
+    value: {
+      fixed: string;
+      attribute: string;
+    }
+  }
+  position: {
+    type: string; //fixed, attribute
+    axis: string; //left, right, float
+    value: {
+      fixed: string;
+      attribute: string;
+    }
+  }
+  height: {
+    type: string; //fixed, attribute
+    value: {
+      fixed: string;
+      attribute: string;
+    }
+  }
 }
 export interface IEventStreamState extends EntityState<IEventStream> { };
 

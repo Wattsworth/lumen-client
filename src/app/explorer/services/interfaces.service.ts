@@ -39,9 +39,9 @@ export class InterfacesService {
       .get(`app/${id}.json`)
       .subscribe(
       json => {
-        let normalized = normalize(json, schema.dataApp);
-        let dataApps: IDataApp[] = normalized.result.map(id => ({...defaultDataApp, ...normalized.entities[id]}))
-        this.store.dispatch(actions.receiveDataApp({apps: dataApps}));
+        let app_list = normalize(json, schema.dataApp).entities['dataApps']
+        let app: IDataApp = {...defaultDataApp, ...app_list[id]}
+        this.store.dispatch(actions.receiveDataApp({apps: [app]}));
         this.store.dispatch(InterfaceActions.addInterface({id: +id}))
       },
       error => this.messageService.setError("App not available"))
@@ -60,11 +60,10 @@ export class InterfacesService {
     .get(`app/${id}.json`)
     .subscribe(
     json => {
-      let entities = normalize(json, schema.dataApp).entities;
-      let normalized = normalize(json, schema.dataApp);
-      let dataApps: IDataApp[] = normalized.result.map(id => ({...defaultDataApp, ...normalized.entities[id]}))
-      this.store.dispatch(actions.receiveDataApp({apps: dataApps}));
-      window.open(entities[id].url, '_blank')
+      let app_list = normalize(json, schema.dataApp).entities['dataApps']
+      let app: IDataApp = {...defaultDataApp, ...app_list[id]}
+      this.store.dispatch(actions.receiveDataApp({apps: [app]}));
+      window.open(app.url, '_blank')
     },
     error => this.messageService.setError("App not available"))
   }
