@@ -474,7 +474,7 @@ export class PlotService {
   getPlotData(){
     let plotData:IDataSet
     this.store.select(
-      createSelector(explorer_UI_,state=>state.plot.nav_data))
+      createSelector(explorer_UI_,state=>state.plot.plot_data))
       .pipe(take(1)).subscribe(state => plotData=state); 
     return plotData;
   }

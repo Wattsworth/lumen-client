@@ -1,5 +1,5 @@
 
-import {combineLatest} from 'rxjs/operators';
+import {combineLatest} from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
@@ -39,16 +39,17 @@ export class MeasurementResultsComponent implements OnInit, OnDestroy {
 
     //figure out whether measurements are direct or relative
     //
-    let activeMeasurements$ = this.measurementSelectors.relative$.pipe(
-      combineLatest(
+    let activeMeasurements$ = combineLatest([
+      this.measurementSelectors.relative$,
       this.measurementSelectors.directMeasurements$,
-      this.measurementSelectors.relativeMeasurements$))
+      this.measurementSelectors.relativeMeasurements$])
       .pipe(map(([isRelative, direct, relative]) => isRelative ? relative : direct))
 
     //create the display data type
     //
-    this.displayedMeasurements$ = activeMeasurements$
-      .pipe(combineLatest(this.plotSelectors.plottedElements$),
+    this.displayedMeasurements$ = combineLatest(
+      [activeMeasurements$,
+      this.plotSelectors.plottedElements$]).pipe(
       map(([measurements, elements]) => {
         return elements.map(e => {
           let m: IDisplayedMeasurement = { 'name': e.name, 'color': e.color, 'valid': false }
@@ -72,12 +73,11 @@ export class MeasurementResultsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     //make direct measurements
     //
-    this.subs.push(this.measurementSelectors.enabled$
-      .pipe(filter(x => x),
-      combineLatest(
+    this.subs.push(
+      combineLatest([this.measurementSelectors.enabled$,
         this.measurementSelectors.measurementRange$,
-        this.plotSelectors.plottedElements$),
-      filter(([enabled, range, elements]) => range != null))
+        this.plotSelectors.plottedElements$]).pipe(
+      filter(([enabled, range, elements]) => (enabled && range != null)))
       .subscribe(([enabled, range, elements]) => {
         let dataSet = this.plotService.getPlotData();
         let measurements = elements.reduce((acc:IMeasurementSet, e) => {
@@ -95,13 +95,15 @@ export class MeasurementResultsComponent implements OnInit, OnDestroy {
 
     //make relative measurements
     //
-    this.subs.push(this.measurementSelectors.enabled$
-      .pipe(filter(x => x),
-      combineLatest(
+    this.subs.push(
+      combineLatest([this.measurementSelectors.enabled$,
       this.measurementSelectors.zeroRange$,
       this.measurementSelectors.directMeasurements$,
-      this.measurementSelectors.zeroMeasurements$))
+      this.measurementSelectors.zeroMeasurements$])
       .subscribe(([enabled, range, measurements, zeros]) => {
+        if(!enabled){
+          return; //measurement not enabled
+        }
         if(range==null){
           return; //no zero set so no relative measurements
         }
@@ -126,13 +128,14 @@ export class MeasurementResultsComponent implements OnInit, OnDestroy {
 
     //retrieve missing data from zero range
     //
-    this.subs.push(this.measurementSelectors.enabled$
-      .pipe(filter(x => x),
-      combineLatest(
+    this.subs.push(combineLatest([
+      this.measurementSelectors.enabled$,
       this.plotSelectors.plottedElements$,
       this.measurementSelectors.zeroMeasurements$,
-      this.measurementSelectors.zeroRange$))
+      this.measurementSelectors.zeroRange$])
       .subscribe(([enabled, plottedElements, measurements, range]) => {
+        if(!enabled)
+          return; //not enabled
         if(range===undefined || range == null)
           return; //no zero is set
 
