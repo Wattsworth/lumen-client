@@ -12,7 +12,8 @@ import {
   IDbElement,
   IDbStream,
   IDataView,
-  IEventStream
+  IEventStream,
+  IEventOverflow
 } from '../../store/data';
 import {
   dataApps_,
@@ -116,6 +117,10 @@ export class PlotSelectors {
   //are the errors (invalid elements) in the data?
   public isPlotDataValid$: Observable<boolean>;
 
+  //are there too many events to display?
+  public eventOverflows$: Observable<IEventOverflow[]>;
+
+  
   constructor(
     private store: Store
   ) {
@@ -129,6 +134,18 @@ export class PlotSelectors {
       //.share()
       startWith([]));
 
+    this.eventOverflows$ = combineLatest(
+      [this.eventStreams$,this.plottedEventStreamIDs$, this.plotEventData$]).pipe(
+        map(([streams, ids, events]) => {
+          console.log(ids)
+          console.log(events)
+          let overflow_ids = ids.filter(id => id in events && events[id].count>0 && events[id].events.length==0);
+          return overflow_ids.map(id => {
+            return {name: streams[id].name, count: events[id].count}})
+          
+        }), distinctUntilChanged((x, y) => _.isEqual(x, y)),
+        //.share()
+        startWith([]));
 
     this.leftElements$ = combineLatest(
       [this.elements$,this.leftElementIDs$]).pipe(

@@ -19,7 +19,8 @@ export const defaultNilm: types.INilm = {
   data_apps: [],
   refreshing: false,
   root_folder: null,
-  max_points_per_plot: 0
+  max_points_per_plot: 0,
+  max_events_per_plot: 0
 };
 
 // ---- DataApp ----
@@ -173,6 +174,7 @@ export const defaultEvent: types.IEvents = {
   start_time: null,
   end_time: null,
   valid: true,
+  count: 0,
   events: [],
 };
 

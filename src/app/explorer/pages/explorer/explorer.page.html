@@ -85,6 +85,20 @@
           <fa-icon [icon]="['fas', 'exclamation-circle']"></fa-icon>
           some data could not be retrieved
         </span>
+        <!-- warning if there are too many events (and the plot is valid)-->        
+        <span class="event-overflow" [@fadeInOut] [tooltip]="overflowTemplate" placement="bottom"
+          *ngIf="((plotSelectors.eventOverflows$ | async)?.length>0) &&
+             !(plotSelectors.addingPlotData$ | async) && (plotSelectors.isPlotDataValid$ | async)">
+          <fa-icon [icon]="['fas', 'exclamation-triangle']"></fa-icon>
+          too many events to display
+        </span>
+        <ng-template #overflowTemplate>
+            <span class="event-overflow-item" *ngFor="let overflow of plotSelectors.eventOverflows$ | async">
+              {{overflow.name}} has {{overflow.count}} events
+            </span>
+        </ng-template>
+
+
         <!-- warning if interval data is displayed -->
         <span class="interval-warning" [@fadeInOut]
           *ngIf="plotSelectors.isIntervalDataDisplayed$ | async">

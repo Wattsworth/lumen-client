@@ -11,6 +11,7 @@ export interface INilm {
   role: string;
   refreshing: boolean;
   max_points_per_plot: number;
+  max_events_per_plot: number;
   root_folder: number; //id of database root
   data_apps: Array<number>;
 }
@@ -202,12 +203,20 @@ export interface IEvents{
   valid: boolean
   start_time: number;
   end_time: number;
+  count: number; //number of events, if events is null then there are too many to display
   events: any; //just key, value pairs
 }
 
 // ---- EventSet ----
 export interface IEventsSet {
   [index: string]: IEvents; //indexed by EventStream ID
+}
+
+// --- EventOverflow --- 
+// list of plotted event streams with too many events in the time window
+export interface IEventOverflow {
+  name: string,
+  count: number;
 }
 
 // --- Data ---

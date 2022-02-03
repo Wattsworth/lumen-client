@@ -16,9 +16,13 @@
     <input class="form-control" id="nilm-url" placeholder="http://localhost/nilmdb" type="text" [formControl]="form.get('url')">
   </div>
   <div class="form-group" [class.has-error]="!form.get('max_points_per_plot').valid">
-      <label class="control-label" for="nilm-max-points">Maximum Points per Plot</label>
-      <input class="form-control" id="nilm-max-points" type="number" [formControl]="form.get('max_points_per_plot')">
-    </div>
+    <label class="control-label" for="nilm-max-points">Maximum Points per Plot</label>
+    <input class="form-control" id="nilm-max-points" type="number" [formControl]="form.get('max_points_per_plot')">
+  </div>
+  <div class="form-group" [class.has-error]="!form.get('max_events_per_plot').valid">
+    <label class="control-label" for="nilm-max-events">Maximum Events per Plot</label>
+    <input class="form-control" id="nilm-max-events" type="number" [formControl]="form.get('max_events_per_plot')">
+  </div>
   <div class="form-group ">
     <div class="float-left ">
       <button type="submit" (click) = "updateNilm(form.value)" class="btn btn-primary" 

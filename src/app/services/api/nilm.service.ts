@@ -70,12 +70,14 @@ export class NilmService {
     name: string,
     description: string,
     url: string,
-    max_points_per_plot: number) {
+    max_points_per_plot: number,
+    max_events_per_plot: number) {
     this.http.put<schema.IApiResponse>(`nilms/${nilm.id}.json`, {
       name: name,
       description: description,
       url: url,
-      max_points_per_plot: max_points_per_plot
+      max_points_per_plot: max_points_per_plot,
+      max_events_per_plot: max_events_per_plot
     }).subscribe(
       json => {
         let data = normalize(json.data, schema.nilm)
