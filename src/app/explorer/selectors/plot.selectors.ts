@@ -137,8 +137,6 @@ export class PlotSelectors {
     this.eventOverflows$ = combineLatest(
       [this.eventStreams$,this.plottedEventStreamIDs$, this.plotEventData$]).pipe(
         map(([streams, ids, events]) => {
-          console.log(ids)
-          console.log(events)
           let overflow_ids = ids.filter(id => id in events && events[id].count>0 && events[id].events.length==0);
           return overflow_ids.map(id => {
             return {name: streams[id].name, count: events[id].count}})

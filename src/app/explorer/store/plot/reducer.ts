@@ -89,7 +89,7 @@ export const reducer = createReducer(
         //all checks pass, do the move
         return {...state,
           right_elements: state.right_elements.filter(id=>id!=element.id),
-          left_elements: [...state.right_elements, element.id],
+          left_elements: [...state.left_elements, element.id],
           left_units: element.units
         }
       }
