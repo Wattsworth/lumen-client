@@ -71,6 +71,7 @@ export const defaultDbStream: types.IDbStream = {
 // ---- EventStream ----
 
 export const defaultEventStreamPlotSettings: types.IEventStreamPlotSettings = {
+  display_name: '', //use the eventStream name
   color: {
     type: 'fixed', //fixed, attribute, numeric
     value: {
@@ -123,9 +124,7 @@ export const defaultEventStream: types.IEventStream = {
   path: '',
   start_time: null,
   end_time: null,
-  total_rows: 0,
-  total_time: 0,
-  size_on_disk: 0,
+  event_count: 0,
   nilm_id: null,
   //managed by the client
   default_color: null,

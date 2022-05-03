@@ -27,7 +27,7 @@ declare var $: any;
   styleUrls: ['./plotted-events.component.css']
 })
 export class PlottedEventsComponent
-  implements OnInit, AfterViewInit {
+  implements OnInit, AfterViewInit, OnChanges {
   @Input() eventStream: IEventStream;
 
   @ViewChild('eventStreamModal', {static: false}) public eventStreamModal: ModalDirective;
@@ -36,6 +36,7 @@ export class PlottedEventsComponent
   plotSettingsForm: FormGroup;
 
   public toolTipText$: Observable<string>;
+  public displayName: string;
 
   //--state for customization modal--
   public newColor: string;
@@ -74,6 +75,7 @@ export class PlottedEventsComponent
   ngOnInit() {
     let s = this.eventStream.plot_settings;
     this.plotSettingsForm = this.fb.group({
+      display_name: [s.display_name],
       color: this.fb.group({
         type: [s.color.type],
         value: this.fb.group({
@@ -131,6 +133,14 @@ export class PlottedEventsComponent
       }))
 
   }
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.eventStream.plot_settings.display_name != "") {
+      this.displayName = this.eventStream.plot_settings.display_name;
+    } else {
+      this.displayName = this.eventStream.name;
+    }
+  }
+
   // X button on the element display
   hideEventStream() {
     this.plotService.hideEvents(this.eventStream);

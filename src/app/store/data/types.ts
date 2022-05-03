@@ -74,15 +74,14 @@ export interface IEventStream {
   path: string;
   start_time: number;
   end_time: number;
-  size_on_disk: number;
-  total_rows: number;
-  total_time: number;
+  event_count: number;
   nilm_id: number;
   //dynamically managed by the client
   default_color: string; //assigned by color service
   plot_settings: IEventStreamPlotSettings
 }
 export interface IEventStreamPlotSettings{
+  display_name: string;
   color: {
     type: string; //fixed, attribute, numeric
     value: {

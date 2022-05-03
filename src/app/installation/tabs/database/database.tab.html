@@ -29,7 +29,7 @@
       <!--TODO: (click)="console.log('TODO: installationService.refresh()')"-->
       <button class="btn btn-primary btn-block refresh" 
         
-        [disabled]="installationSelectors.refreshing$ | async">
+      [disabled]="installationSelectors.refreshing$ | async">
         <fa-icon [icon]="['fas', 'sync-alt']" [spin]="true" *ngIf="installationSelectors.refreshing$ | async"></fa-icon>
         Refresh<span *ngIf="installationSelectors.refreshing$ | async">ing</span></button>
     </div>

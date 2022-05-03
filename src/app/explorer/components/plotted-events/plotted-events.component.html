@@ -9,7 +9,7 @@
         <i class="fa fa-square fa-stack-1x fa-lg"></i>
        <i class="fa fa-square fa-stack-1x" [style.color]="element.color"></i>
       </span> -->
-  <span [tooltip]="tipTemplate" placement='right' class="lead name" [delay]="500"> {{eventStream.name}} </span>
+  <span [tooltip]="tipTemplate" placement='right' class="lead name" [delay]="500"> {{displayName}} </span>
   <fa-icon [icon]="['fas', 'times']" class="float-right icon-button right-button" (click)="hideEventStream()"></fa-icon>
 
   <ng-template #tipTemplate><fa-icon [icon]="['fas', 'database']"></fa-icon> {{toolTipText$ | async}}</ng-template>
@@ -21,18 +21,29 @@
      [config]="{backdrop: 'static'}"
      tabindex="-1" role="dialog"
      aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <!-- modal title bar -->
-        <h4 class="modal-title float-left">Plot Settings for <strong>{{eventStream.name}}</strong></h4>
+        <h4 class="modal-title float-left">Plot Settings for <strong>{{displayName}}</strong></h4>
         <button type="button" class="close float-right" aria-label="Close" (click)="eventStreamModal.hide()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <!-- Color Format -->
+        <div class="row">
+          <div class="col-md-4 border-right border-light">
         <form [formGroup]='plotSettingsForm'>
+          <!-- Display Name -->
+          <div class="row">
+            <label class="col-12 label-name mb-0">Display Name</label>
+          </div>
+          <div class="row">
+            <div class="form-group col-12 mb-1">
+              <input type="text" class="form-control" formControlName="display_name" placeholder="{{eventStream.name}}">
+            </div>
+          </div>
+          <!-- Color Format -->
           <div class="row">
             <label class="col-2 label-name mb-0">Color</label>
           </div>
@@ -56,23 +67,23 @@
             <div class="row" formGroupName="value">
               <!-- fixed color -->
               <div [hidden]="colorType()!='fixed'" 
-                class="form-group col-6 mb-1">
+                class="form-group col-12 mb-1">
                 <input type="text" class="form-control"
                 #colorPicker formControlName="fixed">
               </div>
               <!-- attribute color -->
               <div *ngIf="colorType()=='attribute'" 
-                class="form-group col-6 mb-1">
+                class="form-group col-12 mb-1">
                 <input type="text" class="form-control" placeholder="key" formControlName="attribute">
               </div>
               <!-- numeric color -->
-              <div *ngIf="colorType()=='numeric'" class="form-group col-2 mb-1 pr-0">
+              <div *ngIf="colorType()=='numeric'" class="form-group col-4 mb-1 pr-0">
                 <input type="text" class="form-control" placeholder="key">
               </div>
-              <div *ngIf="colorType()=='numeric'" class="form-group col-2 mb-1 pl-0 pr-0">
+              <div *ngIf="colorType()=='numeric'" class="form-group col-4 mb-1 pl-0 pr-0">
                 <input type="text" class="form-control" placeholder="min">
               </div>
-              <div *ngIf="colorType()=='numeric'" class="form-group col-2 mb-1 pl-0">
+              <div *ngIf="colorType()=='numeric'" class="form-group col-4 mb-1 pl-0">
                 <input type="text" class="form-control" placeholder="max">
               </div>
             </div>
@@ -99,7 +110,7 @@
             <div class="row">
               <!-- fixed marker -->
               <div *ngIf="markerType()=='fixed'" 
-                class="form-group col-3 mb-1">
+                class="form-group col-6 mb-1">
                 <div formGroupName="value">
                   <ng-select appearance="outline" [searchable]="false" [clearable]="false" formControlName="fixed">
                     <ng-option value=".">
@@ -149,13 +160,13 @@
               </div>
               <!-- attribute marker -->
               <div *ngIf="markerType()=='attribute'" 
-                class="form-group col-3 mb-1">
+                class="form-group col-6 mb-1">
                 <div formGroupName="value">
                   <input type="text" class="form-control" formControlName="attribute" placeholder="key">
                 </div>
               </div>
               <!-- marker size -->
-              <div class="form-group col-3 mb-1">
+              <div class="form-group col-6 mb-1">
                 <div class="input-group">
                   <input type="number" formControlName="size" class="form-control" placeholder="size">
                   <div class="input-group-append">
@@ -189,17 +200,17 @@
               </div>
             </div>
             <div class="row" >
-              <div *ngIf="labelType()=='fixed'" class="form-group col-3 mb-1">
+              <div *ngIf="labelType()=='fixed'" class="form-group col-6 mb-1">
                 <div formGroupName="value">
                   <input type="text" formControlName="fixed" class="form-control">
                 </div>
               </div>
-              <div *ngIf="labelType()=='attribute'" class="form-group col-3 mb-1">
+              <div *ngIf="labelType()=='attribute'" class="form-group col-6 mb-1">
                 <div formGroupName="value">
                   <input type="text" formControlName="attribute" class="form-control" placeholder="key">
                 </div>
               </div>
-              <div *ngIf="labelType()!='none'" class="form-group col-3 mb-1">
+              <div *ngIf="labelType()!='none'" class="form-group col-6 mb-1">
                 <div class="input-group">
                   <input type="number" formControlName="size" class="form-control" placeholder="size">
                   <div class="input-group-append">
@@ -229,13 +240,13 @@
               </div>
             </div>
             <div class="row">
-              <div class="form-group col-3 mb-1" *ngIf="positionType()=='fixed'" formGroupName="value">
+              <div class="form-group col-6 mb-1" *ngIf="positionType()=='fixed'" formGroupName="value">
                 <input type="text" formControlName="fixed" class="form-control">
               </div>
-              <div class="form-group col-3 mb-1" *ngIf="positionType()=='attribute'" formGroupName="value">
+              <div class="form-group col-6 mb-1" *ngIf="positionType()=='attribute'" formGroupName="value">
                 <input type="text" formControlName="attribute" class="form-control" placeholder="key">
               </div>
-              <div class="form-group col-3 mb-1">
+              <div class="form-group col-6 mb-1">
                 <ng-select appearance="outline" [searchable]="false" [clearable]="false" formControlName="axis">
                   <ng-option value="left">left</ng-option>
                   <ng-option value="right">right</ng-option>
@@ -272,11 +283,34 @@
           </div>
           <div class="row-section"></div>
         </form>
+          </div>
+          <div class="col-md-8">
+            <div class="well">
+              <h4 class="text-muted">Event Information</h4>
+              <table class="table table-condensed">
+                <tbody>
+                <tr><td><b>Stream:</b></td><td>TODO</td></tr>
+                <tr><td><b>Source:</b></td><td>TODO</td></tr>
+                <tr><td><b>Path:</b></td><td> {{eventStream.path}} </td></tr>
+                <tr><td><b>Events:</b></td><td>{{eventStream.event_count}}</td></tr>
+                <tr><td><b>URL:</b></td><td> TODO</td></tr>
+                </tbody>
+              </table>
+              <h4 class="text-muted">Event Filter</h4>
+              <p>TODO: add JSON filters</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Save and Cancel buttons -->
         <div class="clearfix mt-2">
           <!-- save -->
-          <button class="btn btn-primary float-left" 
-                  (click)="onSave()">Save</button>
+          <div class="float-left">
+            <button class="btn btn-primary" 
+            (click)="onSave()">Save</button>
+            <button class="btn btn-secondary ml-4">Duplicate</button>
+          </div>
+          
           <!-- cancel -->
           <button class="btn btn-secondary float-right"
                   (click)="eventStreamModal.hide()">
