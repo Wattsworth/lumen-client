@@ -7,6 +7,7 @@ import {
   IDbElement,
   IDbStream,
   IDataApp,
+  IEventStream,
   INilm,
 } from '../store/data';
 
@@ -34,6 +35,8 @@ export class InstallationSelectors {
   nilms$= this.store.pipe(select(selectors.nilms_));
   dbFolders$= this.store.pipe(select(selectors.dbFolders_));
   dbStreams$= this.store.pipe(select(selectors.dbStreams_));
+  eventStreams$= this.store.pipe(select(selectors.eventStreams_));
+
   dbElements$ = this.store.pipe(select(selectors.dbElements_));
   dataApps$= this.store.pipe(select(selectors.dataApps_));
 
@@ -45,12 +48,14 @@ export class InstallationSelectors {
   dbFolder_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDbFolder)));
   dbStream_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDbStream)));
   dataApp_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDataApp)));
+  eventStream_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedEventStream)));
 
   public nilm$: Observable<INilm>;
   public dbNodes$: Observable<DbTreeNode[]>;
   public rootDbFolder$: Observable<IDbFolder>;
   public selectedDbFolder$: Observable<IDbFolder>;
   public selectedDbStream$: Observable<IDbStream>;
+  public selectedEventStream$: Observable<IEventStream>;
   public selectedDataApp$: Observable<IDataApp>;
   public selectedDbStreamElements$: Observable<IDbElement[]>;
 
@@ -92,6 +97,13 @@ export class InstallationSelectors {
       [this.dbStreams$, this.dbStream_id$]).pipe(
       map(([dbStreams, id]) => dbStreams[id]),
       filter(dbStream => !(dbStream === undefined)),
+      distinctUntilChanged());
+
+     // ---- selectedEventStream: IEventStreamRecord ------
+    this.selectedEventStream$ = combineLatest(
+      [this.eventStreams$, this.eventStream_id$]).pipe(
+      map(([eventStreams, id]) => eventStreams[id]),
+      filter(eventStream => !(eventStream === undefined)),
       distinctUntilChanged());
 
 

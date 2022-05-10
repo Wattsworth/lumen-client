@@ -76,7 +76,7 @@ export const defaultEventStreamPlotSettings: types.IEventStreamPlotSettings = {
     type: 'fixed', //fixed, attribute, numeric
     value: {
       fixed: null,     //initialized to default_color
-      attribute: 'color',   //use this attribute as CSS color
+      attribute: '',   //use this attribute as CSS color
       numeric: {       //apply a color map
         attribute: '', //  use this attribute as the numeric value for the event
         min: 0,        //  left end of color map
@@ -89,7 +89,7 @@ export const defaultEventStreamPlotSettings: types.IEventStreamPlotSettings = {
     size: 12,
     value: {
       fixed: '.',
-      attribute: 'marker'
+      attribute: ''
     }
   },
   label: {
@@ -97,7 +97,7 @@ export const defaultEventStreamPlotSettings: types.IEventStreamPlotSettings = {
     size: 12,
     value: {
       fixed: '',
-      attribute: 'label'
+      attribute: ''
     }
   },
   position: {
@@ -105,14 +105,14 @@ export const defaultEventStreamPlotSettings: types.IEventStreamPlotSettings = {
     axis: 'float',
     value: {
       fixed: '0',
-      attribute: 'position'
+      attribute: ''
     }
   },
   height: {
     type: 'fixed',
     value: {
       fixed: '0.25',
-      attribute: 'height'
+      attribute: ''
     }
   }
 }
@@ -126,6 +126,7 @@ export const defaultEventStream: types.IEventStream = {
   end_time: null,
   event_count: 0,
   nilm_id: null,
+  event_fields: {},
   //managed by the client
   default_color: null,
   plot_settings: defaultEventStreamPlotSettings

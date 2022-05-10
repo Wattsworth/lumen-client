@@ -16,6 +16,7 @@
 </div>
 
 
+
 <!-- ====== edit plot settings ====== -->
 <div class="modal fade" bsModal #eventStreamModal="bs-modal" 
      [config]="{backdrop: 'static'}"
@@ -23,6 +24,10 @@
      aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
+      <!-- datalist of string Event Fields -->
+      <datalist [attr.id]="'eventfields'+eventStream.id">
+        <option *ngFor = "let field of eventFields">{{field}}</option>
+      </datalist>
       <div class="modal-header">
         <!-- modal title bar -->
         <h4 class="modal-title float-left">Plot Settings for <strong>{{displayName}}</strong></h4>
@@ -56,11 +61,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" value="attribute" formControlName="type" type="radio">
-                  <label class="form-check-label"> Attribute </label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" value="numeric" formControlName="type" type="radio">
-                  <label class="form-check-label"> Numeric </label>
+                  <label class="form-check-label"> Dynamic </label>
                 </div>
               </div>
             </div>
@@ -74,7 +75,7 @@
               <!-- attribute color -->
               <div *ngIf="colorType()=='attribute'" 
                 class="form-group col-12 mb-1">
-                <input type="text" class="form-control" placeholder="key" formControlName="attribute">
+                <input type="text" class="form-control" placeholder="key" formControlName="attribute" [attr.list]="'eventfields'+eventStream.id" >
               </div>
               <!-- numeric color -->
               <div *ngIf="colorType()=='numeric'" class="form-group col-4 mb-1 pr-0">
@@ -103,7 +104,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" value="attribute" formControlName="type" type="radio">
-                  <label class="form-check-label"> Attribute </label>
+                  <label class="form-check-label"> Dynamic </label>
                 </div>
               </div>
             </div>
@@ -162,7 +163,7 @@
               <div *ngIf="markerType()=='attribute'" 
                 class="form-group col-6 mb-1">
                 <div formGroupName="value">
-                  <input type="text" class="form-control" formControlName="attribute" placeholder="key">
+                  <input type="text" class="form-control" formControlName="attribute" placeholder="key"  [attr.list]="'eventfields'+eventStream.id">
                 </div>
               </div>
               <!-- marker size -->
@@ -191,7 +192,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" formControlName="type" value="attribute" type="radio">
-                  <label class="form-check-label"> Attribute </label>
+                  <label class="form-check-label"> Dynamic </label>
                 </div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" formControlName="type" value="none" type="radio">
@@ -207,7 +208,7 @@
               </div>
               <div *ngIf="labelType()=='attribute'" class="form-group col-6 mb-1">
                 <div formGroupName="value">
-                  <input type="text" formControlName="attribute" class="form-control" placeholder="key">
+                  <input type="text" formControlName="attribute" class="form-control" placeholder="key"  [attr.list]="'eventfields'+eventStream.id">
                 </div>
               </div>
               <div *ngIf="labelType()!='none'" class="form-group col-6 mb-1">
@@ -235,7 +236,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                   <input class="form-check-input" formControlName="type" value="attribute" type="radio">
-                  <label class="form-check-label"> Attribute </label>
+                  <label class="form-check-label"> Dynamic </label>
                 </div>
               </div>
             </div>
@@ -244,7 +245,7 @@
                 <input type="text" formControlName="fixed" class="form-control">
               </div>
               <div class="form-group col-6 mb-1" *ngIf="positionType()=='attribute'" formGroupName="value">
-                <input type="text" formControlName="attribute" class="form-control" placeholder="key">
+                <input type="text" formControlName="attribute" class="form-control" placeholder="key"  [attr.list]="'eventfields'+eventStream.id">
               </div>
               <div class="form-group col-6 mb-1">
                 <ng-select appearance="outline" [searchable]="false" [clearable]="false" formControlName="axis">
@@ -270,7 +271,7 @@
               </div>
               <div class="form-check form-check-inline">
                 <input class="form-check-input" formControlName="type" value="attribute" type="radio">
-                <label class="form-check-label"> Attribute </label>
+                <label class="form-check-label"> Dynamic </label>
               </div>
             </div>
           </div>
@@ -278,7 +279,7 @@
             <div class="form-group col-6 mb-1" formGroupName="value">
               <input *ngIf="heightType()=='fixed'" type="text" class="form-control" formControlName="fixed">
               <input *ngIf="heightType()=='attribute'" type="text" class="form-control" 
-               formControlName="attribute" placeholder="key">
+               formControlName="attribute" placeholder="key"  [attr.list]="'eventfields'+eventStream.id">
             </div>
           </div>
           <div class="row-section"></div>

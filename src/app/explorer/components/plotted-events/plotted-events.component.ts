@@ -37,6 +37,7 @@ export class PlottedEventsComponent
 
   public toolTipText$: Observable<string>;
   public displayName: string;
+  public eventFields: Array<string>;
 
   //--state for customization modal--
   public newColor: string;
@@ -74,6 +75,12 @@ export class PlottedEventsComponent
   }
   ngOnInit() {
     let s = this.eventStream.plot_settings;
+    if (this.eventStream.event_fields != null)
+      this.eventFields = Object.entries(this.eventStream.event_fields)
+        .map(entry=>entry[0])
+    else
+      this.eventFields = [] //no fields specified
+  
     this.plotSettingsForm = this.fb.group({
       display_name: [s.display_name],
       color: this.fb.group({

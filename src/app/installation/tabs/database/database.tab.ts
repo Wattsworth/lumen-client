@@ -11,12 +11,14 @@ import {
   INilm,
   IDbFolder,
   IDbStream,
+  IEventStream,
   IDataApp
 } from '../../../store/data';
 import { combineLatest } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 import { data } from '../../../api';
 import { EntityState } from '@ngrx/entity';
+import { Dictionary } from '@ngrx/entity';
 
 @Component({
   selector: 'installation-database-tab',
@@ -24,6 +26,8 @@ import { EntityState } from '@ngrx/entity';
   styleUrls: ['./database.tab.css']
 })
 export class DatabaseTabComponent {
+
+  @Input() nilm: INilm;
 
   private subs: Subscription[];
   public nilmTree$: Observable<DbTreeNode[]>
@@ -42,11 +46,16 @@ export class DatabaseTabComponent {
         map(([nilm, data]) => this.mapNilm(nilm, 
           data.dataApps.entities,
           data.dbFolders.entities,
-          data.dbStreams.entities)));
+          data.dbStreams.entities,
+          data.eventStreams.entities)));
       
     
   };
 
+  public refresh(){
+    this.installationService.refresh(this.nilm);
+  }
+  
   public toggleNode(event: any){
     if(event.isExpanded == false)
       return; //nothing to do
@@ -68,6 +77,9 @@ export class DatabaseTabComponent {
       case 'dataApp':
         this.installationService.selectDataApp(node.data.dbId);
         return;
+      case 'eventStream':
+        this.installationService.selectEventStream(node.data.dbId);
+        return;
       default:
         console.log(`unknown type ${node.data.type}`);
     }
@@ -78,9 +90,9 @@ export class DatabaseTabComponent {
     data_apps: {[id: number]: IDataApp },
     folders: {[id: number]: IDbFolder },
     streams: {[id: number]: IDbStream },
-  ): DbTreeNode[] {
+    eventStreams: Dictionary<IEventStream>,
+  ): DbTreeNode[] {    
 
-    
     //first map folders
     let root = folders[nilm.root_folder]
     if(root===undefined){
@@ -89,7 +101,7 @@ export class DatabaseTabComponent {
     let folder_nodes = root.subfolders
       .filter(id => folders[id] !== undefined)
       .map(id => this.mapFolder(
-        folders[id], folders, streams))
+        folders[id], folders, streams, eventStreams))
     let module_nodes = this.mapDataApps(nilm.data_apps, data_apps)
     return module_nodes.concat(folder_nodes);
     }
@@ -117,6 +129,7 @@ export class DatabaseTabComponent {
     folder: IDbFolder,
     folders:  {[id: number]: IDbFolder },
     streams:  {[id: number]: IDbStream },
+    eventStreams: Dictionary<IEventStream>
   ): DbTreeNode {
     let children = null;
     //if folder is loaded, map children
@@ -126,13 +139,18 @@ export class DatabaseTabComponent {
         folder.subfolders
           .filter(id => folders[id] !== undefined)
           .map(id => this.mapFolder(
-            folders[id], folders, streams))
+            folders[id], folders, streams, eventStreams))
             .sort((a,b) => a.name > b.name ? 1:-1),
         //now map streams
         folder.streams
           .filter(id => streams[id] !== undefined)
           .map(id => this.mapStream(
             streams[id]))
+          .sort((a,b) => a.name > b.name ? 1:-1),
+        //now map event streams
+        folder.event_streams
+          .filter(id => eventStreams[id] !== undefined)
+          .map(id => this.mapEventStream(eventStreams[id]))
           .sort((a,b) => a.name > b.name ? 1:-1))
     }
     //create the DbNode and return it
@@ -154,6 +172,19 @@ export class DatabaseTabComponent {
       dbId: stream.id,
       name: stream.name,
       type: 'dbStream',
+      children: [],
+      hasChildren: false
+    }
+  }
+
+  mapEventStream(
+    stream: IEventStream,
+  ): DbTreeNode {
+    return {
+      id: 'v' + stream.id,
+      dbId: stream.id,
+      name: stream.name,
+      type: 'eventStream',
       children: [],
       hasChildren: false
     }

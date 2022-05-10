@@ -53,6 +53,12 @@ export class InstallationService {
     this.messageService.clearMessages();
   }
 
+  // ---selectEventStream: pick event stream from tree -----
+  public selectEventStream(id: number) {
+    this.store.dispatch(uiActions.selectEventStream({id}));
+    this.messageService.clearMessages();
+  }
+
   // ---selectJouleModule: pick an interface from tree---
   public selectDataApp(id: number){
     this.http

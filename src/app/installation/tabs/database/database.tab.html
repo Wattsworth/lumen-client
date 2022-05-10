@@ -20,6 +20,9 @@
               <span *ngSwitchCase="'dbStream'">
                 <fa-icon [icon]="['fas', 'database']"></fa-icon>
               </span>
+              <span *ngSwitchCase="'eventStream'">
+                <fa-icon [icon]="['fas', 'chart-bar']"></fa-icon>
+              </span>
             </span>
             {{ node.data.name }}
           </ng-template>
@@ -28,7 +31,7 @@
       </div>
       <!--TODO: (click)="console.log('TODO: installationService.refresh()')"-->
       <button class="btn btn-primary btn-block refresh" 
-        
+      (click)="refresh()"
       [disabled]="installationSelectors.refreshing$ | async">
         <fa-icon [icon]="['fas', 'sync-alt']" [spin]="true" *ngIf="installationSelectors.refreshing$ | async"></fa-icon>
         Refresh<span *ngIf="installationSelectors.refreshing$ | async">ing</span></button>
@@ -44,6 +47,8 @@
       [dbFolder]="installationSelectors.selectedDbFolder$ | async "></app-edit-folder>
     <app-edit-module *ngSwitchCase="'dataApp'"
       [dataApp]="installationSelectors.selectedDataApp$ | async"></app-edit-module>
+    <app-edit-eventstream *ngSwitchCase="'eventStream'"
+      [eventStream] = "installationSelectors.selectedEventStream$ | async"></app-edit-eventstream>
     <div *ngSwitchDefault class="default-overlay">
       <fa-icon [icon]="['fas', 'cogs']" size="5x"></fa-icon>
       <br>

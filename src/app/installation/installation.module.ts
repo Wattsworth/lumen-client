@@ -37,6 +37,7 @@ import { InstallationService } from './installation.service'
 import { InstallationSelectors } from './installation.selectors';
 import { SharedModule } from '../shared/shared.module';
 import { EditModuleComponent } from './components/edit-module/edit-module.component';
+import { EditEventstreamComponent } from './components/edit-eventstream/edit-eventstream.component';
 
 @NgModule({
   imports: [
@@ -59,7 +60,8 @@ import { EditModuleComponent } from './components/edit-module/edit-module.compon
     TABS,
     PIPES,
     InstallationPageComponent,
-    EditModuleComponent
+    EditModuleComponent,
+    EditEventstreamComponent
   ],
   providers: [
     InstallationService,

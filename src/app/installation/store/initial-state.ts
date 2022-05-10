@@ -10,6 +10,7 @@ export const defaultInstallation: IInstallation = {
   selectedType: 'unknown',
   selectedDbFolder: null,
   selectedDbStream: null,
+  selectedEventStream: null,
   selectedDataApp: null,
   rootFolderId: null,
   nilm: null,

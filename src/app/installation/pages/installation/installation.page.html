@@ -11,7 +11,8 @@
 <div *ngIf="nilm!=null">
   <tabset>
     <tab heading='Database'>
-      <installation-database-tab>
+      <installation-database-tab
+      [nilm]="nilm">
       </installation-database-tab>
     </tab>
     <tab  *ngIf="nilm.role =='admin'" heading='Admin'>

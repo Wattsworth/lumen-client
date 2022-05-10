@@ -76,9 +76,11 @@ export interface IEventStream {
   end_time: number;
   event_count: number;
   nilm_id: number;
+  event_fields: Dictionary<string>
   //dynamically managed by the client
   default_color: string; //assigned by color service
   plot_settings: IEventStreamPlotSettings
+
 }
 export interface IEventStreamPlotSettings{
   display_name: string;

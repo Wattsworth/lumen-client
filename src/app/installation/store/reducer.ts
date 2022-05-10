@@ -11,6 +11,7 @@ export const reducer = createReducer(
   defaultInstallation,
   on(actions.selectDbFolder, (state: IInstallation, {id})=>({...state, selectedDbFolder: id, selectedType: 'dbFolder'})),
   on(actions.selectDbStream, (state: IInstallation, {id})=>({...state, selectedDbStream: id, selectedType: 'dbStream'})),
+  on(actions.selectEventStream, (state: IInstallation, {id})=>({...state, selectedEventStream: id, selectedType: 'eventStream'})),
   on(actions.selectDataApp, (state: IInstallation, {id})=>({...state, selectedDataApp: id, selectedType: 'dataApp'})),
   on(actions.setNilm, (state: IInstallation, {id})=>({...state, nilm: id})),
   on(actions.refreshing, (state: IInstallation)=>({...state, refreshing: true})),
