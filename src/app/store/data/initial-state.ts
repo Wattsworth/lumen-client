@@ -129,7 +129,8 @@ export const defaultEventStream: types.IEventStream = {
   event_fields: {},
   //managed by the client
   default_color: null,
-  plot_settings: defaultEventStreamPlotSettings
+  plot_settings: defaultEventStreamPlotSettings,
+  filter_groups: []
 };
 // ---- DbElement ----
 export const defaultDbElement: types.IDbElement = {

@@ -12,6 +12,7 @@ import {
   IEventStream
 } from '../../store/data';
 import { defaultData, defaultEvent } from 'app/store/data/initial-state';
+import { GroupsComponent } from 'app/account/components/groups/groups.component';
 
 @Injectable()
 export class DataService {
@@ -62,7 +63,15 @@ export class DataService {
     padding: number = 0
   ): Observable<any> {
     let params = new HttpParams()
-      .set('streams', JSON.stringify(streams.map(s => s.id)))
+      .set('streams', JSON.stringify(streams.map(s => {
+        let filter_string = s.filter_groups.reduce((groups, group)=>{
+            groups.push(
+            group.reduce((clauses, clause)=>{
+                clauses.push([clause.key, clause.comparison, clause.value])
+                return clauses}, []));
+              return groups
+            }, <any[]>[])
+        return {id: s.id, filter: filter_string}})))
       .set('padding', String(padding))
     if(startTime!=null)
       params = params.set('start_time',(startTime * 1e3).toString())

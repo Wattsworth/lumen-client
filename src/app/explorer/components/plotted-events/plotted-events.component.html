@@ -290,15 +290,15 @@
               <h4 class="text-muted">Event Information</h4>
               <table class="table table-condensed">
                 <tbody>
-                <tr><td><b>Stream:</b></td><td>TODO</td></tr>
-                <tr><td><b>Source:</b></td><td>TODO</td></tr>
-                <tr><td><b>Path:</b></td><td> {{eventStream.path}} </td></tr>
+                <tr><td><b>Stream:</b></td><td> {{eventStream.path}} </td></tr>
                 <tr><td><b>Events:</b></td><td>{{eventStream.event_count}}</td></tr>
-                <tr><td><b>URL:</b></td><td> TODO</td></tr>
+                <tr><td><b>Filtered Events:</b></td><td> TODO</td></tr>
                 </tbody>
               </table>
               <h4 class="text-muted">Event Filter</h4>
-              <p>TODO: add JSON filters</p>
+              <app-filter-plotted-events
+              [eventStream]="eventStream"
+              (changeEventFilter)="changeEventFilter($event)"></app-filter-plotted-events>
             </div>
           </div>
         </div>

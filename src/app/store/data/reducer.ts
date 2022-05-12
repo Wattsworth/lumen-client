@@ -67,6 +67,9 @@ export const eventStreamReducer = createReducer(
   //SET plot settings
   on(actions.setEventStreamPlotSettings, (state: types.IEventStreamState, {id, settings})=> 
     eventStreamAdapter.updateOne({id: id, changes:{plot_settings: settings}}, state)),
+  //SET event filters
+  on(actions.setEventStreamFilterGroups, (state: types.IEventStreamState, {id, filter_groups})=>
+    eventStreamAdapter.updateOne({id: id, changes:{filter_groups: filter_groups}}, state)),
   //RESTORE: replace event streams with new objects
   on(actions.restoreEventStream, (state: types.IEventStreamState, {streams})=> eventStreamAdapter.upsertMany(streams,state)),
   //RESET: remove plot settings

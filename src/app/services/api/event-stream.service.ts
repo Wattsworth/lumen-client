@@ -3,10 +3,11 @@ import { Store } from '@ngrx/store';
 import{ ColorService } from './color.service';
 
 import {
-  IEventStream, IEventStreamPlotSettings,
+  IEventStream, IEventStreamFilterGroup, IEventStreamPlotSettings,
 } from '../../store/data';
 import * as actions from '../../store/data/actions';
 import * as _ from 'lodash-es';
+import { identity } from 'lodash';
 @Injectable()
 export class EventStreamService {
 
@@ -17,6 +18,9 @@ export class EventStreamService {
 
   public setPlotSettings(stream_id: number, settings: IEventStreamPlotSettings){
     this.store.dispatch(actions.setEventStreamPlotSettings({id: stream_id, settings}))
+  }
+  public setFilterGroups(stream_id: number, filter_groups: Array<IEventStreamFilterGroup>){
+    this.store.dispatch(actions.setEventStreamFilterGroups({id: stream_id, filter_groups}))
   }
   public setColor(stream: IEventStream, color: string){
     if(stream.default_color == color)

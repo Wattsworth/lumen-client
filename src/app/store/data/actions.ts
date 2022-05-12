@@ -19,6 +19,7 @@ export const setEventStreamColor = createAction('[EVENTS] Set Color', props<{id:
 export const setEventStreamPlotSettings = createAction('[EVENTS] Set Plot Settings', props<{id: number, settings: types.IEventStreamPlotSettings}>());
 
 export const setEventStreamName = createAction('[EVENTS] Set Display Name', props<{id: number, name: string}>());
+export const setEventStreamFilterGroups = createAction('[EVENTS] Set Filter Groups', props<{id: number, filter_groups: Array<types.IEventStreamFilterGroup>}>())
 export const restoreEventStream = createAction('[EVENTS] Restore', props<{streams: types.IEventStream[]}>());
 export const resetEventStream = createAction('[EVENTS] Reset');
 

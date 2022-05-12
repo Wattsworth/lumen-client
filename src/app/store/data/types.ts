@@ -80,8 +80,10 @@ export interface IEventStream {
   //dynamically managed by the client
   default_color: string; //assigned by color service
   plot_settings: IEventStreamPlotSettings
-
+  filter_groups: IEventStreamFilterGroups;
 }
+export interface IEventStreamState extends EntityState<IEventStream> { };
+
 export interface IEventStreamPlotSettings{
   display_name: string;
   color: {
@@ -128,8 +130,17 @@ export interface IEventStreamPlotSettings{
     }
   }
 }
-export interface IEventStreamState extends EntityState<IEventStream> { };
 
+export type IEventStreamFilterGroup = Array<IEventStreamFilter>
+export type IEventStreamFilterGroups = Array<IEventStreamFilterGroup>
+
+type numeric_comparison = 'lt'|'lte'|'gt'|'gte'|'eq'|'neq';
+type string_comparison = 'like'|'unlike'|'is'|'not'
+export interface IEventStreamFilter{
+  key: string;
+  comparison: numeric_comparison|string_comparison
+  value: string|number;
+}
 // ---- DbElements ----
 export interface IDbElement {
   id: number;

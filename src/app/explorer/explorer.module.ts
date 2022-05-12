@@ -48,7 +48,14 @@ import {
   faBan,
   faAnkh,
   faRulerHorizontal,
-  faRulerVertical
+  faRulerVertical,
+  faGreaterThan,
+  faGreaterThanEqual,
+  faLessThan,
+  faLessThanEqual,
+  faEquals,
+  faNotEqual,
+  faMinus
 } from '@fortawesome/free-solid-svg-icons'
 import{
   faCircle as farCircle
@@ -78,6 +85,7 @@ import { SELECTORS } from './selectors';
 import { TreeModule } from 'angular-tree-component';
 import { PIPES } from './pipes';
 import { NewAnnotationComponent } from './components/new-annotation/new-annotation.component';
+import { FilterPlottedEventsComponent } from './components/filter-plotted-events/filter-plotted-events.component';
 
 @NgModule({
   imports: [
@@ -103,6 +111,7 @@ import { NewAnnotationComponent } from './components/new-annotation/new-annotati
     ExplorerPageComponent,
     PIPES,
     NewAnnotationComponent,
+    FilterPlottedEventsComponent,
   ],
   providers: [
     SERVICES,
@@ -159,6 +168,13 @@ export class ExplorerModule {
       faBan,
       faAnkh,
       faRulerHorizontal,
-      faRulerVertical);
+      faRulerVertical,
+      faGreaterThan,
+      faGreaterThanEqual,
+      faLessThan,
+      faLessThanEqual,
+      faEquals,
+      faNotEqual,
+      faMinus);
   }
  }

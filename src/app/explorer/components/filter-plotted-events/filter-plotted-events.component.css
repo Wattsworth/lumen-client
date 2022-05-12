@@ -1,0 +1,44 @@
+
+.icon-button.fa-close{
+    padding-top: 13px;
+    margin-right: 10px;
+  }
+  .icon-button{
+      color: #000;
+      text-shadow: 0 1px 0 #fff;
+      opacity: .2;
+      margin-top: 0.3em;
+  }
+.left-button{
+    padding-left: 0.5em;
+    margin-right: 0.5em;
+  }
+  .right-button{
+    padding-right: 0.5em;
+  }
+  .icon-button:hover{
+    cursor: pointer;
+    opacity: 0.5;
+    vertical-align: middle;
+  }
+  
+  .and{
+    padding-left: 16px;
+    padding-top: 5px;
+    color: #6c757d;
+  }
+  .or-bar{
+      margin-top: 10px;
+      border-color: #8d8f91;
+  }
+  .or{
+      color: #6c757d;
+      text-align: center;
+  }
+  .or-btn-row{
+    text-align: center;
+    padding-top: 5px;
+  }
+  .card-body.filter{
+    background: #ededed;
+  }
