@@ -42,3 +42,7 @@
   .card-body.filter{
     background: #ededed;
   }
+
+  input.ng-invalid:not(.ng-untouched){
+    border-color: #dc3545;
+  }

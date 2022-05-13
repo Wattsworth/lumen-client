@@ -18,6 +18,8 @@ import { PlotService } from '../../services/plot.service';
 import { PlotSelectors } from '../../selectors/plot.selectors';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { defaultEventStreamPlotSettings } from 'app/store/data/initial-state';
+import { FilterPlottedEventsComponent } from '../filter-plotted-events/filter-plotted-events.component';
+import * as _ from 'lodash';
 
 declare var $: any;
 
@@ -32,16 +34,13 @@ export class PlottedEventsComponent
 
   @ViewChild('eventStreamModal', {static: false}) public eventStreamModal: ModalDirective;
   @ViewChild('colorPicker', {static: false}) colorPicker: ElementRef
+  @ViewChild('eventFilterComponent', {static: false}) eventFilterComponent: FilterPlottedEventsComponent;
 
   plotSettingsForm: FormGroup;
 
   public toolTipText$: Observable<string>;
   public displayName: string;
   public eventFields: Array<string>;
-  public eventFilter: IEventStreamFilterGroups;
-
-  //-- track changes to the filter options --
-  private modified_filter: null|IEventStreamFilterGroups = null;
 
   //--state for customization modal--
   public newColor: string;
@@ -195,24 +194,19 @@ export class PlottedEventsComponent
     //TODO
     this.eventStreamModal.show();
   }
-  // handle changes to the event filter
-  changeEventFilter(new_filter: IEventStreamFilterGroups){
-    if(this.eventStream.filter_groups != new_filter){
-      this.modified_filter = new_filter;
-    }
-  }
   // modify the element if the user clicks 'save'
   onSave() {
-    //TODO
+    let new_filter = this.eventFilterComponent.getFilter();
+    if(!this.eventFilterComponent.isValid())
+      return;
     //changes succesfully processed, close the modal
     let newSettings: IEventStreamPlotSettings = {...defaultEventStreamPlotSettings, ...this.plotSettingsForm.value}
     //update the color values from the color picker
     newSettings.color.value.fixed = $(this.colorPicker.nativeElement).minicolors('rgbaString');
     this.eventService.setPlotSettings(this.eventStream.id, newSettings);
-    if(this.modified_filter != null){
-      this.eventService.setFilterGroups(this.eventStream.id, this.modified_filter);
-      this.modified_filter = null;
-    }
+   
+    if(!_.isEqual(this.eventStream.filter_groups, new_filter))
+      this.eventService.setFilterGroups(this.eventStream.id, new_filter);
     this.eventStreamModal.hide();
   }
 }

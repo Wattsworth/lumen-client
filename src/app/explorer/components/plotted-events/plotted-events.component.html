@@ -297,8 +297,8 @@
               </table>
               <h4 class="text-muted">Event Filter</h4>
               <app-filter-plotted-events
-              [eventStream]="eventStream"
-              (changeEventFilter)="changeEventFilter($event)"></app-filter-plotted-events>
+              #eventFilterComponent
+              [eventStream]="eventStream"></app-filter-plotted-events>
             </div>
           </div>
         </div>

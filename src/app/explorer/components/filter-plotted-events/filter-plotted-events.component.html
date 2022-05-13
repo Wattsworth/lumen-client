@@ -1,3 +1,4 @@
+<div *ngIf="showErrorMsg" class="text-danger">Invalid Filter Specification</div>
 <div *ngFor="let filterGroup of filterGroupsForm.controls; let i=index" >
     <div [formGroup]="filterGroup" class="card">
         <div class="card-body filter">
@@ -45,7 +46,12 @@
                     </div>
                     <div class="col-3">
                         <input type="text" class="form-control" formControlName="value" placeholder="value">
+                        <div *ngIf="filter.errors != null && filter.errors['valueError'] && (filter.touched || filter.dirty)" 
+                        class="text-danger">
+                            must be numeric
+                        </div>
                     </div>
+                    
                     <div *ngIf="j== filterGroup.controls.length-1" class="col-2">
                         <button class="btn btn-outline-secondary" (click)="addClause(i)">AND</button>
                     </div>
