@@ -39,6 +39,14 @@ export const dbFolder = new schema.Entity('dbFolders',
       } else {
         entity.shallow = true
       }
+      //event_stream ID values should be strings
+      if('event_streams' in entity){
+        entity['event_streams'] = entity.event_streams.map(
+         stream => {
+            stream.id = stream.id.toString();
+            return stream;
+        });
+      }
       return entity;
     }
   });

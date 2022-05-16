@@ -70,7 +70,6 @@ export class SessionService {
   public resetPassword(email: string): Observable<any> {
     if(email.length == 0){
       this.messageService.setError("enter an e-mail address");
-      console.log("returning empty")
       return empty();
     }
     let o = this.http.post('auth/password.json',{ 

@@ -48,6 +48,13 @@ export const reducer = createReducer(
         event_streams:state.event_streams.filter(stream_id=>stream_id!=id)
       }
   }),
+  //hide an event stream and any duplicates
+    on(actions.hideEventsAndDuplicates, (state: IState, {id}) => {
+      return {...state,
+          event_streams:state.event_streams.filter(
+            stream_id=> stream_id!=id && !stream_id.startsWith(id+'_'))
+        }
+    }),
   //hide a plotted element
   on(actions.hideElement, (state: IState, {id}) => {
     return {...state, 

@@ -7,7 +7,9 @@ import { IAxisSettings, IRange } from '../helpers';
 //Plot Actions
 export const hideElement = createAction('[EXPLORER: PLOT] Hide element ', props<{id: number}>());
 export const plotElement = createAction('[EXPLORER: PLOT] Show element', props<{element: IDbElement}>());
-export const hideEvents = createAction('[EXPLORER: PLOT] Hide events ', props<{id: number}>());
+export const hideEvents = createAction('[EXPLORER: PLOT] Hide events', props<{id: string}>());
+export const hideEventsAndDuplicates = createAction('[EXPLORER: PLOT] Hide events and duplicates', props<{id: string}>());
+
 export const plotEvents = createAction('[EXPLORER: PLOT] Show events', props<{stream: IEventStream}>());
 export const hideAllElements = createAction('[EXPLORER: PLOT] Hide all elements');
 export const hideAllEvents = createAction('[EXPLORER: PLOT] Hide all events');

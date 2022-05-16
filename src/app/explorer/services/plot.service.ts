@@ -55,7 +55,15 @@ export class PlotService {
     this.store.dispatch(PlotActions.plotEvents({stream}))
   }
   public hideEvents(stream: IEventStream){
+    //if this is a duplicate event stream it has to be removed from the 
+    //event stream store as well (otherwise it will just be pushed back in by main_plot.ts)
+    this.eventStreamService.deduplicateEventStream(stream);
     this.store.dispatch(PlotActions.hideEvents({id: stream.id}));
+  }
+  public hideEventsAndDuplicates(stream: IEventStream){
+    //hide this event stream and any duplicates of it
+    this.eventStreamService.removeDuplicateEventStreams(stream);
+    this.store.dispatch(PlotActions.hideEventsAndDuplicates({id: stream.id}))
   }
   
   // remove all elements from the plot
@@ -107,8 +115,25 @@ export class PlotService {
       .subscribe(
         data=>{this.store.dispatch(PlotActions.addPlotEventData({data}))}
       )
-    
   }
+  // reload the data for a single event stream
+  // used when an event filter changes
+  public refreshEventData(
+    stream: IEventStream
+  ){
+    let timeRange:IRange;
+    this.store.select(
+      createSelector(explorer_UI_,state=>state.plot.plot_time))
+      .pipe(take(1)).subscribe(state => timeRange=state);
+    this.store.dispatch(PlotActions.addingPlotData());
+    this.dataService.loadEvents(
+      timeRange.min, timeRange.max, 
+      [stream], 0.25)
+      .subscribe(
+        data=>{this.store.dispatch(PlotActions.addPlotEventData({data}))}
+      )
+  }
+
   public loadNavEventData(
     streams: IEventStream[],
     timeRange: IRange
@@ -478,6 +503,7 @@ export class PlotService {
       .pipe(take(1)).subscribe(state => plotData=state); 
     return plotData;
   }
+  
   //PRIVATE
   private findNeededElements(
     elements: Array<any>,

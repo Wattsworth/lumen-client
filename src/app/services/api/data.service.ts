@@ -71,7 +71,8 @@ export class DataService {
                 return clauses}, []));
               return groups
             }, <any[]>[])
-        return {id: s.id, filter: filter_string}})))
+        let id = +(s.id.toString().split('_')[0])
+        return {id: id, filter: filter_string, tag: s.id.toString()}})))
       .set('padding', String(padding))
     if(startTime!=null)
       params = params.set('start_time',(startTime * 1e3).toString())
@@ -81,8 +82,9 @@ export class DataService {
     let o = this.http.get<schema.IApiResponse>('events/data.json', 
       {params: params}).pipe(
       timeout(20000), //wait a maximum of 20 seconds
-      map(json => normalize(json.data, schema.events)),
-
+      map(json => json.data.map(item => {item.id = item.tag; return item})),
+      map(data => normalize(data, schema.events)),
+      // restore the duplicate ids
       map(json =>  json.entities['event']),
       share())
     o.subscribe(_ => {}, 

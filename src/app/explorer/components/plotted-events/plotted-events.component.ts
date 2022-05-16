@@ -199,14 +199,23 @@ export class PlottedEventsComponent
     let new_filter = this.eventFilterComponent.getFilter();
     if(!this.eventFilterComponent.isValid())
       return;
-    //changes succesfully processed, close the modal
     let newSettings: IEventStreamPlotSettings = {...defaultEventStreamPlotSettings, ...this.plotSettingsForm.value}
     //update the color values from the color picker
     newSettings.color.value.fixed = $(this.colorPicker.nativeElement).minicolors('rgbaString');
     this.eventService.setPlotSettings(this.eventStream.id, newSettings);
    
-    if(!_.isEqual(this.eventStream.filter_groups, new_filter))
+    if(!_.isEqual(this.eventStream.filter_groups, new_filter)){
       this.eventService.setFilterGroups(this.eventStream.id, new_filter);
+      this.plotService.refreshEventData({...this.eventStream, filter_groups: new_filter});
+    }
+     
+    //changes succesfully processed, close the modal
+    this.eventStreamModal.hide();
+  }
+
+  //add another copy of this event stream to the plot
+  onDuplicate(){
+    this.eventService.duplicateEventStream(this.eventStream);
     this.eventStreamModal.hide();
   }
 }

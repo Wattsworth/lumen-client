@@ -1,5 +1,6 @@
 
 import * as actions from './actions';
+import * as _ from 'lodash-es';
 
 import { createReducer, on} from '@ngrx/store';
 import {EntityAdapter, createEntityAdapter} from '@ngrx/entity';
@@ -7,6 +8,7 @@ import {EntityAdapter, createEntityAdapter} from '@ngrx/entity';
 
 import * as types from './types';
 import {defaultEventStreamPlotSettings} from './initial-state';
+import { max } from 'lodash';
 
 export const nilmAdapter: EntityAdapter<types.INilm> = createEntityAdapter<types.INilm>()
 export const dataAppAdapter: EntityAdapter<types.IDataApp> = createEntityAdapter<types.IDataApp>()
@@ -53,6 +55,8 @@ export const eventStreamReducer = createReducer(
   //RECEIVE (this respects local settings)
   on(actions.receiveEventStream, (state: types.IEventStreamState, {streams}) => {
     streams = streams.map(stream => {
+      //convert id to a string type
+      stream = {...stream, id: stream.id.toString()}
       //keep local values if they have been customized
       if(state.entities[stream.id]!==undefined){
         return {...stream, 
@@ -77,7 +81,35 @@ export const eventStreamReducer = createReducer(
     let ids:any[]= state.ids; //force type to array to avoid type error
     let changes = ids.map(id=>({id, changes:{plot_settings: defaultEventStreamPlotSettings}}))
     return eventStreamAdapter.updateMany(changes,state)
+  }),
+  //DUPLICATE: make another copy of this event stream
+  on(actions.duplicateEventStream, (state: types.IEventStreamState, {id}) =>{
+    let base_id = id.toString().split('_')[0]
+    //get 
+    let duplicate_offset= (<string[]>state.ids)
+      .filter(val => val.toString().startsWith(`${base_id}_`))
+      .map(composite_id => composite_id.split('_')[1])
+      .reduce((max_offset, offset)=>max([max_offset, +offset+1]),1)
+    console.log(`base_id=${base_id}, offset=${duplicate_offset}`)
+    let duplicate = <types.IEventStream>_.cloneDeep(state.entities[id])
+    duplicate.id=`${base_id}_${duplicate_offset}`;
+    duplicate.name += "-copy"
+    return eventStreamAdapter.addOne(duplicate, state)
+  }),
+  //REMOVE DUPLICATE
+  on(actions.deduplicateEventStream, (state: types.IEventStreamState, {id})=>{
+    if(id.includes('_'))
+      return eventStreamAdapter.removeOne(id, state);
+    else
+      return state;
+  }),
+  //REMOVE ALL DUPLICATES
+  on(actions.removeDuplicateEventStreams, (state: types.IEventStreamState, {id})=>{
+    let base_id = id.split('_')[0]
+    let duplicate_ids = (<string[]>state.ids).filter(stream_id => stream_id.startsWith(base_id+'_'))
+    return eventStreamAdapter.removeMany(duplicate_ids, state);
   })
+
 );
 
 

@@ -199,7 +199,7 @@ export class DatabaseTabComponent {
 
 export interface DbTreeNode {
   id: string;
-  dbId: number;
+  dbId: number|string;
   name: string;
   type: string;
   refreshing?: boolean;

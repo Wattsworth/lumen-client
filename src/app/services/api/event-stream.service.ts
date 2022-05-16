@@ -16,10 +16,10 @@ export class EventStreamService {
     private colorService: ColorService
   ) { }
 
-  public setPlotSettings(stream_id: number, settings: IEventStreamPlotSettings){
+  public setPlotSettings(stream_id: string, settings: IEventStreamPlotSettings){
     this.store.dispatch(actions.setEventStreamPlotSettings({id: stream_id, settings}))
   }
-  public setFilterGroups(stream_id: number, filter_groups: Array<IEventStreamFilterGroup>){
+  public setFilterGroups(stream_id: string, filter_groups: Array<IEventStreamFilterGroup>){
     this.store.dispatch(actions.setEventStreamFilterGroups({id: stream_id, filter_groups}))
   }
   public setColor(stream: IEventStream, color: string){
@@ -57,6 +57,15 @@ export class EventStreamService {
   }
   public resetEventStreams(){
     this.store.dispatch(actions.resetEventStream()); 
+  }
+  public duplicateEventStream(stream: IEventStream){
+    this.store.dispatch(actions.duplicateEventStream({id: stream.id}))
+  }
+  public deduplicateEventStream(stream: IEventStream){
+    this.store.dispatch(actions.deduplicateEventStream({id: stream.id}));
+  }
+  public removeDuplicateEventStreams(stream: IEventStream){
+    this.store.dispatch(actions.removeDuplicateEventStreams({id: stream.id}));
   }
 }
 

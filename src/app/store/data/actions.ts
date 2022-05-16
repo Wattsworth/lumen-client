@@ -15,14 +15,15 @@ export const reloadStreamAnnotations = createAction('[STREAM] Reload Annotations
 export const refreshedAnnotations = createAction('[STREAM] Refreshed Annotations', props<{id: number}>());
 
 export const receiveEventStream= createAction('[EVENTS] Receive', props<{streams: types.IEventStream[]}>());
-export const setEventStreamColor = createAction('[EVENTS] Set Color', props<{id: number, color: string}>());
-export const setEventStreamPlotSettings = createAction('[EVENTS] Set Plot Settings', props<{id: number, settings: types.IEventStreamPlotSettings}>());
-
-export const setEventStreamName = createAction('[EVENTS] Set Display Name', props<{id: number, name: string}>());
-export const setEventStreamFilterGroups = createAction('[EVENTS] Set Filter Groups', props<{id: number, filter_groups: Array<types.IEventStreamFilterGroup>}>())
+export const setEventStreamColor = createAction('[EVENTS] Set Color', props<{id: string, color: string}>());
+export const setEventStreamPlotSettings = createAction('[EVENTS] Set Plot Settings', props<{id: string, settings: types.IEventStreamPlotSettings}>());
+export const setEventStreamName = createAction('[EVENTS] Set Display Name', props<{id: string, name: string}>());
+export const setEventStreamFilterGroups = createAction('[EVENTS] Set Filter Groups', props<{id: string, filter_groups: Array<types.IEventStreamFilterGroup>}>())
 export const restoreEventStream = createAction('[EVENTS] Restore', props<{streams: types.IEventStream[]}>());
 export const resetEventStream = createAction('[EVENTS] Reset');
-
+export const duplicateEventStream = createAction('[EVENTS] Duplicate Event Stream', props<{id: string}>());
+export const deduplicateEventStream = createAction('[EVENTS] Deduplicate Event Stream', props<{id: string}>());
+export const removeDuplicateEventStreams = createAction('[EVENTS] Remove Duplicate Event Streams', props<{id: string}>());
 export const receiveDbElement = createAction('[ELEMENT] Receive', props<{elements: types.IDbElement[]}>());
 export const setDbElementColor = createAction('[ELEMENT] Set Color', props<{id: number, color: string}>());
 export const setDbElementName = createAction('[ELEMENT] Set Display Name', props<{id: number, name: string}>());

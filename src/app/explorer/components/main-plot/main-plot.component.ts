@@ -11,7 +11,7 @@ import {
 
 } from '@angular/core';
 import { Subscription, Subject, combineLatest } from 'rxjs';
-import { map, filter, debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import { map, filter, take, debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
 
 import { IRange } from '../../store';
@@ -118,6 +118,15 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
         this.plot.setupGrid();
         this.plot.draw();
       }));
+    /* when an event stream is duplicated, add it to the plot */
+    this.subs.push(combineLatest(
+      [this.plotSelectors.plottedEventStreams$,this.plotSelectors.eventStreams$])
+      .subscribe(([plotted_streams, all_streams])=>{
+          let plotted_ids = plotted_streams.map(stream=>stream.id)
+          Object.values(all_streams)
+            .filter(stream=>stream.id.indexOf('_')>0 && !plotted_ids.includes(stream.id))
+            .map(stream => this.plotService.plotEvents(stream))
+        }))
     /* set data cursor visibility based on state */
     this.subs.push(this.plotSelectors.dataCursor$.pipe(
       distinctUntilChanged())

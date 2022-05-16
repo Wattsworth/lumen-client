@@ -101,7 +101,7 @@ export class FileTreeComponent implements OnInit {
     streams: Dictionary<IDbStream>,
     eventStreams: Dictionary<IEventStream>,
     elements: Dictionary<IDbElement>,
-    plottedEventStreams: number[]
+    plottedEventStreams: string[]
   ): DbTreeNode {
     let children = null
     if (rootDbFolder !== undefined) {
@@ -156,9 +156,14 @@ export class FileTreeComponent implements OnInit {
     streams: Dictionary<IDbStream>,
     eventStreams: Dictionary<IEventStream>,
     elements: Dictionary<IDbElement>,
-    plottedEventStreams: number[]
+    plottedEventStreams: string[]
   ): DbTreeNode {
     let children = null;
+    //helper function to handle duplicated event streams
+    let isEventStreamPlotted=(id:string)=>{
+      let base_ids = plottedEventStreams.map(composite_id => composite_id.split('_')[0])
+      return base_ids.includes(id);
+    }
     //if folder is loaded, map children
     if (!folder.shallow) {
       children = [].concat(
@@ -178,7 +183,7 @@ export class FileTreeComponent implements OnInit {
         //now map event streams
         folder.event_streams
           .filter(id => eventStreams[id] !== undefined)
-          .map(id => this.mapEventStream(eventStreams[id],_.includes(plottedEventStreams, id)))
+          .map(id => this.mapEventStream(eventStreams[id],isEventStreamPlotted(id)))
           .sort((a,b) => a.name > b.name ? 1:-1)
           )
     }

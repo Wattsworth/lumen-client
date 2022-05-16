@@ -38,7 +38,7 @@ export interface IDbFolder {
   locked: boolean;
   subfolders: Array<number>;
   streams: Array<number>;
-  event_streams: Array<number>;
+  event_streams: Array<string>;
   start_time: number;
   end_time: number;
   size_on_disk: number;
@@ -68,7 +68,7 @@ export interface IDbStream {
 export interface IDbStreamState extends EntityState<IDbStream> { };
 
 export interface IEventStream {
-  id: number;
+  id: string;
   name: string;
   description: string;
   path: string;

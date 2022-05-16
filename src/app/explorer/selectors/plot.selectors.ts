@@ -128,7 +128,11 @@ export class PlotSelectors {
     this.plottedEventStreams$ = combineLatest(
       [this.eventStreams$,this.plottedEventStreamIDs$]).pipe(
       map(([streams, ids]) => {
-        return ids.map(id => streams[id]);
+        return _.flatMap(ids, id=>Object
+          .values(streams)
+          .filter(stream => stream.id==id)
+        );
+        
       }),
       distinctUntilChanged((x, y) => _.isEqual(x, y)),
       //.share()

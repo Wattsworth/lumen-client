@@ -42,7 +42,7 @@
         <!--hide plotted events button -->
         <span class="tree-button unplot" 
           *ngIf="node.data.plotted==true"
-          (click)="plotService.hideEvents(node.data.stream)">
+          (click)="plotService.hideEventsAndDuplicates(node.data.stream)">
           <fa-icon [icon]="['fas', 'chart-bar']"></fa-icon> hide </span>
         {{ node.data.name }}
       </span>

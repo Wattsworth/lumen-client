@@ -4,7 +4,7 @@ import { IRange, IAxisSettings } from '../helpers';
 export interface IState {
   left_elements?: number[];
   right_elements?: number[];
-  event_streams?: number[];
+  event_streams?: string[];
   left_units?: string;
   right_units?: string;
   show_plot?: boolean;
