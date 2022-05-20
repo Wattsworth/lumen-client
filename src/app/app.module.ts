@@ -33,6 +33,7 @@ import {
 } from './store/data'
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EffectsModule } from '@ngrx/effects';
+import { environment } from 'environments/environment';
 
 
 @NgModule({
@@ -60,7 +61,7 @@ import { EffectsModule } from '@ngrx/effects';
     }),
     StoreDevtoolsModule.instrument({
       maxAge: 25, //retain last 25 states
-      logOnly: false
+      logOnly: environment.production,
     }),
     EffectsModule.forRoot([PageEffects])
   ],

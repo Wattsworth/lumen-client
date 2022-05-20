@@ -143,7 +143,10 @@ export class PlotSelectors {
         map(([streams, ids, events]) => {
           let overflow_ids = ids.filter(id => id in events && events[id].count>0 && events[id].events.length==0);
           return overflow_ids.map(id => {
-            return {name: streams[id].name, count: events[id].count}})
+            let name = streams[id].name;
+            if (streams[id].plot_settings.display_name != '')
+              name = streams[id].plot_settings.display_name;
+            return {name: name, count: events[id].count}})
           
         }), distinctUntilChanged((x, y) => _.isEqual(x, y)),
         //.share()
