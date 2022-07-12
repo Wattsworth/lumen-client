@@ -25,6 +25,10 @@
   </tbody>
 </table>
 <ng-template #empty>&mdash;</ng-template>
+<h6>Time Range (UNIX Microseconds):</h6>
+<code>
+  {{ measurementSelectors.measurementRangeString$ | async }}
+</code>
 
 <div class="clearfix">
   <!-- checkbox for relative measurements -->

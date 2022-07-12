@@ -22,6 +22,7 @@ export class MeasurementSelectors {
   relative$ = this.store.pipe(select(createSelector(measurement_UI_Ex_, state=>state.relative)));
   zeroMeasurements$= this.store.pipe(select(createSelector(measurement_UI_Ex_, state=>state.zero_measurements)));
   public zeroSet$: Observable<boolean>
+  public measurementRangeString$: Observable<string>
 
   constructor(
     private store: Store
@@ -33,5 +34,12 @@ export class MeasurementSelectors {
           return false;
         return true;
       }));
+    this.measurementRangeString$ = this.measurementRange$
+      .pipe(map(range=> {
+        if(range==null)
+          return "not set";
+        return `${range.min}, ${range.max}`
+      }))
+
   }
 }
