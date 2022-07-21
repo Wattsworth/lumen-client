@@ -38,7 +38,7 @@ export class MeasurementSelectors {
       .pipe(map(range=> {
         if(range==null)
           return "not set";
-        return `${range.min}, ${range.max}`
+        return `${range.min*1e3}, ${range.max*1e3}`
       }))
 
   }
