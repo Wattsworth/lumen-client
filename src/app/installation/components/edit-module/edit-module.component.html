@@ -3,7 +3,11 @@
   <hr class="my-4">
   <div *ngIf="app.url==''" class="alert alert-warning">Apps are not available on this node. Apps reqiure a proxy server.</div>
   <div *ngIf="app.url!=''">
-  <a href="{{app.url}}" target="_blank" class="btn btn-primary">Open App {{app.url}}
+    <p>
+      One Time Link: <code>{{app.url}}</code>
+    </p>
+
+  <a href="{{app.url}}" target="_blank" class="btn btn-primary">Open App
     <fa-icon [icon]="['fas', 'external-link-alt']" class="ml-2"></fa-icon></a>
   </div>
 </div>

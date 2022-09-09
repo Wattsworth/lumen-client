@@ -11,7 +11,7 @@ import * as schema from '../api';
 
 import * as uiActions from './store/actions';
 import * as appActions from '../store/data/actions';
-import {defaultDataApp} from '../store/data/initial-state'
+import {defaultDataApp, entityFactory} from '../store/data/initial-state'
 import {
 
   INilm,
@@ -66,7 +66,7 @@ export class InstallationService {
       .subscribe(
       json => {
         let entities = normalize(json, schema.dataApp).entities;
-        let apps = entities.values.map(e=>({...defaultDataApp, ...e}))
+        let apps = entityFactory(entities['dataApps'], defaultDataApp);
         this.store.dispatch(appActions.receiveDataApp({apps}));
       })
       this.store.dispatch(uiActions.selectDataApp({id}));;
