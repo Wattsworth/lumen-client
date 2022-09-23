@@ -11,7 +11,7 @@ import {
   IDataView,
 } from '../../../store/data';
 import { Store, createSelector, select } from '@ngrx/store';
-import { dataViews_ } from 'app/selectors';
+import { dataViews_ } from '../../../selectors';
 
 @Component({
   selector: 'app-data-views',
@@ -41,11 +41,11 @@ export class DataViewsComponent{
     return `<b>${view.name}</b> <span class='text-muted'>${description}</span>`
   }
 
-  editDataView(view){
+  editDataView(view: IDataView){
     this.activeView = _.cloneDeep(view);
     this.editViewModal.show();
   }
-  updateDataView(view){
+  updateDataView(view: IDataView){
     this.dataViewService.update(view)
       .subscribe( success => this.editViewModal.hide(),
       _ => console.log('error updating view'))

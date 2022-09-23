@@ -99,7 +99,7 @@
                 [class.has-error]="!emailForm.get('email').valid && !emailForm.get('email').pristine">
                 <label>Email address</label>
                 <input type="email" class="form-control" placeholder="Email"
-                  [formControl]="emailForm.get('email')">
+                  [formControl]="emailForm.get('email') | formControl">
               </div>
             </form>
             <!-- Save and Cancel buttons -->

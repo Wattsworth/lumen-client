@@ -8,7 +8,6 @@ import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {PopoverModule} from 'ngx-bootstrap/popover';
 
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 import {
   ReactiveFormsModule,
   FormsModule
@@ -44,7 +43,6 @@ import { COMPONENTS } from './components';
     ReactiveFormsModule,
     RouterModule,
     NgSelectModule,
-    NgOptionHighlightModule,
     SharedModule,
     FontAwesomeModule,
     PopoverModule.forRoot(),

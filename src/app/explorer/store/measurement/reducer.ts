@@ -2,6 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 
 import * as actions from './actions';
 import { IState } from './types';
+import { IRange } from '../helpers'
 import {
   defaultMeasurementState
 } from './initial-state';
@@ -15,11 +16,11 @@ export const reducer = createReducer(
   //set the measurement range
   on(actions.setMeasurementRange, (state: IState, {range})=>({...state, measurement_range: range})),
   //clear the measurement range
-  on(actions.clearMeasurementRange, (state: IState)=>({...state, measurement_range: null})),
+  on(actions.clearMeasurementRange, (state: IState)=>({...state, measurement_range: null as IRange})),
   //set the measurement zero
   on(actions.setMeasurementZero, (state: IState)=>({...state, zero_range: state.measurement_range, zero_measurements: state.direct_measurements})),
   //clear the zero
-  on(actions.clearMeasurementZero, (state: IState)=>({...state, zero_measurements: {}, relative: false, zero_range: null})),
+  on(actions.clearMeasurementZero, (state: IState)=>({...state, zero_measurements: {}, relative: false, zero_range: null as IRange})),
   //set the measurements
   on(actions.setDirectMeasurements, (state: IState, {measurements})=>({...state, direct_measurements: measurements})),
   //set the relative measurements

@@ -5,18 +5,16 @@ import {Observable, empty} from 'rxjs';
 import { share } from 'rxjs/operators';
 import { Store } from '@ngrx/store'
 
-import { environment } from '../../../environments/environment';
 import * as schema from '../../api';
 import { MessageService } from '../message.service';
 import { parseDeviseErrors } from './helpers';
-import { IAppState } from '../../app.store'
 import {
   setCurrentUser
 } from '../../store/data/actions';
 
-import * as uiActions from 'app/store/ui/actions';
-import { defaultUser } from 'app/store/data/initial-state';
-import { IUser } from 'app/store/data/types';
+import * as uiActions from '../../store/ui/actions';
+import { defaultUser } from '../../store/data/initial-state';
+import { IUser } from '../../store/data/types';
 
 @Injectable()
 export class SessionService {
@@ -116,7 +114,7 @@ export class SessionService {
 
   // ----------private helper functions----------
 
-  private setUser(json) {
+  private setUser(json: IUser) {
     let user:IUser = {...defaultUser, ...json}
     this.store.dispatch(setCurrentUser({user}));
   }

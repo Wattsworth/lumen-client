@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store, select, createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { measurement_UI_Ex_ } from 'app/selectors';
+import { measurement_UI_Ex_ } from '../../selectors';
 
 import {
   IRange,

@@ -1,7 +1,7 @@
 
 import * as types from './types';
 
-export function entityFactory<T>(entities, defaultState: T){
+export function entityFactory<T>(entities: any, defaultState: T){
   if(entities===undefined || entities.length==0){
     return [];
   }

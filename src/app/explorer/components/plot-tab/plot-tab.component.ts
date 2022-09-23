@@ -14,9 +14,9 @@ import {
   transition,
 } from '@angular/animations';
 import { distinctUntilChanged, map, filter } from 'rxjs/operators';
-import { AnnotationService } from 'app/services';
-import { AnnotationSelectors, MeasurementSelectors } from 'app/explorer/selectors';
-import { IDbStream, IAnnotation } from 'app/store/data';
+import { AnnotationService } from '../../../services';
+import { AnnotationSelectors, MeasurementSelectors } from '../../../explorer/selectors';
+import { IDbStream, IAnnotation } from '../../../store/data';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -105,7 +105,7 @@ export class PlotTabComponent implements OnInit, OnDestroy {
     while (this.subs.length > 0)
       this.subs.pop().unsubscribe()
   }
-  public editAnnotation($event, annotation:IAnnotation){
+  public editAnnotation($event: any, annotation:IAnnotation){
     $event.stopPropagation();
     this.selectedAnnotation = {...annotation};
     this.annotationModal.show();

@@ -88,6 +88,9 @@
               bindValue="value"
               placeholder = "select a user"
               notFoundText = "no users found">
+              <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
+                 <span [ngOptionHighlight]="search">{{item.label}}</span>
+              </ng-template>
             </ng-select>
             <!-- Save and Cancel buttons -->
             <div class="clearfix">
@@ -114,7 +117,7 @@
                 [class.has-error]="!form.get('email').valid && !form.get('email').pristine">
                 <label>Email address</label>
                 <input type="email" class="form-control" placeholder="Email" 
-                [formControl]="form.controls['email']">
+                [formControl]="form.controls['email'] | formControl">
               </div>
               <!-- Save and Cancel buttons -->
               <div class="clearfix">

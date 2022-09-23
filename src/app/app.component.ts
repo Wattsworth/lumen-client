@@ -1,8 +1,7 @@
 import { createSelector, Store, select } from '@ngrx/store';
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
 import { IAppState } from './app.store';
-import { global_UI_ } from 'app/selectors';
+import { global_UI_ } from './selectors';
 
 //import {AppEpics} from './epics';
 
@@ -18,9 +17,9 @@ import {
 })
 export class AppComponent {
 
-  uiSelect = (state: IAppState) => state.ui.global
+  uiSelect = (state: IAppState) => state?.ui?.global
   
-  public pageHeader$ = this.store.pipe(select(createSelector(global_UI_, state=>state.page_header)));
+  public pageHeader$ = this.store.pipe(select(createSelector(global_UI_, state=>state?.page_header)));
 
   constructor(
     //private epics: AppEpics,

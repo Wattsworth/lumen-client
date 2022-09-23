@@ -7,6 +7,9 @@ import {
   MeasurementService,
   PlotService
 } from '../../services';
+import { 
+  IRange
+} from "../../store/helpers"
 import {
   MeasurementSelectors,
   PlotSelectors
@@ -121,7 +124,7 @@ export class MeasurementResultsComponent implements OnInit, OnDestroy {
               }
             }
             return acc;
-          }, {});
+          }, {} as any);
         this.measurementService
           .setRelativeMeasurements(relative_measurements)
       }));
@@ -156,10 +159,14 @@ export class MeasurementResultsComponent implements OnInit, OnDestroy {
             let measurements = Object.keys(dataSet).reduce((acc, id) => {
               acc[id] = this.measure(dataSet[id], range);
               return acc;
-            }, {})
+            }, {} as any)
             this.measurementService.addZeroMeasurements(measurements)
           })
       }));
+  }
+
+  public setRelativeMeasurement(event:EventTarget){
+    this.measurementService.setRelative((event as HTMLInputElement).checked)
   }
 
   ngOnDestroy() {
@@ -168,7 +175,7 @@ export class MeasurementResultsComponent implements OnInit, OnDestroy {
   }
 
   //-------------
-  private measure(data: IData, range): IMeasurement {
+  private measure(data: IData, range: IRange): IMeasurement {
     let measurement: IMeasurement = {
       mean: 0,
       min: Number.POSITIVE_INFINITY,

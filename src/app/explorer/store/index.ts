@@ -13,7 +13,7 @@ export interface IState {
   interfaces?: interfaces.IInterfaceState,
   annotation?: annotations.IAnnotationState
 }
-export const reducer = combineReducers({
+export const reducer = combineReducers<IState>({
   plot: plot.reducer,
   measurement: measurement.reducer,
   interfaces: interfaces.reducer,

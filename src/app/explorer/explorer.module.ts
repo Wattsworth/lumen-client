@@ -75,14 +75,13 @@ import {
 } from '@angular/forms';
 
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 
 import { SharedModule } from '../shared/shared.module';
 import { COMPONENTS } from './components';
 import { ExplorerPageComponent } from './pages/explorer/explorer.page';
 import { SERVICES } from './services';
 import { SELECTORS } from './selectors';
-import { TreeModule } from 'angular-tree-component';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { PIPES } from './pipes';
 import { NewAnnotationComponent } from './components/new-annotation/new-annotation.component';
 import { FilterPlottedEventsComponent } from './components/filter-plotted-events/filter-plotted-events.component';
@@ -90,13 +89,12 @@ import { FilterPlottedEventsComponent } from './components/filter-plotted-events
 @NgModule({
   imports: [
     CommonModule,
-    TreeModule.forRoot(),
+    TreeModule,
     RouterModule,
     FormsModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     NgSelectModule,
-    NgOptionHighlightModule,
     SharedModule,
     FontAwesomeModule,
     ModalModule.forRoot(),

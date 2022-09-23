@@ -37,7 +37,7 @@
     <label>
     <input type="checkbox"
         [checked]="measurementSelectors.relative$ | async" 
-        (change)="measurementService.setRelative($event.target.checked)">
+        (change)="setRelativeMeasurement($event.target)">
       Relative to <b>{{measurementSelectors.zeroRange$ | async | duration }}</b>
     </label>
   </div>

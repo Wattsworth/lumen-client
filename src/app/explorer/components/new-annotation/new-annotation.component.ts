@@ -17,8 +17,8 @@ import { map} from 'rxjs/operators';
 import {
   IAnnotation, IDbStream,
 } from '../../../store/data';
-import { IRange } from 'app/explorer/store';
-import { PlotSelectors } from 'app/explorer/selectors';
+import { IRange } from '../../../explorer/store';
+import { PlotSelectors } from '../../../explorer/selectors';
 
 @Component({
   selector: 'app-new-annotation',
@@ -73,8 +73,8 @@ export class NewAnnotationComponent implements OnInit {
     });
 
     this.streamList$ = combineLatest(
-      this.plotSelectors.plottedStreams$,
-      this.plotSelectors.nilms$)
+      [this.plotSelectors.plottedStreams$,
+      this.plotSelectors.nilms$])
       .pipe(map(([streams,nilms])=>{
         return streams
         .filter(stream => nilms[stream.nilm_id]!==undefined)

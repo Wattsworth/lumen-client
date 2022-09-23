@@ -16,7 +16,6 @@ import {
   IEventOverflow
 } from '../../store/data';
 import {
-  dataApps_,
   dataViews_,
   data_,
   dbElements_,
@@ -24,8 +23,7 @@ import {
   eventStreams_,
   nilms_,
   plot_UI_Ex_
-} from 'app/selectors'
-import { defaultPlotState } from '../store/plot/initial-state';
+} from '../../selectors'
 import { IAxisSettings } from '../store';
 
 
@@ -37,7 +35,7 @@ export const leftElements = createSelector(
   selectElements, selectLeftElementIDs, 
   (elements, ids)=>{
     if (ids && elements) {
-      return ids.map((id: number) => elements[id]);
+      return ids.map((id: number) => elements.entities[id]);
     } else {
       return [];
     }
@@ -245,7 +243,7 @@ export class PlotSelectors {
       map(([elements, data]) => elements
         .map(e => data[e.id])
         .filter(data => data !== undefined)),
-      map(dataset => {
+      map((dataset:any) => {
         return Object
           .keys(dataset)
           .reduce((isValid, id) => isValid && dataset[id].valid, true)

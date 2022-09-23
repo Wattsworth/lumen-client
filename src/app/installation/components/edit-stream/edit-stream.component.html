@@ -25,7 +25,7 @@
           id="folder-name"
           placeholder="Name"
           type="text"
-          [formControl]="form.controls['name']">
+          [formControl]="form.controls['name'] | formControl">
     </div>
     <div class="form-group col-md-9">
       <label for="folder-description">Description</label>
@@ -33,7 +33,7 @@
           id="folder-description"
           placeholder="Name"
           type="text"
-          [formControl]="form.controls['description']">
+          [formControl]="form.controls['description'] | formControl">
     </div>
 
     <div class="panel-title">
@@ -56,40 +56,40 @@
         <tr *ngFor="let subform of formElementsArray.controls">
           <td>
             <input type="checkbox"
-                [formControl]="subform.get('plottable')"></td>
+                [formControl]="subform.get('plottable') | formControl"></td>
           <td>
-            <ng-select [formControl]="subform.get('display_type')"
+            <ng-select [formControl]="subform.get('display_type') | formControl"
               [items]="displayTypeOptions" [clearable]="false"></ng-select></td>
           <td class="form-group" [class.has-error]="!subform.get('name').valid"> 
             <input type="text" class="form-control"
                 
-                [formControl]="subform.get('name')"></td>
+                [formControl]="subform.get('name') | formControl"></td>
           <td>
             <input type="text"
                 class="form-control"
-                [formControl]="subform.get('units')">
+                [formControl]="subform.get('units') | formControl">
           </td>
           <td class="form-group" [class.has-error]="!subform.get('offset').valid">
             <input type="text"
                 class="form-control"
-                [formControl]="subform.get('offset')">
+                [formControl]="subform.get('offset') | formControl">
           </td>
           <td class="form-group" [class.has-error]="!subform.get('scale_factor').valid">
             <input type="text"
                 class="form-control"
-                [formControl]="subform.get('scale_factor')">
+                [formControl]="subform.get('scale_factor') | formControl">
           </td>
           <td class="form-group" [class.has-error]="!subform.get('default_min').valid">
             <input type="text"
                 class="form-control"
                 placeholder="auto"
-                [formControl]="subform.get('default_min')">
+                [formControl]="subform.get('default_min') | formControl">
           </td>
           <td class="form-group" [class.has-error]="!subform.get('default_max').valid">
             <input type="text"
                 class="form-control"
                 placeholder="auto"
-                [formControl]="subform.get('default_max')">
+                [formControl]="subform.get('default_max') | formControl">
           </td>
         </tr>
 

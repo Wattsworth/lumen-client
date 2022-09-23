@@ -20,7 +20,7 @@ import {
   DataService,
   DbElementService,
 } from '../../services';
-import { data_, explorer_UI_ } from 'app/selectors';
+import { data_, explorer_UI_ } from '../../selectors';
 import { Dictionary } from '@ngrx/entity';
 
 
@@ -37,14 +37,14 @@ export class PlotService {
 
   // add element to specified axis
   //
-  public plotElement(element, axis: string = 'either') {
+  public plotElement(element: IDbElement, axis: string = 'either') {
     this.elementService.assignColor(element);
     this.store.dispatch(PlotActions.plotElement({element}));
   }
 
   // remove element from plot
   //
-  public hideElement(element) {
+  public hideElement(element: IDbElement) {
     this.store.dispatch(PlotActions.hideElement({id: element.id}));
     this.elementService.removeColor(element);
   }
@@ -196,7 +196,7 @@ export class PlotService {
   public loadNavData(
     elements: IDbElement[],
     timeRange: IRange,
-    resolution
+    resolution: number
   ) {
     
     let existingData:IDataSet
@@ -210,9 +210,9 @@ export class PlotService {
 
     this.dataService.loadData(
       timeRange.min, timeRange.max, neededElements, resolution)
-      .subscribe(
-        data => {this.store.dispatch(PlotActions.addNavData({data}));},
-        error => {
+      .subscribe({
+        next: (data) => {this.store.dispatch(PlotActions.addNavData({data}));},
+        error: (error) => {
           this.store.dispatch(PlotActions.addNavData({
            data: neededElements.reduce((acc,e) => {
             acc[e.id] = {
@@ -225,7 +225,7 @@ export class PlotService {
             return acc
           },{}) //nothing came back so create dummy error entries
         }))
-      })
+      }})
   }
 
   public toggleNavZoomLock() {
@@ -413,6 +413,9 @@ export class PlotService {
                 {
                   bars: { show: true, barWidth: 2 },
                 });
+            default:
+              console.log(`error in continuous case, unexpected display_type ${element.display_type}`)
+              return {}
           }
         case 'decimated':
           let opacity = showEnvelope ? 0.2: 0.0;
@@ -429,6 +432,9 @@ export class PlotService {
                   fillArea: [{ opacity: opacity, representation: "asymmetric" }],
                   points: { show: true, radius: 1 }
                 });
+            default:
+              console.log(`error in decimated case, unexpected display_type ${element.display_type}`)
+              return {};
           }
         case 'interval':
           return Object.assign({}, baseConfig,
@@ -446,7 +452,7 @@ export class PlotService {
         default:
           console.log("unknown data type: ", data[element.id].type)
       }
-      return
+      return {}
     }).filter(data => data != null)
   }
 

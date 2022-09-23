@@ -118,7 +118,7 @@ export class PlottedElementsComponent
       theme: 'bootstrap',
       letterCase: 'uppercase',
       changeDelay: 100,
-      change: (value, opacity) => { this.newColor = value }
+      change: (value: string, opacity: any) => { this.newColor = value }
     });
   }
   showModal() {

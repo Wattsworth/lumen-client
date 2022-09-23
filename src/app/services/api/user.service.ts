@@ -7,6 +7,7 @@ import * as types  from '../../store/data/types';
 import {entityFactory, defaultUser} from '../../store/data/initial-state';
 import * as schema from '../../api';
 import {map} from 'rxjs/operators';
+import { IUsersAuthTokenGET } from './json-types';
 import { 
   receiveUser, 
   installationTokensUnavailable, 
@@ -38,27 +39,27 @@ export class UserService {
     this.http
       .get('users.json', {}).pipe(
         map(json => normalize(json, schema.users).entities))
-      .subscribe(
-      entities => {
-        let users: types.IUser[] = entityFactory(entities.users, defaultUser)
+      .subscribe({
+      next: (entities) => {
+        let users: types.IUser[] = entityFactory(entities['users'], defaultUser)
         this.store.dispatch(receiveUser({users}))
         this.usersLoaded = true;
       },
-      error => this.messageService.setErrorsFromAPICall(error)
-      );
+      error: (error) => this.messageService.setErrorsFromAPICall(error)
+    });
   }
 
   public requestInstallationToken(): void{
     this.http
-      .post('users/auth_token.json',{})
-      .subscribe(
-      data => {
-        this.store.dispatch(receiveUserInstallationToken({token: data["key"]}));
+      .post<IUsersAuthTokenGET>('users/auth_token.json',{})
+      .subscribe({
+      next: (data) => {
+        this.store.dispatch(receiveUserInstallationToken({token: data.key}));
       },
-      error => {
+      error: (error) => {
         this.store.dispatch(installationTokensUnavailable());
       }
-    )
+    })
   }
 
   public acceptInvitation(userParams: any, token: string): void {

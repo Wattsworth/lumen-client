@@ -8,9 +8,9 @@ import * as schema from '../../api';
 import { normalize } from 'normalizr';
 import { IDataApp } from '../../store/data';
 import * as actions from '../../store/data/actions';
-import { MessageService } from 'app/services';
+import { MessageService } from '../../services';
 import { IInterfaceState } from '../store/interfaces';
-import { defaultDataApp } from 'app/store/data/initial-state';
+import { defaultDataApp } from '../../store/data/initial-state';
 
 
 @Injectable()

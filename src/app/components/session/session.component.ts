@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
 import {SessionService} from '../../services';
 import { Store, select, createSelector } from '@ngrx/store'
-import {users_} from 'app/selectors';
+import {users_} from '../../selectors';
 
 @Component({
   selector: 'app-session',

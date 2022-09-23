@@ -1,13 +1,12 @@
 
 import { Injectable } from '@angular/core';
-import { Observable, Subscription, combineLatest } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { map, share } from 'rxjs/operators';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { createSelector, Store, select } from '@ngrx/store';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
-import { IAppState } from '../../app.store';
-import { IPermission, IUser, IUserGroup } from '../../store/data';
+import { IPermission} from '../../store/data';
 import * as actions from '../../store/data/actions';
 import { UserService } from './user.service';
 import { UserGroupService } from './user-group.service';
@@ -15,8 +14,8 @@ import { UserGroupService } from './user-group.service';
 import {
   MessageService
 } from '../message.service';
-import { users_, userGroups_ } from 'app/selectors';
-import { defaultPermission, entityFactory } from 'app/store/data/initial-state';
+import { users_, userGroups_ } from '../../selectors';
+import { defaultPermission, entityFactory } from '../../store/data/initial-state';
 
 
 @Injectable()

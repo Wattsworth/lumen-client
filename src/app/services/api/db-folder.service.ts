@@ -8,7 +8,7 @@ import { entityFactory,
   defaultDbFolder, 
   defaultDbStream, 
   defaultDbElement, 
-  defaultEventStream} from 'app/store/data/initial-state'
+  defaultEventStream} from '../../store/data/initial-state'
 import { IDbFolder } from '../../store/data';
 import * as actions from '../../store/data/actions';
 
@@ -43,7 +43,7 @@ export class DbFolderService {
   }
 
   // -------- private helper functions --------
-  private _dispatch(json) {
+  private _dispatch(json: any) {
     let entities = normalize(json, schema.dbFolder).entities;
     let folders = entityFactory(entities['dbFolders'], defaultDbFolder);
     this.store.dispatch(actions.receiveDbFolder({folders}));

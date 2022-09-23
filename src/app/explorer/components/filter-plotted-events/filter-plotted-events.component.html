@@ -1,9 +1,9 @@
 <div *ngIf="showErrorMsg" class="text-danger">Invalid Filter Specification</div>
 <div *ngFor="let filterGroup of filterGroupsForm.controls; let i=index" >
-    <div [formGroup]="filterGroup" class="card">
+    <div  class="card">
         <div class="card-body filter">
             <div *ngFor = "let filter of filterGroup.controls; let j=index">
-                <div [formGroup] = "filter" class="form-row">
+                <div [formGroup]="filter" class="form-row">
                     <div class="col-1">
                         <fa-icon [icon]="['fas', 'times']" class="float-right icon-button right-button" (click)="removeClause(i,j)"></fa-icon>
                     </div>

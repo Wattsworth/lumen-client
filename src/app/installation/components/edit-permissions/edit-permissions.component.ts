@@ -21,7 +21,7 @@ import {
   INilm
 } from '../../../store/data';
 import { Store, select, createSelector } from '@ngrx/store';
-import { global_UI_ } from 'app/selectors';
+import { global_UI_ } from '../../../selectors';
 
 @Component({
   selector: 'app-edit-permissions',

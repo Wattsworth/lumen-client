@@ -17,7 +17,7 @@ import { IEventStream, IEventStreamFilterGroups, IEventStreamPlotSettings } from
 import { PlotService } from '../../services/plot.service';
 import { PlotSelectors } from '../../selectors/plot.selectors';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { defaultEventStreamPlotSettings } from 'app/store/data/initial-state';
+import { defaultEventStreamPlotSettings } from '../../../store/data/initial-state';
 import { FilterPlottedEventsComponent } from '../filter-plotted-events/filter-plotted-events.component';
 import * as _ from 'lodash';
 

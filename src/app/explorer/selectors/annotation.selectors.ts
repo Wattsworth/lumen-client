@@ -7,7 +7,7 @@ import { IAppState } from '../../app.store';
 import {
   IRange,
 } from '../store';
-import { IAnnotation } from 'app/store/data';
+import { IAnnotation } from '../../store/data';
 
 export const ANNOTATION_REDUX= ['ui','explorer','annotation'];
 

@@ -23,11 +23,11 @@
     <div class="form-group" [class.has-error]="!form.get('title').valid && !form.get('title').pristine">
       <label class="control-label" for="name">Title</label>
       <input class="form-control"
-             [formControl]="form.get('title')">
+             [formControl]="form.get('title') | formControl">
     </div>
     <div class="form-group">
       <label class="control-label" for="description">Content</label>
-      <input class="form-control" type="text" placeholder="optional" [formControl]="form.get('content')">
+      <input class="form-control" type="text" placeholder="optional" [formControl]="form.get('content') | formControl">
     </div>
     <!-- Save and Cancel buttons -->
     <div class="clearfix">

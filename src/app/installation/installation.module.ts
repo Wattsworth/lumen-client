@@ -2,13 +2,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgOptionHighlightModule } from '@ng-select/ng-option-highlight';
 
 import { 
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
-import { TreeModule } from 'angular-tree-component';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { AlertModule } from 'ngx-bootstrap/alert';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
@@ -45,9 +44,8 @@ import { EditEventstreamComponent } from './components/edit-eventstream/edit-eve
     ReactiveFormsModule,
     FormsModule,
     RouterModule,
-    TreeModule.forRoot(),
+    TreeModule,
     NgSelectModule,
-    NgOptionHighlightModule,
     SharedModule,
     FontAwesomeModule,
     TooltipModule.forRoot(),

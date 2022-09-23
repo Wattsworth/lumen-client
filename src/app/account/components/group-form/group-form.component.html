@@ -3,11 +3,11 @@
   <div class="form-group" [class.has-error]="!form.get('name').valid && !form.get('name').pristine">
     <label class="control-label" for="name">Name</label>
     <input class="form-control" placeholder="Group Name" 
-           [formControl]="form.get('name')">
+           [formControl]="form.get('name') | formControl">
   </div>
   <div class="form-group">
     <label class="control-label" for="description">Description</label>
-    <input class="form-control" type="text" [formControl]="form.get('description')">
+    <input class="form-control" type="text" [formControl]="form.get('description') | formControl">
   </div>
   <!-- Save and Cancel buttons -->
   <div class="clearfix">

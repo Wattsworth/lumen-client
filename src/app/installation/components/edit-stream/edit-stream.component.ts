@@ -59,7 +59,7 @@ export class EditStreamComponent implements OnInit {
 
   ngOnInit() {}
 
-  onSubmit(streamValues){
+  onSubmit(streamValues: any){
     this.dbStreamService.updateStream(streamValues);
   }
 

@@ -1,5 +1,5 @@
 import {createAction, props} from '@ngrx/store'
-import { IDataSet, IEventsSet, IDbElement, IEventStream } from 'app/store/data';
+import { IDataSet, IEventsSet, IDbElement, IEventStream } from '../../../store/data';
 import { IState } from './types';
 
 import { IAxisSettings, IRange } from '../helpers';

@@ -17,7 +17,6 @@ import {
 } from '@angular/forms';
 /*https://github.com/yuyang041060120/ng2-validation*/
 import { CustomValidators } from 'ng2-validation';
-import { environment } from '../../../../environments/environment';
 
 import {
   IUserGroup,
@@ -29,7 +28,7 @@ import {
   UserService
 } from '../../../services';
 import { createSelector, select, Store } from '@ngrx/store';
-import { users_ , global_UI_} from 'app/selectors';
+import { users_ , global_UI_} from '../../../../app/selectors';
 
 @Component({
   selector: 'account-group',
@@ -41,13 +40,13 @@ export class GroupComponent implements OnInit {
   @ViewChild('groupModal', {static: false}) public groupModal: ModalDirective;
 
   users$ = this.store.pipe(select(createSelector(users_, state=>state.entities)));
-  emailEnabled$ = this.store.pipe(select(createSelector(global_UI_, state=>state.email_enabled)));
+  emailEnabled$ = this.store.pipe(select(createSelector(global_UI_, state=>state?.email_enabled)));
 
 
   @Input() group: IUserGroup;
 
-  public members$: Observable<IUser[]>
-  public selectEntries$: Observable<ISelectEntry[]>
+  public members$: Observable<(IUser|undefined)[]>
+  public selectEntries$: Observable<(ISelectEntry)[]>
   public userType: string;
   public userOptions$: Observable<any[]>;
 
@@ -126,7 +125,7 @@ export class GroupComponent implements OnInit {
     this.selectEntries$ = this.users$.pipe(map(users => {
       return Object.keys(users).map(id => {
         let user = users[id];
-        return { value: user, label: `${user.first_name} ${user.last_name}` }
+        return { value: user, label: `${user?.first_name} ${user?.last_name}` }
       });
     }));
 
@@ -136,6 +135,6 @@ export class GroupComponent implements OnInit {
 
 
 interface ISelectEntry {
-  value: IUser,
+  value?: IUser,
   label: string
 }

@@ -1,28 +1,27 @@
 <div>
-  <app-plot-thumbnail [view]="{image: view.image,
-  live: view.live,
-  name: myForm.get('name').value,
-  description: myForm.get('description').value}"></app-plot-thumbnail>
+  <app-plot-thumbnail [view]="liveView(
+    myForm.get('name').value,
+    myForm.get('description').value)"></app-plot-thumbnail>
   <form [formGroup]="myForm">
     <div class="form-group" 
       [class.has-error]="!myForm.get('name').valid && !myForm.get('name').pristine">
       <label>Name</label>
       <input type="email" class="form-control" placeholder="Name" 
-        [formControl]="myForm.get('name')">
+        [formControl]="myForm.get('name') | formControl">
     </div>
     <div class="form-group">
       <label>Description</label>
       <input type="text" class="form-control" placeholder="Description" 
-        [formControl]="myForm.get('description')">
+        [formControl]="myForm.get('description') | formControl">
     </div>
     <div class="checkbox">
       <label>
-        <input type="checkbox" [formControl]="myForm.get('home')"><b> Set as Home View? </b>
+        <input type="checkbox" [formControl]="myForm.get('home') | formControl"><b> Set as Home View? </b>
       </label>
     </div>
     <div class="checkbox">
       <label>
-        <input type="checkbox" [formControl]="myForm.get('private')"><b> Private? </b>
+        <input type="checkbox" [formControl]="myForm.get('private') | formControl"><b> Private? </b>
       </label>
     </div>
   </form>

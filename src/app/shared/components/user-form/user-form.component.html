@@ -2,29 +2,29 @@
   <!-- First Name -->
   <div class="form-group" [class.has-error]="!form.get('first_name').valid && !form.get('first_name').pristine">
     <label class="control-label" for="first_name">First Name</label>
-    <input class="form-control" placeholder="first name" id="first_name" [formControl]="form.get('first_name')">
+    <input class="form-control" placeholder="first name" id="first_name" [formControl]="form.get('first_name') | formControl">
   </div>
   <!-- Last Name -->
   <div class="form-group" [class.has-error]="!form.get('last_name').valid && !form.get('last_name').pristine">
     <label class="control-label" for="last_name">Last Name</label>
-    <input class="form-control" placeholder="last name" id="last_name" [formControl]="form.get('last_name')">
+    <input class="form-control" placeholder="last name" id="last_name" [formControl]="form.get('last_name') | formControl">
   </div>
   <!-- E-mail -->
   <div class="form-group" [class.has-error]="!form.get('email').valid && !form.get('email').pristine">
     <label class="control-label" for="email">E-mail</label>
-    <input class="form-control" placeholder="e-mail address" id="email" [formControl]="form.get('email')">
+    <input class="form-control" placeholder="e-mail address" id="email" [formControl]="form.get('email') | formControl">
   </div>
   <!-- Password -->
   <div class="form-group" [class.has-error]="!form.get('passwords').get('password').valid">
     <label class="control-label" for="password">Password </label>
     <input class="form-control" id="password" type="password" 
-      [formControl]="form.get('passwords').get('password')">
+      [formControl]="form.get('passwords').get('password') | formControl">
   </div>
   <!-- Confirm Password -->
   <div class="form-group" [class.has-error]="!form.get('passwords').valid">
     <label class="control-label" for="password_confirmation">Confirm Password</label>
     <input class="form-control" id="password_confirmation" type="password" 
-      [formControl]="form.get('passwords').get('password_confirmation')">
+      [formControl]="form.get('passwords').get('password_confirmation')| formControl">
     <span *ngIf="!form.get('passwords').valid" class="help-block danger">passwords must match</span>
   </div>
   <!-- Save and Cancel buttons -->

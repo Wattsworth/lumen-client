@@ -58,7 +58,7 @@ div.nilms-loading{
 .tree-button.noplot:hover{
   color: #8fbd90;
 }
-:host>>>.angular-tree-component{
+:host ::ng-deep .angular-tree-component{
   width: inherit;
   overflow-x: visible;
 }
@@ -95,18 +95,18 @@ div.nilms-loading{
   border-color: gray;
 }
 
-:host>>>.tree-node{
+:host ::ng-deep .tree-node{
   cursor: default;
   white-space: nowrap;
 }
-:host>>>.toggle-children-wrapper{
+:host ::ng-deep .toggle-children-wrapper{
   cursor: pointer;
 }
-:host>>>.node-content-wrapper:hover{
+:host ::ng-deep .node-content-wrapper:hover{
   background: inherit !important;
   border-style: none;
 }
-:host>>>.node-content-wrapper{
+:host ::ng-deep .node-content-wrapper{
   background: inherit !important;
   border-style: none !important;
   box-shadow: unset !important;
@@ -124,17 +124,17 @@ div.nilms-loading{
   visibility: visible;
 }
 /* Tree styling 
-:host>>>.node-content-wrapper {
+:host ::ng-deep.node-content-wrapper {
   display: block;
 }
-:host>>>.node-content-wrapper, .tree-children {
+:host ::ng-deep.node-content-wrapper, .tree-children {
   position: relative;
 }
-:host>>>.node-content-wrapper::before, .tree-children::after {
+:host ::ng-deep.node-content-wrapper::before, .tree-children::after {
   content: "";
   position: absolute;
 }
-:host>>>.node-content-wrapper::before {
+:host ::ng-deep.node-content-wrapper::before {
   border-bottom: 1px solid lightgrey;
   border-left: 1px solid lightgrey;
   height: 28px;
@@ -142,19 +142,19 @@ div.nilms-loading{
   width: 20px;
   left: -28px;
 }
-:host>>>.tree-node-leaf>.node-wrapper>.node-content-wrapper::before {
+:host ::ng-deep.tree-node-leaf>.node-wrapper>.node-content-wrapper::before {
   width: 25px;
 }
-:host>>>.tree-children::after {
+:host ::ng-deep .tree-children::after {
   border-left: 1px solid lightgrey;
   height: 100%;
   top: -15px;
   left: -15px;
 }
-:host>>>treenode:last-child>.tree-node>.tree-children::after {
+:host ::ng-deep treenode:last-child>.tree-node>.tree-children::after {
   border-left: none;
 }
-:host>>>.toggle-children {
+:host ::ng-deep .toggle-children {
   z-index: 1;
 }
 */

@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash-es';
 import { Store, createSelector, select } from '@ngrx/store';
-import {nilms_} from 'app/selectors';
+import {nilms_} from '../../../selectors';
 
 import {
   NilmService,

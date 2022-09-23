@@ -14,7 +14,7 @@ import {
 
 } from '../../../store/data';
 import { InstallationSelectors } from '../../installation.selectors';
-import { permissions_, users_, userGroups_ } from 'app/selectors';
+import { permissions_, users_, userGroups_ } from '../../../selectors';
 
 @Component({
   selector: 'installation-admin-tab',

@@ -42,7 +42,7 @@ export const dbFolder = new schema.Entity('dbFolders',
       //event_stream ID values should be strings
       if('event_streams' in entity){
         entity['event_streams'] = entity.event_streams.map(
-         stream => {
+         (stream: any) => {
             stream.id = stream.id.toString();
             return stream;
         });
@@ -81,7 +81,7 @@ export const data = new schema.Entity('data', {},
     idAttribute: 'element_id',
     processStrategy: (entity) => {
       if (entity.data != null) {
-        entity.data = entity.data.map(d => {
+        entity.data = entity.data.map((d:any) => {
           if (d != null && d.length != 0) {
             d[0] = d[0] / 1.0e3; //convert to ms
           }
@@ -105,7 +105,7 @@ export const event = new schema.Entity('event', {},
     idAttribute: 'id',
     processStrategy: (entity) => {
       if (entity.events != null) {
-        entity.events = entity.events.map(e => {
+        entity.events = entity.events.map((e:any) => {
           if (e.end_time!= null) {
             e.end_time  = Math.round(e.end_time / 1e3); //convert to ms
           }

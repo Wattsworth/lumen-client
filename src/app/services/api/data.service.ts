@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http'
 import { Observable } from 'rxjs';
-import { timeout, map, share, tap } from 'rxjs/operators';
+import { timeout, map, share } from 'rxjs/operators';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 import { MessageService } from '../message.service';
-import { IAppState } from '../../app.store';
 import {
   IDbElement,
   IDbStream,
   IEventStream
 } from '../../store/data';
-import { defaultData, defaultEvent } from 'app/store/data/initial-state';
-import { GroupsComponent } from 'app/account/components/groups/groups.component';
+import { defaultData, defaultEvent } from '../../store/data/initial-state';
 
 @Injectable()
 export class DataService {
@@ -45,7 +43,7 @@ export class DataService {
       map(json => normalize(json.data, schema.datas)),
       map(json => {
         let raw_data = json.entities['data']
-        return Object.keys(raw_data).reduce((acc,id)=>{
+        return Object.keys(raw_data).reduce((acc:any,id)=>{
           acc[id]=Object.assign({},defaultData,raw_data[id]); 
           return acc}, {})}),
       share())
@@ -82,7 +80,7 @@ export class DataService {
     let o = this.http.get<schema.IApiResponse>('events/data.json', 
       {params: params}).pipe(
       timeout(20000), //wait a maximum of 20 seconds
-      map(json => json.data.map(item => {item.id = item.tag; return item})),
+      map(json => json.data.map((item:any) => {item.id = item.tag; return item})),
       map(data => normalize(data, schema.events)),
       // restore the duplicate ids
       map(json =>  json.entities['event']),

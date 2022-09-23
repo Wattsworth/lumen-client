@@ -45,8 +45,8 @@ export class LoadDataViewComponent implements OnInit {
   setDataViewFilterText(text: string){
     this.plotService.setDataViewFilterText(text);
   }
-  setShowPublicDataViews(val: boolean){
-    this.plotService.setShowPublicDataViews(val);
+  setShowPublicDataViews(target: EventTarget){
+    this.plotService.setShowPublicDataViews((target as HTMLInputElement).checked);
   }
 
 

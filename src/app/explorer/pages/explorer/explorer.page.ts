@@ -126,10 +126,7 @@ export class ExplorerPageComponent implements OnInit, AfterViewInit, OnDestroy {
   showLoadDataView() {
     this.dataViewService
       .loadDataViews()
-      .subscribe(
-      () => { },
-      () => { },
-      () => this.plotService.setDataViewsLoaded())
+      .subscribe({complete: () => this.plotService.setDataViewsLoaded()})
 
     this.loadDataViewModal.show();
   }
@@ -156,7 +153,7 @@ export class ExplorerPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.interfacesSelectors.selectedId$]).pipe(
       map(([ids,id])=> ids.indexOf(id)+1))
       .subscribe(tabIndex => {
-        setTimeout( _ => {this.interfaceTabs.tabs[tabIndex].active=true;}, 100); 
+        setTimeout( (_:any) => {this.interfaceTabs.tabs[tabIndex].active=true;}, 100); 
       }));
   }
   ngOnInit() {

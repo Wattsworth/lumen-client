@@ -11,10 +11,8 @@ import {
 
 } from '@angular/core';
 import { Subscription, Subject, combineLatest } from 'rxjs';
-import { map, filter, take, debounceTime, distinctUntilChanged} from 'rxjs/operators';
-
-
-import { IRange } from '../../store';
+import { map, filter, debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import html2canvas from "html2canvas"
 
 import { 
   PlotService,
@@ -30,9 +28,8 @@ import {
 import { FLOT_OPTIONS } from './flot.options';
 
 import * as _ from 'lodash-es';
-import { isLabeledStatement } from 'typescript';
-import { EventStreamService } from 'app/services';
-
+import { EventStreamService } from '../../../services';
+import {IRange} from '../../store/helpers'
 declare var $: any;
 
 @Component({
@@ -431,7 +428,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
 
   
   //flot helper function to customize axes based on settings
-  configureAxis(axis_options, settings, units){
+  configureAxis(axis_options: any, settings: any, units: any){
     axis_options.axisLabel=this.buildUnitLabel(units,settings.scale);
     if(settings.axis_font_size!=null)
       axis_options.font.size = settings.axis_font_size;
@@ -439,7 +436,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
       axis_options.font.size = 12;
     axis_options.ticks = settings.ticks;
     axis_options.tickDecimals = settings.precision;
-    axis_options.tickScaler = (val) => {
+    axis_options.tickScaler = (val: any) => {
       if(settings.scale!=null)
         val = (val/(10**settings.scale));
       return val;
@@ -447,7 +444,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   //flot hook to listen for event settings changes
-  updateEventSettings(event, settings){
+  updateEventSettings(event: any, settings: any){
     console.log(settings)
   }
   //flot hook to listen for zoom/scroll events
@@ -468,17 +465,17 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     })
   }
   //flot hook to listen for plot click events (annotation only)
-  updatePlotSelection(event) {
+  updatePlotSelection(event: any) {
     let selection = this.plot.getSelection(true);
     this.plotPointSelection.next(selection['xaxis']['to'])
   }
 
-  getCanvas(): Html2CanvasPromise<HTMLCanvasElement> {
+  getCanvas(){
     return html2canvas(this.plotArea.nativeElement);
   };
 
   //flot helper to add scientific notation to unit
-  buildUnitLabel(units,scale){
+  buildUnitLabel(units: string, scale: number){
     if(units==null || units=="none" || units=="event")
       return null;
     switch(scale){

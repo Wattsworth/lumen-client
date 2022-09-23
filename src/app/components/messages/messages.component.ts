@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { IAppState } from '../../app.store';
-import { IUI} from '../../store/ui';
-
-import { Observable } from 'rxjs';
-import { Store, select, createSelector } from '@ngrx/store';
-import { global_UI_ } from 'app/selectors';
+import { Store, select } from '@ngrx/store';
+import { global_UI_ } from '../../selectors';
 
 @Component({
   selector: 'app-messages',

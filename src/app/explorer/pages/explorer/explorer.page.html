@@ -220,6 +220,9 @@
           description: '',
           private: true,
           home: false,
+          id: null,
+          redux: null,
+          owner: null,
           live: this.plotSelectors.liveUpdate$ | async}" 
             (save)="createDataView($event)" 
             (cancel)="saveDataViewModal.hide()"></app-data-view-form>

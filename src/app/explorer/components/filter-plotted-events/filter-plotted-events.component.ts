@@ -14,7 +14,7 @@ import * as _ from 'lodash-es';
 export class FilterPlottedEventsComponent implements OnInit {
   @Input() eventStream: IEventStream;
   @Output() changeEventFilter = new EventEmitter;
-  filterGroupsForm: FormArray;
+  filterGroupsForm: FormArray<FormArray<FormGroup>>;
 
   public showErrorMsg = false;
   private filter_template;
@@ -32,11 +32,11 @@ export class FilterPlottedEventsComponent implements OnInit {
 
   ngOnInit(): void {
     this.filterGroupsForm = this.eventStream.filter_groups
-      .reduce((groups, group)=>{
+      .reduce((groups: FormArray, group)=>{
         groups.push(group.reduce((clauses, clause)=>{
           clauses.push(this.fb.group(clause, { validators: this.valueTypeValidator }))
           return clauses
-        }, this.fb.array([])))
+        }, this.fb.array([] as FormGroup [])))
         return groups
       }, this.fb.array([]))
   }
@@ -45,7 +45,7 @@ export class FilterPlottedEventsComponent implements OnInit {
     let filterGroup = <FormArray> this.filterGroupsForm.controls[group_index]
     filterGroup.push(this.fb.group(this.filter_template, { validators: this.valueTypeValidator }))
   }
-  removeClause(group_index: number, filter_index){
+  removeClause(group_index: number, filter_index: number){
     let filterGroup = <FormArray> this.filterGroupsForm.controls[group_index]
     filterGroup.removeAt(filter_index);
     if(filterGroup.length==0){
@@ -53,7 +53,7 @@ export class FilterPlottedEventsComponent implements OnInit {
     }
   }
   addGroup(){
-    this.filterGroupsForm.push(this.fb.array([]));
+    this.filterGroupsForm.push(this.fb.array([] as FormGroup[]));
     this.addClause(this.filterGroupsForm.length-1);
   }
   removeGroup(group_index: number){

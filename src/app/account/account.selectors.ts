@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store, select, createSelector} from '@ngrx/store'
 
-import { account_UI_, userGroups_, users_ } from 'app/selectors';
+import { account_UI_, userGroups_, users_ } from '../selectors';
 
 @Injectable()
 export class AccountSelectors {

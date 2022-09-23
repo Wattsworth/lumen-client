@@ -140,7 +140,7 @@ button.hide-annotation{
 .filter-annotations{
     background: #eee;
 }
-:host >>> .highlight { 
+:host  ::ng-deep .highlight { 
     background: yellow; 
 }
 

@@ -6,6 +6,8 @@ import { share } from 'rxjs/operators';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 
+import {IUserGroupsGET} from './json-types'
+
 import {
   IUser,
   IUserGroup
@@ -15,7 +17,8 @@ import * as actions from '../../store/data/actions'
 import {
   MessageService
 } from '../message.service';
-import { defaultUserGroup, defaultUser, entityFactory } from 'app/store/data/initial-state';
+import { defaultUserGroup, defaultUser, entityFactory } from '../../store/data/initial-state';
+
 
 @Injectable()
 export class UserGroupService {
@@ -38,10 +41,10 @@ export class UserGroupService {
     }
 
     let o = this.http
-      .get('user_groups.json', {}).pipe(share());
-      
-    o.subscribe(
-      json => {
+      .get<IUserGroupsGET>('user_groups.json', {}).pipe(share());
+
+    o.subscribe({
+      next: (json: IUserGroupsGET) => {
         this.groupsLoaded = true;
         //load owned groups (contains user data)
         let entities = normalize(json['owner'], schema.userGroups).entities;
@@ -63,8 +66,8 @@ export class UserGroupService {
         this.store.dispatch(actions.receiveGroups({groups}))
         
       },
-      error => this.messageService.setErrorsFromAPICall(error)
-      );
+      error: (error) => this.messageService.setErrorsFromAPICall(error),
+    });
     return o;
   }
 

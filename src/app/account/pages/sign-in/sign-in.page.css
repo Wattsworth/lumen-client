@@ -24,17 +24,17 @@ div.carousel-caption{
  }
 
 /* override styling on carousel, the left/right nav shading is distracting*/
-:host>>>.carousel-control.left {
+:host ::ng-deep .carousel-control.left {
   background-image: none;
 }
-:host>>>.carousel-control.right {
+:host ::ng-deep .carousel-control.right {
   background-image: none;
 }
-:host>>>.carousel-control.left:hover {
+:host ::ng-deep .carousel-control.left:hover {
   opacity: 0.5;
   background-image: linear-gradient(to right,rgba(0,0,0,.5) 0,rgba(0,0,0,.0001) 100%)
 }
-:host>>>.carousel-control.right:hover {
+:host ::ng-deep .carousel-control.right:hover {
   opacity: 0.5;
   background-image: linear-gradient(to right,rgba(0,0,0,.0001) 0,rgba(0,0,0,.5) 100%)
 }

@@ -159,7 +159,7 @@ export interface IDbElement {
   color: string;
   display_name: string;
 }
-export interface IDbElementState extends EntityState<IDbElement> { };
+export interface IDbElementState extends EntityState<IDbElement> {};
 
 // --- Stream Annotation ---
 export interface IAnnotation{

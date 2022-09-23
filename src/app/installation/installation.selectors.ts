@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { TreeNode } from 'angular-tree-component';
 import { Store, select, createSelector} from '@ngrx/store';
 import {
   IState,
@@ -15,7 +14,7 @@ import {IInstallation} from './store';
 import {IAppState} from '../app.store';
 import { Observable, combineLatest } from 'rxjs';
 import { map, filter, tap, distinctUntilChanged } from 'rxjs/operators';
-import * as selectors from 'app/selectors';
+import * as selectors from '../selectors';
 
 export interface DbTreeNode {
   id: string;
@@ -118,8 +117,8 @@ export class InstallationSelectors {
     // ---- dbNodes: DbTreeNode[] -----
     this.dbNodes$ = combineLatest(
       [this.root_folder_id$, this.data$]).pipe(
-      filter(([root_id, data]) => data.dbFolders[root_id] !== undefined),
-      map(([root_id, data]) => this._mapRoot(data, data.dbFolders[root_id]))
+      filter(([root_id, data]) => data.dbFolders.entities[root_id] !== undefined),
+      map(([root_id, data]) => this._mapRoot(data, data.dbFolders.entities[root_id]))
     );
   }
 
@@ -141,12 +140,12 @@ export class InstallationSelectors {
       children = [].concat(
         //first map subfolders
         folder.subfolders
-          .filter(id => data.dbFolders[id] !== undefined)
-          .map(id => this._mapFolder(data,data.dbFolders[id])),
+          .filter(id => data.dbFolders.entities[id] !== undefined)
+          .map(id => this._mapFolder(data,data.dbFolders.entities[id])),
         //now map streams
         folder.streams
-          .filter(id => data.dbStreams[id] !== undefined)
-          .map(id => this._mapStream(data, data.dbStreams[id])))
+          .filter(id => data.dbStreams.entities[id] !== undefined)
+          .map(id => this._mapStream(data, data.dbStreams.entities[id])))
     }
     /*
     if (!dbFolder.shallow) {

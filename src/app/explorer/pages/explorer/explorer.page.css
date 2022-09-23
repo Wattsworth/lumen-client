@@ -286,7 +286,7 @@ a.help-btn {
 }
 
 @media(max-width: 767px){
-  :host(.main-plot) >>> plot{
+  :host(.main-plot)  ::ng-deep plot{
     height: 400px;
   }
   .date-picker {

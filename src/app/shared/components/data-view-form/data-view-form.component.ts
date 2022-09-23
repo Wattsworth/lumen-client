@@ -36,6 +36,9 @@ export class DataViewFormComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     this.buildForm();
   }
+  liveView(name: string, description: string){
+    return {...this.view, name: name, description: description}
+  }
   buildForm() {
     this.myForm = this.fb.group({
       name: [this.view.name, [Validators.required]],
@@ -45,6 +48,9 @@ export class DataViewFormComponent implements OnInit, OnChanges {
     });
   }
   reset(){
+    let x={'test':1, 'abc': 2}
+    let y = {...this.view,
+       'abc': 4}
     this.myForm.reset();
   }
   onCancel() {

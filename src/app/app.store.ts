@@ -1,7 +1,7 @@
 import { combineReducers} from '@ngrx/store';
 
 import * as ui from './store/ui';
-import {IState, reducer} from './store/data';
+import {IState} from './store/data';
 import * as installation from './installation/store';
 import * as explorer from './explorer/store';
 import * as account from './account/store';

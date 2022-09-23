@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 
@@ -25,7 +24,7 @@ export class MessageService {
   public setErrors(messages: string[]): void {
     this.store.dispatch(actions.setErrorMessages({messages}));
   }
-  public setErrorsFromAPICall(error): void {
+  public setErrorsFromAPICall(error: HttpErrorResponse): void {
     let errors = this.parseAPIErrors(error)
     if(errors.length > 0)
       this.setErrors(errors)

@@ -1,11 +1,11 @@
 <div class="alerts" *ngFor="let messages of [(messages$ | async)]">
-  <alert type="success" dismissible="true" *ngFor="let notice of messages.notices">
+  <alert type="success" [dismissible]="true" *ngFor="let notice of messages.notices">
     {{notice}}
   </alert>
-  <alert type="danger" dismissible="true" *ngFor="let error of messages.errors">
+  <alert type="danger" [dismissible]="true" *ngFor="let error of messages.errors">
     <strong>Error:</strong> {{error}}
   </alert>
-  <alert type="warning" dismissible="true" *ngFor="let warning of messages.warnings">
+  <alert type="warning" [dismissible]="true" *ngFor="let warning of messages.warnings">
     <strong>Warning: </strong>{{warning}}
   </alert>
 </div>

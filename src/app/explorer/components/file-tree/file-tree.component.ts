@@ -3,7 +3,7 @@ import {combineLatest} from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { TreeNode } from 'angular-tree-component';
+import { TreeNode } from '@circlon/angular-tree-component';
 import * as _ from 'lodash-es';
 
 import {
@@ -27,7 +27,6 @@ import {
   PlotSelectors,
 } from '../../selectors';
 import { Dictionary } from '@ngrx/entity';
-import { eventStreamAdapter } from 'app/store/data/reducer';
 
 @Component({
   selector: 'app-file-tree',
@@ -86,10 +85,14 @@ export class FileTreeComponent implements OnInit {
     switch (node.data.type) {
       case 'nilm':
         this.nilmService.loadNilm(id);
-        return [];
+        break;
+        //return [];
       case 'dbFolder':
         this.dbFolderService.loadFolder(id);
-        return [];
+        break;
+        //return [];
+      default:
+        console.log(`unexpected call to getChildren with ${node.data.type}`)
     }
   }
 

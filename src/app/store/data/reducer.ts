@@ -174,7 +174,11 @@ export const dbElementReducer = createReducer(
 
 //  -----------  User Reducer --------------
 export const userReducer = createReducer(
-  userAdapter.getInitialState(),
+  userAdapter.getInitialState({
+    current: null,
+    new_installation_token: "",
+    installation_token_available: false
+  }),
   //RECEIVE
   on(actions.receiveUser, (state: types.IUserState, {users}) => {
     //current user has more data fields, don't 
@@ -192,13 +196,13 @@ export const userReducer = createReducer(
   }),
   //SET Installation Token Unavailable
   on(actions.installationTokensUnavailable, (state: types.IUserState) => {
-    return { ...state, new_installation_token: null, installation_token_available: false };
+    return { ...state, new_installation_token: "", installation_token_available: false };
   })
 )
 
 // ------ User Group Reducer -----
 export const userGroupReducer = createReducer(
-  userGroupAdapter.getInitialState(),
+  userGroupAdapter.getInitialState({owner: [], member: []}),
   //RECEIVE generic groups
   on(actions.receiveGroups, (state: types.IUserGroupState, {groups}) => userGroupAdapter.upsertMany(groups, state)),
   //RECEIVE owner group

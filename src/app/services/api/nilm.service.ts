@@ -6,14 +6,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
 
-import { IAppState } from '../../app.store';
 import { INilm } from '../../store/data';
 import * as actions from '../../store/data/actions';
 
 import {
   MessageService
 } from '../message.service';
-import { defaultDataApp, defaultDbFolder, defaultNilm, entityFactory } from 'app/store/data/initial-state';
+import { defaultDataApp, defaultDbFolder, defaultNilm, entityFactory } from '../../store/data/initial-state';
 
 
 @Injectable()
@@ -125,7 +124,7 @@ export class NilmService {
   }
 
   // -------- private helper functions --------
-  private _dispatch(entities) {
+  private _dispatch(entities: any) {
     let nilms = entityFactory(entities['nilms'], defaultNilm);
     this.store.dispatch(actions.receiveNilm({nilms}));
     let apps = entityFactory(entities['dataApps'], defaultDataApp);

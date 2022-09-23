@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
-  FormsModule
 } from '@angular/forms';
 
 import {COMPONENTS} from './components';
 import {PIPES} from './pipes';
+import { DIRECTIVES } from './directives';
 
 @NgModule({
   imports: [
@@ -16,10 +16,12 @@ import {PIPES} from './pipes';
   declarations: [
     COMPONENTS,
     PIPES,
+    DIRECTIVES
   ],
   exports: [
     COMPONENTS,
-    PIPES
+    PIPES,
+    DIRECTIVES
   ]
 })
 export class SharedModule { }

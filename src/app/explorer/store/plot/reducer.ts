@@ -10,7 +10,7 @@ import {
 import {
   IRange,
 } from '../helpers'
-import { defaultData } from 'app/store/data/initial-state';
+import { defaultData } from '../../../store/data/initial-state';
 
 export const reducer = createReducer(
   defaultPlotState,
@@ -63,9 +63,9 @@ export const reducer = createReducer(
     };
   }),
   //hide all elements (clear left_elements and right_elements)
-  on(actions.hideAllElements, (state: IState) => ({...state, leftElements: [], right_elements: []})),
+  on(actions.hideAllElements, (state: IState) => ({...state, leftElements: [] as number[], right_elements: [] as number[]})),
   //hide all event streams
-  on(actions.hideAllEvents, (state: IState) => ({...state, event_streams: []})),
+  on(actions.hideAllEvents, (state: IState) => ({...state, event_streams: [] as string[]})),
   //change a plotted element's axis
   on(actions.setElementAxis, (state: IState, {element, axis}) => {
       if (axis == 'right') {
@@ -158,8 +158,8 @@ export const reducer = createReducer(
   }),
   //reset the plot time ranges
   on(actions.resetTimeRanges,(state: IState) => ({...state, 
-    plot_time: {min: null, max:null}, 
-    nav_time: {min: null, max: null}})),
+    plot_time: {min: null as number, max:null as number}, 
+    nav_time: {min: null as number, max: null as number}})),
   //set plot time range
   on(actions.setPlotTimeRange,(state: IState, {range}) => ({...state, plot_time: range})),
   //set nav time range
@@ -228,9 +228,10 @@ export const reducer = createReducer(
 
 function setTimeRange(range: IRange, data: IDataSet|IEventsSet) {
   let autoRange = { min: range.min, max: range.max }
-  if (data == {})
+  let hasData = Object.keys(data).length>0
+  if (!hasData)
     return range;
-  if (range.min == null && data != {}) {
+  if (range.min == null && hasData) {
     let possibleMinTimes = Object.keys(data)
       .map(id => data[id].start_time)
       .filter(time => time!=null)
@@ -238,7 +239,7 @@ function setTimeRange(range: IRange, data: IDataSet|IEventsSet) {
     if(possibleMinTimes.length>0) 
       autoRange.min = possibleMinTimes[0]
   }
-  if (range.max == null && data != {}) {
+  if (range.max == null && hasData) {
     let possibleMaxTimes = Object.keys(data)
       .map(id => data[id].end_time)
       .filter(time => time!=null)

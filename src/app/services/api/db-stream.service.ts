@@ -6,7 +6,9 @@ import * as schema from '../../api';
 import { MessageService } from '../message.service';
 import { entityFactory, 
   defaultDbStream, 
-  defaultDbElement } from 'app/store/data/initial-state'
+  defaultDbElement } from '../../store/data/initial-state'
+import { IDbStream } from '../../store/data';
+
 import * as actions from '../../store/data/actions';
 
 
@@ -38,7 +40,7 @@ export class DbStreamService {
   }
 
   
-  public updateStream(stream): void {
+  public updateStream(stream: IDbStream): void {
     this.http
       .put<schema.IApiResponse>(`db_streams/${stream.id}.json`, stream)
       .subscribe(
@@ -51,7 +53,7 @@ export class DbStreamService {
   }
 
   // -------- private helper functions --------
-  private _dispatch(entities) {
+  private _dispatch(entities: any) {
     let streams = entityFactory(entities['dbStreams'], defaultDbStream);
     this.store.dispatch(actions.receiveDbStream({streams}));
     let elements = entityFactory(entities['dbElements'], defaultDbElement);

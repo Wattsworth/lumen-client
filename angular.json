@@ -3,31 +3,30 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "frontend": {
+    "lumen": {
+      "projectType": "application",
+      "schematics": {},
       "root": "",
       "sourceRoot": "src",
-      "projectType": "application",
+      "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": true,
-            "outputPath": "dist",
+            "outputPath": "dist/lumen",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.json",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
             "assets": [
-              "src/assets",
               "src/favicon.ico",
-              {"glob": "jquery.minicolors.png", 
-              "input": "./node_modules/@claviska/jquery-minicolors",
-              "output": "/"}
+              "src/assets"
             ],
             "styles": [
               "src/styles.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/@claviska/jquery-minicolors/jquery.minicolors.css",
-              "node_modules/angular-tree-component/dist/angular-tree-component.css",
+              "node_modules/@circlon/angular-tree-component/css/angular-tree-component.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css"
             ],
@@ -50,162 +49,74 @@
             ]
           },
           "configurations": {
-            "nginxdev": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.nginxdev.ts"
-                }]
-            },
             "production": {
               "budgets": [
                 {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "3mb"
+                },
+                {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
                 }
               ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
                 }
-              ]
-            },
-            "aws": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
               ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.aws.ts"
-                }
-              ]
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "frontend:build"
-          },
           "configurations": {
             "production": {
-              "browserTarget": "frontend:build:production"
+              "browserTarget": "lumen:build:production"
             },
-            "nginxdev":{
-              "browserTarget": "frontend:build:nginxdev"
-            },
-            "local": {
-              "browserTarget": "frontend:build:local"
-            },
-            "aws": {
-              "browserTarget": "frontend:build:aws"
+            "development": {
+              "browserTarget": "lumen:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "frontend:build"
+            "browserTarget": "lumen:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
-            "scripts": [
-              "src/flot/jquery.js",
-              "src/flot/jquery.mousewheel.js",
-              "src/flot/jquery.flot.js",
-              "src/flot/jquery.flot.resize.js",
-              "src/flot/jquery.flot.navigate.js",
-              "src/flot/jquery.flot.fillarea.js",
-              "src/flot/jquery.flot.crosshair.js",
-              "src/flot/jquery.flot.time.js",
-              "src/flot/jquery.flot.tooltip.js",
-              "src/flot/jquery.flot.selection.js",
-              "src/flot/jquery.flot.canvas.js",
-              "src/flot/jquery.flot.highlight.js",
-              "node_modules/@claviska/jquery-minicolors/jquery.minicolors.js",
-              "node_modules/html2canvas/dist/html2canvas.js"
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
-              "src/styles.css",
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/@claviska/jquery-minicolors/jquery.minicolors.css",
-              "node_modules/angular-tree-component/dist/angular-tree-component.css"
+              "src/styles.css"
             ],
-            "assets": [
-              "src/assets",
-              "src/favicon.ico",
-              "node_modules/@claviska/jquery-minicolors/jquery.minicolors.png"
-            ]
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "src/tsconfig.json"
-            ],
-            "exclude": []
+            "scripts": []
           }
         }
       }
-    },
-    "frontend-e2e": {
-      "root": "",
-      "sourceRoot": "",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "frontend:serve"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "e2e/tsconfig.json"
-            ],
-            "exclude": []
-          }
-        }
-      }
-    }
-  },
-  "defaultProject": "frontend",
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "style": "css"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
     }
   }
 }

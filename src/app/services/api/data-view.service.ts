@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Store, select, createSelector } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { HttpClient } from '@angular/common/http';
 import { Observable, EMPTY } from 'rxjs';
 import { tap, map, share, take } from 'rxjs/operators';
@@ -17,7 +17,6 @@ import {
   IDataView,
   IData,
   IDataViewRedux,
-  IDbElementState,
   IDbElement,
   IDbStream,
   IEventStream
@@ -25,8 +24,13 @@ import {
 import * as actions from '../../store/data/actions';
 import * as plotActions from '../../explorer/store/plot/actions'
 import * as plot from '../../explorer/store/plot';
-import { defaultDataView, entityFactory, defaultDataViewRedux, defaultEventStreamPlotSettings, defaultEventStream } from 'app/store/data/initial-state';
-import { dbElements_, dbStreams_, eventStreams_, plot_UI_Ex_ } from 'app/selectors';
+import { defaultDataView, 
+  entityFactory, 
+  defaultDataViewRedux, 
+  defaultEventStreamPlotSettings, 
+  defaultEventStream 
+} from '../../store/data/initial-state';
+import { dbElements_, dbStreams_, eventStreams_, plot_UI_Ex_ } from '../../selectors';
 import { Dictionary } from '@ngrx/entity';
 
 export const MAX_SAVE_DATA_LENGTH = 200;
@@ -78,14 +82,14 @@ export class DataViewService {
   //
   public deleteDataView(view: IDataView) {
     this.http
-      .delete(`data_views/${view.id}.json`)
-      .subscribe(
-      json => {
+      .delete<schema.IApiResponse>(`data_views/${view.id}.json`)
+      .subscribe({
+      next: json => {
         this.store.dispatch(actions.removeDataView({id:view.id}));
         this.messageService.setMessages(json['messages']);
       },
-      error => this.messageService.setErrorsFromAPICall(error)
-      )
+      error: error => this.messageService.setErrorsFromAPICall(error)
+      })
   }
 
 
@@ -157,12 +161,12 @@ export class DataViewService {
     this.http
       .get('data_views/home.json', {}).pipe(
        map(json => normalize(json, schema.dataView)),
-       map(json => json.entities.data_views[json.result]),
+       map(json => json.entities['data_views'][json.result]),
        map(json => ({...defaultDataView, ...json})))
-      .subscribe(
-      view => this.restoreDataView(view),
-      error => {}//no home view
-      );
+      .subscribe({
+      next: (view) => this.restoreDataView(view),
+      error: error => {}//no home view
+      });
   }
 
   //------------------ Local Functions -----------------------
@@ -198,8 +202,9 @@ export class DataViewService {
     //fill in any missing plot_settings keys with defaults
     let eventStreams = Object.values(redux.data_eventStreams)
       .map(stream => {
-        let new_stream = {...defaultEventStream, ...stream};
-        new_stream.plot_settings = {...defaultEventStreamPlotSettings, ...stream.plot_settings}
+        let new_stream = {...defaultEventStream, ...stream as IEventStream};
+        new_stream.plot_settings = {...defaultEventStreamPlotSettings,
+                                    ...(stream as IEventStream).plot_settings}
         this.colorService.checkoutEventColor(new_stream.default_color);
         //if the stream is missing a fixed color use the default color
         if(new_stream.plot_settings.color.value.fixed==null){
@@ -247,11 +252,11 @@ export class DataViewService {
     let plottedElements = _.concat(
       explorerState.left_elements,
       explorerState.right_elements)
-      .reduce((acc, id) => {
+      .reduce((acc: any, id) => {
         acc[id] = allElements[id];
         return acc
       }, {});
-    let plottedEventStreams = explorerState.event_streams.reduce((acc,id)=>{
+    let plottedEventStreams = explorerState.event_streams.reduce((acc: any,id)=>{
       acc[id]=eventStreams[id];
       return acc
     }, {});
@@ -267,7 +272,7 @@ export class DataViewService {
     if (includeData) {
       //remove nav_data and data that are not part of plottedElements
       explorerState.plot_data = Object.keys(plottedElements)
-        .reduce((acc, id) => {
+        .reduce((acc: any, id) => {
           let dataset = explorerState.plot_data[id];
           if (dataset === undefined) {
             return acc; //data is missing we can't save it
@@ -276,7 +281,7 @@ export class DataViewService {
           return acc;
         }, {})
         explorerState.nav_data = Object.keys(plottedElements)
-        .reduce((acc, id) => {
+        .reduce((acc: any, id) => {
           let dataset = explorerState.nav_data[id];
           if (dataset === undefined) {
             return acc; //data is missing we can't save it
@@ -285,7 +290,7 @@ export class DataViewService {
           return acc;
         }, {})
         explorerState.plot_event_data = Object.keys(plottedEventStreams)
-        .reduce((acc,id) =>{
+        .reduce((acc: any,id) =>{
           let dataset = explorerState.plot_event_data[id];
           if (dataset === undefined) {
             return acc; //data is missing we can't save it
@@ -294,7 +299,7 @@ export class DataViewService {
           return acc;
         },{})
         explorerState.nav_event_data = Object.keys(plottedEventStreams)
-        .reduce((acc,id) =>{
+        .reduce((acc: any,id) =>{
           let dataset = explorerState.nav_event_data[id];
           if (dataset === undefined) {
             return acc; //data is missing we can't save it

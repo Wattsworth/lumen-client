@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { Store, select, createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
-import {dataApps_, interfaces_UI_Ex_} from 'app/selectors';
+import {dataApps_, interfaces_UI_Ex_} from '../../../app/selectors';
 
 export const INTERFACES_REDUX= ['ui','explorer','interfaces'];
 

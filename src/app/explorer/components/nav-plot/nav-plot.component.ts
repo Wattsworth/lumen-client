@@ -163,7 +163,7 @@ export class NavPlotComponent implements OnInit, AfterViewInit, OnDestroy {
       }));
   }
   //flot hook to listen for selection events
-  selectRange(event, range) {
+  selectRange(event: any, range: any) {
     this.xBounds.next({
       min: Math.round(range.xaxis.from),
       max: Math.round(range.xaxis.to)

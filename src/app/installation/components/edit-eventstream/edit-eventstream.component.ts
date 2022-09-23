@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { IEventStream } from 'app/store/data';
+import { IEventStream } from '../../../store/data';
 
 @Component({
   selector: 'app-edit-eventstream',

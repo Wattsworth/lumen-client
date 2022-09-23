@@ -10,9 +10,9 @@ import { SessionService } from "../../../services";
 /*https://github.com/yuyang041060120/ng2-validation*/
 import { CustomValidators } from 'ng2-validation';
 
-import { AccountService } from 'app/account/account.service';
-import { AccountSelectors } from 'app/account/account.selectors';
-import { global_UI_ } from 'app/selectors';
+import { AccountService } from '../../../account/account.service';
+import { AccountSelectors } from '../../../account/account.selectors';
+import { global_UI_ } from '../../../selectors';
 
 @Component({
   selector: 'app-sign-in',

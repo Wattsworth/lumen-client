@@ -55,10 +55,10 @@ div.default-overlay{
 h1.default-overlay-header{
   font-weight: 300;
 }
-:host>>>.tree-node{
+:host ::ng-deep .tree-node{
   white-space: nowrap;
 }
-:host>>>.angular-tree-component{
+:host ::ng-deep .angular-tree-component{
     width: inherit;
     overflow-x: visible;
   }

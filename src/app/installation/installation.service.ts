@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { TreeNode } from 'angular-tree-component';
 
 import { normalize } from 'normalizr';
-import {
-  IAppState,
-} from '../app.store';
 
 import * as schema from '../api';
 
@@ -82,10 +78,10 @@ export class InstallationService {
   // ---refreshInstallation: refresh current installation ----
   public refresh(nilm: INilm){
     this.store.dispatch(uiActions.refreshing());;
-    this.nilmService.refreshNilm(nilm.id).subscribe(
-      success => this.store.dispatch(uiActions.refreshed()),
-      error => this.store.dispatch(uiActions.refreshed()),
-    );
+    this.nilmService.refreshNilm(nilm.id).subscribe({
+      next: success => this.store.dispatch(uiActions.refreshed()),
+      error: error => this.store.dispatch(uiActions.refreshed()),
+    });
   }
 
 }

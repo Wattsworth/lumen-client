@@ -12,7 +12,10 @@ export const reducer = createReducer(
   on(actions.setWarningMessages, (state: IUI, {messages})=>({...state, warnings: messages})),
   on(actions.setNoticeMessages, (state: IUI, {messages})=>({...state, notices: messages})),
 
-  on(actions.clearMessages, (state: IUI)=>({...state, errors: [], warnings: [], notices: []})),
+  on(actions.clearMessages, (state: IUI)=>({...state, 
+    errors: [] as string[],
+    warnings: [] as string[], 
+    notices: [] as string[]})),
   on(actions.enableEmails, (state: IUI, {enable})=>({...state, email_enabled: enable})),
   on(actions.setPageHeader, (state: IUI, {header})=>({...state, page_header: header})),
 )

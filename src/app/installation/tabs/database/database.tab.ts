@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TreeNode } from 'angular-tree-component';
+import { TreeNode } from '@circlon/angular-tree-component';
 import { Observable, Subscription } from 'rxjs';
 
 import {
@@ -15,10 +15,9 @@ import {
   IDataApp
 } from '../../../store/data';
 import { combineLatest } from 'rxjs';
-import { map, filter } from 'rxjs/operators';
-import { data } from '../../../api';
-import { EntityState } from '@ngrx/entity';
+import { map } from 'rxjs/operators';
 import { Dictionary } from '@ngrx/entity';
+import { faCoffee, faCogs } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'installation-database-tab',
@@ -31,6 +30,7 @@ export class DatabaseTabComponent {
 
   private subs: Subscription[];
   public nilmTree$: Observable<DbTreeNode[]>
+  faCogs = faCogs;
 
   constructor(
     public installationService: InstallationService,
@@ -65,7 +65,7 @@ export class DatabaseTabComponent {
     }
   }
 
-  public selectNode(event) {
+  public selectNode(event: any) {
     let node: TreeNode = event.node;
     switch (node.data.type) {
       case 'dbFolder':
