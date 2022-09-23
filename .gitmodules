@@ -1,4 +1,0 @@
-[submodule "src/assets/flot"]
-	path = src/flot
-	url = git@git.wattsworth.net:wattsworth/flot.git
-
