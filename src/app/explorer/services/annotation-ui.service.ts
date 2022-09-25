@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { IRange } from '../store';
 import * as MeasurementActions from '../store/measurement/actions';
 import * as AnnotationActions from '../store/annotations/actions';
+import * as EventSelectorActions from '../store/event-selector/actions';
 import { HttpClient } from '@angular/common/http';
 import {IAnnotation} from '../../store/data'
 
@@ -20,6 +21,10 @@ export class AnnotationUIService {
   //
   public startAnnotation() {
     this.store.dispatch(AnnotationActions.enableAnnotations())
+    //make sure the Event Selector and Measurement Modes are disabled
+    this.store.dispatch(MeasurementActions.disableMeasurements());
+    this.store.dispatch(EventSelectorActions.disableEventSelector());
+
   }
 
   //exit measurement mode

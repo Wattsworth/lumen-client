@@ -4,7 +4,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import * as _ from 'lodash-es';
 
 import { PlotSelectors } from '../../selectors/plot.selectors';
-import { PlotService, AnnotationUIService } from '../../services';
+import { PlotService, AnnotationUIService, EventSelectorService } from '../../services';
 
 import {
   trigger,
@@ -15,7 +15,7 @@ import {
 } from '@angular/animations';
 import { distinctUntilChanged, map, filter } from 'rxjs/operators';
 import { AnnotationService } from '../../../services';
-import { AnnotationSelectors, MeasurementSelectors } from '../../../explorer/selectors';
+import { AnnotationSelectors, EventSelectorSelectors, MeasurementSelectors } from '../../../explorer/selectors';
 import { IDbStream, IAnnotation } from '../../../store/data';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
@@ -42,6 +42,7 @@ export class PlotTabComponent implements OnInit, OnDestroy {
 
   
   private subs: Subscription[];
+  public toolModeSelected$: Observable<boolean>
   public annotationMap$: Observable<IAnnotatedStream[]>
   public editForm: FormGroup;
   public selectedAnnotation: IAnnotation;
@@ -55,12 +56,19 @@ export class PlotTabComponent implements OnInit, OnDestroy {
     public annotationUIService: AnnotationUIService,
     public annotationSelectors: AnnotationSelectors,
     public measurementSelectors: MeasurementSelectors,
+    public eventSelectorSelectors: EventSelectorSelectors,
+    public eventSelectorService: EventSelectorService,
     private fb: FormBuilder
   ) {
     this.subs = [];
     this.filterText = "";
     this.selectedAnnotation = {'title': 'none', 'content': 'none', 
     'id': null, 'joule_id': null, 'start':0, 'end':0, 'db_stream_id': null};
+    this.toolModeSelected$ = combineLatest(
+      [this.annotationSelectors.enabled$,
+      this.eventSelectorSelectors.enabled$,
+      this.measurementSelectors.enabled$]).pipe(map(
+        ([x,y,z]) => x||y||z))
    }
 
   ngOnInit() {

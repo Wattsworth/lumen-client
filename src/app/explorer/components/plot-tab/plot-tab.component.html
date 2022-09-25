@@ -106,8 +106,34 @@
 <div *ngIf="(plotSelectors.plottedEventStreams$ | async)?.length>0">
   <div class="row justify-content-between section-title top lead no-gutters">
     <div class="col">Events</div>
+    <div class="col">
+      <!-- Enable Event Selection-->
+      <button class="btn btn-primary autoscale"
+        *ngIf = "!(eventSelectorSelectors.enabled$ | async)"
+        (click)="eventSelectorService.startEventSelector()"
+        [disabled] = "toolModeSelected$ | async">
+        select
+      </button>
+      <!-- Stop Annotating -->
+    <div *ngIf="eventSelectorSelectors.enabled$ | async">
+      <button class="btn btn-danger exit-annotation"
+        
+        (click)="eventSelectorService.exitEventSelector()">
+      exit
+    </button>
+    <!-- Clear Annotations -->
+    <button class="btn btn-primary icon">
+      <fa-icon [icon]="['fas', 'trash-alt']"  tooltip='clear selection' [fixedWidth]="true"></fa-icon></button>
+    <!-- Download Annotations -->
+    <button class="btn btn-primary icon">
+      <fa-icon [icon]="['fas', 'download']"  tooltip='download selection' [fixedWidth]="true"></fa-icon></button>
+    </div>
+    </div>
   </div>
-
+  <!-- Event selection instructions -->
+  <div *ngIf="eventSelectorSelectors.enabled$ | async" class="annotation-instructions">
+    click or drag to select/deselect <fa-icon [icon]="['fas', 'arrow-right']"></fa-icon> 
+  </div>
   <app-plotted-events
     class="plotted-element"
     *ngFor="let eventStream of plotSelectors.plottedEventStreams$ | async"
@@ -124,7 +150,7 @@
     <!-- Start Annotating -->
     <button class="btn btn-primary autoscale"
       *ngIf="!(annotationSelectors.enabled$ | async)"
-      [disabled]="measurementSelectors.enabled$ | async"
+      [disabled]="toolModeSelected$ | async"
       (click)="annotationUIService.startAnnotation()">
       <fa-icon [icon]="['fas', 'plus']"  [fixedWidth]="true"></fa-icon> create 
     </button>

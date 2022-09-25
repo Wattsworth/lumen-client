@@ -10,8 +10,7 @@
   <!-- start a new annotation-->
   <button class="btn btn-secondary btn-block"
     *ngIf="!(annotationSelectors.enabled$ | async)"
-    [disabled]="measurementSelectors.enabled$ | async"
-
+    [disabled]="toolModeSelected$ | async"
     (click)="annotationUIService.startAnnotation()">
     Annotation Mode
   </button>
@@ -19,7 +18,6 @@
   <!-- exit Annotation mode -->
   <button class="btn btn-danger btn-block"
   *ngIf="(annotationSelectors.enabled$ | async)"
-  [disabled]="measurementSelectors.enabled$ | async"
   (click)="annotationUIService.cancelAnnotation()">
   Exit Annotation Mode </button>
 
@@ -28,7 +26,7 @@
   <!--   start a new measurement -->
   <button class="btn btn-secondary btn-block"
     *ngIf="!(measurementSelectors.enabled$ | async)"
-    [disabled]="annotationSelectors.enabled$ | async"
+    [disabled]="toolModeSelected$ | async"
     (click)="measurementService.startMeasurement()">
     Measurement Mode </button>
   <!-- cancel the current measurement -->
@@ -37,6 +35,20 @@
     (click)="measurementService.cancelMeasurement()">
     Exit Measurement Mode </button>
   
+
+  <!-- Event Selection Buttons -->
+  <!--   start event selection -->
+  <button class="btn btn-secondary btn-block"
+  *ngIf="!(eventSelectorSelectors.enabled$ | async)"
+  [disabled]="toolModeSelected$ | async"
+  (click)="eventSelectorService.startEventSelector()">
+  Event Selection Mode </button>
+<!-- exit event selection -->
+<button class="btn btn-danger btn-block"
+  *ngIf="(eventSelectorSelectors.enabled$ | async)"
+  (click)="eventSelectorService.exitEventSelector()">
+  Exit Selection Mode </button>
+
   <hr/>
 
   

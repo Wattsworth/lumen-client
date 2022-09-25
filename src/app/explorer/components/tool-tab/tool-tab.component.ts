@@ -1,19 +1,21 @@
 
 import {distinctUntilChanged, filter} from 'rxjs/operators';
 import { Component, OnInit, OnDestroy, Output, EventEmitter, ViewChild } from '@angular/core';
-import { Observable, Subscription, timer } from 'rxjs';
+import { combineLatest, Observable, Subscription, timer } from 'rxjs';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 
 import {
   PlotService,
   MeasurementService,
-  AnnotationUIService
+  AnnotationUIService,
+  EventSelectorService
 } from '../../services';
 import {
   MeasurementSelectors,
   PlotSelectors,
-  AnnotationSelectors
+  AnnotationSelectors,
+  EventSelectorSelectors
 } from '../../selectors';
 
 /*NOTE: These are set by the state now */
@@ -35,6 +37,7 @@ export class ToolTabComponent implements OnInit, OnDestroy {
   @Output() saveDataView: EventEmitter<string>;
   @Output() loadDataView: EventEmitter<string>;
 
+  public toolModeSelected$: Observable<boolean>;
   public livePlotUpdateTimer: Observable<any>;
   public liveNavUpdateTimer: Observable<any>;
   public livePlotTimerSubscription: Subscription;
@@ -51,7 +54,9 @@ export class ToolTabComponent implements OnInit, OnDestroy {
     public measurementService: MeasurementService,
     public plotSelectors: PlotSelectors,
     public measurementSelectors: MeasurementSelectors,
-    public annotationSelectors: AnnotationSelectors
+    public annotationSelectors: AnnotationSelectors,
+    public eventSelectorSelectors: EventSelectorSelectors,
+    public eventSelectorService: EventSelectorService
   ) {
     this.savePlotImage = new EventEmitter();
     this.saveDataView = new EventEmitter();
@@ -61,6 +66,13 @@ export class ToolTabComponent implements OnInit, OnDestroy {
 
     this.livePlotTimerSubscription = null;
     this.liveNavTimerSubscription = null;
+
+    this.toolModeSelected$ = combineLatest(
+      [this.annotationSelectors.enabled$,
+      this.eventSelectorSelectors.enabled$,
+      this.measurementSelectors.enabled$]).pipe(map(
+        ([x,y,z]) => x||y||z))
+  
     this.subs = [];
   }
 
