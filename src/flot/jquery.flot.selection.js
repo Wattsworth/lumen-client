@@ -161,7 +161,9 @@ The plugin allso adds the following methods to the plot object:
                 plot.getPlaceholder().trigger("plotunselected", [ ]);
                 plot.getPlaceholder().trigger("plotselecting", [ null ]);
             }
-
+            if(plot.getOptions().selection.transient){
+                clearSelection(true);
+            }
             return false;
         }
 		//force==true -> bypass IsSane check
@@ -177,8 +179,10 @@ The plugin allso adds the following methods to the plot object:
             var r = {}, c1 = selection.first, c2 = selection.second;
             $.each(plot.getAxes(), function (name, axis) {
                 if (axis.used) {
-                    var p1 = axis.c2p(c1[axis.direction]), p2 = axis.c2p(c2[axis.direction]); 
-                    r[name] = { from: Math.min(p1, p2), to: Math.max(p1, p2) };
+                    var p1 = axis.c2p(c1[axis.direction]), p2 = axis.c2p(c2[axis.direction]);
+                    //include selection direction (left->right (leftToRight) is true or false)
+                    r[name] = { from: Math.min(p1, p2), to: Math.max(p1, p2), 
+                        leftToRight: p2>p1 };
                 }
             });
             return r;
@@ -374,6 +378,8 @@ The plugin allso adds the following methods to the plot object:
                 y = Math.min(selection.first.y, selection.second.y) + 0.5,
                 w = Math.abs(selection.second.x - selection.first.x) - 1,
                 h = Math.abs(selection.second.y - selection.first.y) - 1;
+            //determine selection direction
+            var leftToRight = selection.first.x<selection.second.x;
             //make sure we are in bounds
             x = Math.max(x,0);
             x = Math.min(x,plot.width())
@@ -385,7 +391,10 @@ The plugin allso adds the following methods to the plot object:
 
             ctx.save();
             ctx.translate(plotOffset.left, plotOffset.top);
-            var c = $.color.parse(o.selection.color);
+            if(leftToRight)
+                var c = $.color.parse(o.selection.color);
+            else
+                var c = $.color.parse(o.selection.altColor);
             ctx.strokeStyle = c.scale('a', 0.8).toString();    
             if (selectionIsSane()) {
                 ctx.lineWidth = 1;
@@ -420,7 +429,9 @@ The plugin allso adds the following methods to the plot object:
             selection: {
                 mode: null, // one of null, "x", "y" or "xy"
                 color: "#e8cfac",
-                interactive: true
+                altColor: "#e8cfac",
+                interactive: true,
+                transient: false //clear selection highlight on mouseup
             }
         },
         name: 'selection',

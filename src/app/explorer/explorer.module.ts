@@ -55,7 +55,8 @@ import {
   faLessThanEqual,
   faEquals,
   faNotEqual,
-  faMinus
+  faMinus,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons'
 import{
   faCircle as farCircle
@@ -68,7 +69,7 @@ import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {TabsModule } from 'ngx-bootstrap/tabs';
 import {  TimepickerModule } from 'ngx-bootstrap/timepicker'
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-
+import { LetModule } from '@ngrx/component';
 import {
   ReactiveFormsModule,
   FormsModule
@@ -92,6 +93,7 @@ import { FilterPlottedEventsComponent } from './components/filter-plotted-events
     TreeModule,
     RouterModule,
     FormsModule,
+    LetModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     NgSelectModule,
@@ -173,6 +175,7 @@ export class ExplorerModule {
       faLessThanEqual,
       faEquals,
       faNotEqual,
-      faMinus);
+      faMinus,
+      faCheck);
   }
  }

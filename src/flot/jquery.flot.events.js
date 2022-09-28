@@ -76,6 +76,22 @@ JSON content that can be used for color, label, and/or styling
                     ctx.scale(0.02*marker_scale,0.02*marker_scale);
                     ctx.fill(new Path2D(marker));
                     ctx.restore();
+                   
+                    //draw a check on selected events
+                    if(event.selected){
+                        ctx.save();
+                        //same location as the marker
+                        ctx.translate(box[0]+box[2]/2-10,box[1]+box[3]/2-25);
+                        ctx.scale(0.04,0.04);
+                        ctx.fillStyle='LimeGreen'
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                        ctx.shadowColor = '#444'
+                        ctx.shadowBlur =6;
+                        ctx.fill(new Path2D(svg_check));
+                        ctx.restore();
+                    }
+
                     //draw the label
                     var label = computeLabel(series.events.settings.label, event);
                     if(label==null)
@@ -421,7 +437,9 @@ JSON content that can be used for color, label, and/or styling
     svg_pentagram = "M 8 256 c 0 136.966 111.033 248 248 248 s 248 -111.034 248 -248 S 392.966 8 256 8 S 8 119.033 8 256 Z m 248 184 V 72 c 101.705 0 184 82.311 184 184 c 0 101.705 -82.311 184 -184 184 Z";
     //ban
     svg_hexagram = "M 256 8 C 119.034 8 8 119.033 8 256 s 111.034 248 248 248 s 248 -111.034 248 -248 S 392.967 8 256 8 Z m 130.108 117.892 c 65.448 65.448 70 165.481 20.677 235.637 L 150.47 105.216 c 70.204 -49.356 170.226 -44.735 235.638 20.676 Z M 125.892 386.108 c -65.448 -65.448 -70 -165.481 -20.677 -235.637 L 361.53 406.784 c -70.203 49.356 -170.226 44.736 -235.638 -20.676 Z";
-
+    //check (for selected events)
+    svg_check = "M470.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L192 338.7 425.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"
+    
     svg_default=svg_square;
     $.plot.plugins.push({
         init: init,

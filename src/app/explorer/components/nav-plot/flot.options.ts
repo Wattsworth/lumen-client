@@ -27,7 +27,9 @@ export const FLOT_OPTIONS = {
 			show: false
 		},
 		selection: {
-			mode: "x"
+			mode: "x",
+			altColor: "#e8cfac",
+
 		},
 		//shadowSize: 0,
 		series:{

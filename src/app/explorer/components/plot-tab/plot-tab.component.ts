@@ -13,10 +13,10 @@ import {
   animate,
   transition,
 } from '@angular/animations';
-import { distinctUntilChanged, map, filter } from 'rxjs/operators';
-import { AnnotationService } from '../../../services';
+import { distinctUntilChanged, map } from 'rxjs/operators';
+import { AnnotationService, MessageService } from '../../../services';
 import { AnnotationSelectors, EventSelectorSelectors, MeasurementSelectors } from '../../../explorer/selectors';
-import { IDbStream, IAnnotation } from '../../../store/data';
+import { IDbStream, IAnnotation, IEventsSet } from '../../../store/data';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -58,6 +58,7 @@ export class PlotTabComponent implements OnInit, OnDestroy {
     public measurementSelectors: MeasurementSelectors,
     public eventSelectorSelectors: EventSelectorSelectors,
     public eventSelectorService: EventSelectorService,
+    public messageService: MessageService,
     private fb: FormBuilder
   ) {
     this.subs = [];
@@ -126,6 +127,24 @@ export class PlotTabComponent implements OnInit, OnDestroy {
   public deleteAnnotation(){
     this.annotationService.deleteAnnotation(this.selectedAnnotation);
     this.annotationModal.hide();
+  }
+  public downloadEvents(eventsSet: IEventsSet){
+    if(Object.keys(eventsSet).length==0){
+      this.messageService.setWarning("No Events Selected");
+      return;
+    }
+    //https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
+    var element = document.createElement('a');
+    let event_json = JSON.stringify(eventsSet, null, 2);
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(event_json));
+    element.setAttribute('download', 'events.txt');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
   }
 }
 

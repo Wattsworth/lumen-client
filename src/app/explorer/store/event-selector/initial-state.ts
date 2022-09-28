@@ -6,5 +6,6 @@ import {
   // ---- Plot ----
   export const defaultEventSelectorState:IState = {
     enabled: false,
+    eventsSet: {}
   };
   

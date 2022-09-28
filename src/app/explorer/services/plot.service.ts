@@ -341,12 +341,22 @@ export class PlotService {
 
   buildEventDataset(
     eventStreams: IEventStream[],
-    eventsSet: IEventsSet
+    eventsSet: IEventsSet,
+    selectedEvents: IEventsSet
   ){
     return eventStreams.map(stream => {
       if(eventsSet[stream.id]===undefined||eventsSet[stream.id]==null)
         return null;
   
+      let eventsWithSelect = eventsSet[stream.id].events.map(event=>{
+        let selected=false;
+        if(selectedEvents[stream.id]!=undefined){
+          if(selectedEvents[stream.id].events.map(e=>e.id).includes(event.id)){
+            selected=true 
+          }
+        }
+        return {...event, selected}
+      })
       return {
         label: stream.name,
         yaxis: 5, //this is the event y-axis (not shown on plot)
@@ -359,7 +369,7 @@ export class PlotService {
           settings: stream.plot_settings
         },
         color: stream.default_color,
-        data: eventsSet[stream.id].events,
+        data: eventsWithSelect
       }
     }).filter(data => data != null)
   }

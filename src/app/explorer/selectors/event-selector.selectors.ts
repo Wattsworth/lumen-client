@@ -13,7 +13,7 @@ export class EventSelectorSelectors {
     eventSelectorUI_ = (state:IAppState)=>state.ui.explorer.eventSelector;
 
     enabled$ = this.store.select(createSelector(this.eventSelectorUI_,state=>state.enabled));
-
+    selectedEventsSet$ = this.store.select(createSelector(this.eventSelectorUI_,state=>state.eventsSet))
     constructor(
         private store: Store
     ){}

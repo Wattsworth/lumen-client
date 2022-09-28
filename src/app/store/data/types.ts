@@ -210,14 +210,23 @@ export interface IPermission {
 }
 export interface IPremissionState extends EntityState<IPermission> { };
 
-// --- Event ---
+// --- Events (Group of Event Objects for a particular Event Stream) ---
 export interface IEvents{
   valid: boolean
   start_time: number;
   end_time: number;
   count: number; //number of events, if events is null then there are too many to display
-  events: any; //just key, value pairs
+  events: IEvent[];
 }
+
+// --- Event ---
+export interface IEvent{
+  id: number,
+  start_time: number,
+  end_time: number,
+  content: any //arbitrary key/value pairs
+}
+
 
 // ---- EventSet ----
 export interface IEventsSet {

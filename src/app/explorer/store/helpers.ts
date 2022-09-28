@@ -1,6 +1,7 @@
 export interface IRange {
   min: number;
   max: number;
+  leftToRight?: boolean //optional direction specification
 }
 export interface IAxisSettings {
   scale: number;

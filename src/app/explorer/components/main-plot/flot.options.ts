@@ -19,7 +19,8 @@ export const FLOT_OPTIONS = {
 		selection: {
 			mode: "x",
 			interactive: false,
-			color: "#00b33c"
+			color: "#e8cfac",   //left->right highlight color
+			altColor: "#e8cfac" //right->left highlight color
 		},
 		tooltip: true,
 		eventInfoOverlay: true,

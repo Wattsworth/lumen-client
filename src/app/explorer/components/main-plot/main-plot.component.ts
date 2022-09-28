@@ -17,12 +17,14 @@ import html2canvas from "html2canvas"
 import { 
   PlotService,
   MeasurementService,
-  AnnotationUIService
+  AnnotationUIService,
+  EventSelectorService
 } from '../../services';
 import { 
   PlotSelectors,
   MeasurementSelectors, 
-  AnnotationSelectors
+  AnnotationSelectors,
+  EventSelectorSelectors
 } from '../../selectors';
 
 import { FLOT_OPTIONS } from './flot.options';
@@ -30,6 +32,7 @@ import { FLOT_OPTIONS } from './flot.options';
 import * as _ from 'lodash-es';
 import { EventStreamService } from '../../../services';
 import {IRange} from '../../store/helpers'
+import { IEventsSet } from 'src/app/store/data';
 declare var $: any;
 
 @Component({
@@ -55,16 +58,19 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
   //saved by the time range listener if the plot
   //isn't drawn yet
   private storedPlotTimeRange: IRange;
+
+  //keep track of currently displayed events so they can be (de)selected
+  private displayedEventsSet: IEventsSet;
   
   constructor(
-    private renderer: Renderer2,
     private plotSelectors: PlotSelectors,
     private measurementSelectors: MeasurementSelectors,
     private annotationSelectors: AnnotationSelectors,
+    private eventSelectorSelectors: EventSelectorSelectors,
     private plotService: PlotService,
-    private eventService: EventStreamService,
     private measurementService: MeasurementService,
-    private annotationUIService: AnnotationUIService
+    private annotationUIService: AnnotationUIService,
+    private eventSelectorService: EventSelectorService
   ) {
     this.plot = null;
     this.xBounds = new Subject();
@@ -73,6 +79,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     this.flot_options = _.cloneDeep(FLOT_OPTIONS);
     this.subs = [];
     this.storedPlotTimeRange = { min: null, max: null }
+    this.displayedEventsSet = {};
   }
 
   ngOnInit(
@@ -136,17 +143,30 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subs.push(
       
       combineLatest(
-        [this.measurementSelectors.enabled$, this.annotationSelectors.enabled$]).pipe(
-        map(([measure, annotate]) => measure || annotate),
-        distinctUntilChanged())
-      .subscribe(val => {
+        [this.measurementSelectors.enabled$, 
+          this.annotationSelectors.enabled$,
+          this.eventSelectorSelectors.enabled$
+        ]).pipe(distinctUntilChanged())
+      .subscribe(([measure, annotate, select]) => {
         if (this.plot != null){
-          if(val){ //enter measurement mode
+          if(measure||annotate||select){ //enter selection mode
             //enable selection
             this.plot.getOptions()['selection']['interactive']="true";
             //disable pan/zoom
             this.plot.getOptions()['zoom']['interactive']=false;
             this.plot.getOptions()['pan']['interactive']=false;
+            if (select){
+              //green and red highlight depending on selection direction
+              this.plot.getOptions()['selection']['color']="#00b33c"
+              this.plot.getOptions()['selection']['altColor']="#cc0000"
+              this.plot.getOptions()['selection']['transient']=true
+            } else {
+              //gray highlight regardless of selection direction
+              this.plot.getOptions()['selection']['color']="#e8cfac"
+              this.plot.getOptions()['selection']['altColor']="#e8cfac"
+              this.plot.getOptions()['selection']['transient']=false
+
+            }
           } else {
             //disable selection
             this.plot.getOptions()['selection']['interactive']=false;
@@ -373,6 +393,33 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }));
     // ---- END ANNOTATION SELECTORS ----
+
+    // ---- BEGIN EVENT SELECTOR TOOLS ---
+
+    /* listen for plot selections (range) */
+    this.subs.push(this.plotIntervalSelection.pipe(
+      withLatestFrom(this.eventSelectorSelectors.enabled$))
+      .subscribe( ([range, enabled]) => {
+      if(enabled){
+        //figure out what events are inside this range
+        //create a filtered IEventsSet object with just these
+        //events
+        let selectedEvents = Object.keys(this.displayedEventsSet)
+          .reduce((eventsSet: IEventsSet, id)=>{
+            eventsSet[id] = {...this.displayedEventsSet[id]}
+            eventsSet[id].events = this.displayedEventsSet[id].events
+              .filter(event => event.end_time>range.min && event.start_time<range.max)
+            return eventsSet;
+            }, {} as IEventsSet)
+        if(range.leftToRight){
+         this.eventSelectorService.addEvents(selectedEvents)
+        } else{
+          this.eventSelectorService.removeEvents(selectedEvents)
+        }
+      }
+    })
+  );
+    // ---- END EVENT SELECTOR TOOLS ---
   }
   
   ngOnDestroy() {
@@ -390,16 +437,20 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
         [elementsByAxis,
           this.plotSelectors.plottedEventStreams$,
         this.plotSelectors.plotEventData$,
+        this.eventSelectorSelectors.selectedEventsSet$,
         this.plotSelectors.plotData$, 
-        this.plotSelectors.showDataEnvelope$])
-      .subscribe(([elementsByAxis, eventStreams, eventsSet, data, showEnvelope]) => {
+        this.plotSelectors.showDataEnvelope$,
+       ])
+      .subscribe(([elementsByAxis, eventStreams, eventsSet, selectedEventsSet, data, showEnvelope]) => {
         //build data structure
         let leftAxis = this.plotService
           .buildDataset(elementsByAxis.left, data, 1, showEnvelope);
         let rightAxis = this.plotService
           .buildDataset(elementsByAxis.right, data, 2, showEnvelope);
         let eventData = this.plotService
-          .buildEventDataset(eventStreams, eventsSet)
+          .buildEventDataset(eventStreams, eventsSet, selectedEventsSet)
+        //store event data to use with event selector tools
+        this.displayedEventsSet = eventsSet;
         let dataset = [...leftAxis, ...rightAxis, ...eventData]
         if (dataset.length == 0) {
           this.plotService.hidePlot();
@@ -461,13 +512,18 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
     let selection = this.plot.getSelection();
     this.plotIntervalSelection.next({
       min: Math.round(selection['xaxis']['from']),
-      max: Math.round(selection['xaxis']['to'])
+      max: Math.round(selection['xaxis']['to']),
+      leftToRight: selection['xaxis']['leftToRight']
     })
+  }
+  clearEventSelectionHighlight(event: any){
+
   }
   //flot hook to listen for plot click events (annotation only)
   updatePlotSelection(event: any) {
-    let selection = this.plot.getSelection(true);
-    this.plotPointSelection.next(selection['xaxis']['to'])
+    //DISABLED- no point events, must specify an interval
+    //let selection = this.plot.getSelection(true);
+    //this.plotPointSelection.next(selection['xaxis']['to'])
   }
 
   getCanvas(){

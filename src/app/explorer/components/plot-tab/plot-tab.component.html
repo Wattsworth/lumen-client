@@ -115,24 +115,28 @@
         select
       </button>
       <!-- Stop Annotating -->
-    <div *ngIf="eventSelectorSelectors.enabled$ | async">
-      <button class="btn btn-danger exit-annotation"
-        
-        (click)="eventSelectorService.exitEventSelector()">
-      exit
-    </button>
-    <!-- Clear Annotations -->
-    <button class="btn btn-primary icon">
-      <fa-icon [icon]="['fas', 'trash-alt']"  tooltip='clear selection' [fixedWidth]="true"></fa-icon></button>
-    <!-- Download Annotations -->
-    <button class="btn btn-primary icon">
-      <fa-icon [icon]="['fas', 'download']"  tooltip='download selection' [fixedWidth]="true"></fa-icon></button>
-    </div>
+      <div *ngIf="eventSelectorSelectors.enabled$ | async">
+        <button class="btn btn-danger exit-annotation"
+          
+          (click)="eventSelectorService.exitEventSelector()">
+        exit
+        </button>
+        <!-- Clear Annotations -->
+        <button class="btn btn-primary icon" (click)="eventSelectorService.clearEventSelection()">
+          <fa-icon [icon]="['fas', 'trash-alt']" tooltip='clear selection' [fixedWidth]="true"></fa-icon>
+        </button>
+        <!-- Download Annotations -->
+        <ng-container *ngrxLet="this.eventSelectorSelectors.selectedEventsSet$ as eventsSet">
+          <button class="btn btn-primary icon" (click)="downloadEvents(eventsSet)">
+            <fa-icon [icon]="['fas', 'download']"  tooltip='download selection' [fixedWidth]="true"></fa-icon>
+          </button>
+        </ng-container>
+      </div>
     </div>
   </div>
   <!-- Event selection instructions -->
   <div *ngIf="eventSelectorSelectors.enabled$ | async" class="annotation-instructions">
-    click or drag to select/deselect <fa-icon [icon]="['fas', 'arrow-right']"></fa-icon> 
+    drag right to add, left to remove <fa-icon [icon]="['fas', 'arrow-right']"></fa-icon> 
   </div>
   <app-plotted-events
     class="plotted-element"
@@ -208,7 +212,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- ====== edit annotation modal ====== -->
 <div class="modal fade" bsModal #annotationEditModal="bs-modal" 
