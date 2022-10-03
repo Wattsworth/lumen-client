@@ -16,8 +16,9 @@ import {
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AnnotationService, MessageService } from '../../../services';
 import { AnnotationSelectors, EventSelectorSelectors, MeasurementSelectors } from '../../../explorer/selectors';
-import { IDbStream, IAnnotation, IEventsSet } from '../../../store/data';
+import { IDbStream, IAnnotation, IEventsSet, IEventStream, INilm } from '../../../store/data';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Dictionary } from '@ngrx/entity';
 
 @Component({
   selector: 'app-plot-tab',
@@ -128,14 +129,25 @@ export class PlotTabComponent implements OnInit, OnDestroy {
     this.annotationService.deleteAnnotation(this.selectedAnnotation);
     this.annotationModal.hide();
   }
-  public downloadEvents(eventsSet: IEventsSet){
+  public downloadEvents(eventsSet: IEventsSet, eventStreams: Dictionary<IEventStream>, nilms: Dictionary<INilm>){
     if(Object.keys(eventsSet).length==0){
       this.messageService.setWarning("No Events Selected");
       return;
     }
+    let event_data: any[] = Object.keys(eventsSet).reduce((event_data: any[], id)=>{
+      let stream = eventStreams[id]
+      let nilm = nilms[stream.nilm_id]
+      event_data.push({
+        node: nilm.name,
+        url: nilm.url,
+        path: stream.path,
+        selection: eventsSet[id]
+      })
+      return event_data}, [])
+
     //https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
     var element = document.createElement('a');
-    let event_json = JSON.stringify(eventsSet, null, 2);
+    let event_json = JSON.stringify(event_data, null, 2);
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(event_json));
     element.setAttribute('download', 'events.txt');
 

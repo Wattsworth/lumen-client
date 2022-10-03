@@ -2,8 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 
 import * as actions from './actions';
 import { IState } from './types';
-import { IEventsSet, IEvents, IEvent} from 'src/app/store/data';
-import { IRange } from '../helpers'
+import { IEventsSet, IEvent} from 'src/app/store/data';
 import {
   defaultEventSelectorState
 } from './initial-state';

@@ -126,11 +126,16 @@
           <fa-icon [icon]="['fas', 'trash-alt']" tooltip='clear selection' [fixedWidth]="true"></fa-icon>
         </button>
         <!-- Download Annotations -->
-        <ng-container *ngrxLet="this.eventSelectorSelectors.selectedEventsSet$ as eventsSet">
-          <button class="btn btn-primary icon" (click)="downloadEvents(eventsSet)">
-            <fa-icon [icon]="['fas', 'download']"  tooltip='download selection' [fixedWidth]="true"></fa-icon>
-          </button>
-        </ng-container>
+
+        <ng-container  *ngrxLet="this.plotSelectors.nilms$ as nilms">
+          <ng-container  *ngrxLet="this.plotSelectors.eventStreams$ as eventStreams">
+            <ng-container *ngrxLet="this.eventSelectorSelectors.selectedEventsSet$ as eventsSet">
+              <button class="btn btn-primary icon" (click)="downloadEvents(eventsSet, eventStreams, nilms)">
+                <fa-icon [icon]="['fas', 'download']"  tooltip='download selection' [fixedWidth]="true"></fa-icon>
+              </button>
+            </ng-container>
+          </ng-container>
+          </ng-container>
       </div>
     </div>
   </div>
