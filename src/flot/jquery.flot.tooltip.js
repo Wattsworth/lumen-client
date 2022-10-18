@@ -247,7 +247,11 @@
                         str_value = value;
                         break;
                     default:
-                        str_value = value.toString();
+                        if(value===null){
+                            str_value = "--null--";
+                        } else {
+                            str_value = value.toString();
+                        }
                 }
                 html+="<tr><th>"+attrib+"</th><td>"+str_value+"</td></tr>";
                 return html;
