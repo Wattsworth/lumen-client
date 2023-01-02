@@ -141,6 +141,7 @@ export class PlotTabComponent implements OnInit, OnDestroy {
         node: nilm.name,
         url: nilm.url,
         path: stream.path,
+        display_name: stream.plot_settings.display_name,
         selection: eventsSet[id]
       })
       return event_data}, [])
