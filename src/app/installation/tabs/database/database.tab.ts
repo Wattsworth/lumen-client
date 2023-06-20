@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TreeNode } from '@circlon/angular-tree-component';
 import { Observable, Subscription } from 'rxjs';
 
 import {
@@ -66,7 +65,7 @@ export class DatabaseTabComponent {
   }
 
   public selectNode(event: any) {
-    let node: TreeNode = event.node;
+    let node: any = event.node;
     switch (node.data.type) {
       case 'dbFolder':
         this.installationService.selectDbFolder(node.data.dbId);

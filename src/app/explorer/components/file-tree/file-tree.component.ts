@@ -3,7 +3,6 @@ import {combineLatest} from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { TreeNode } from '@circlon/angular-tree-component';
 import * as _ from 'lodash-es';
 
 import {
@@ -80,7 +79,7 @@ export class FileTreeComponent implements OnInit {
       this.getChildren(node);
     }
   }
-  public getChildren(node: TreeNode) {
+  public getChildren(node: any) {
     let id = node.data.id.slice(1, node.data.id.len);
     switch (node.data.type) {
       case 'nilm':

@@ -82,7 +82,6 @@ import { COMPONENTS } from './components';
 import { ExplorerPageComponent } from './pages/explorer/explorer.page';
 import { SERVICES } from './services';
 import { SELECTORS } from './selectors';
-import { TreeModule } from '@circlon/angular-tree-component';
 import { PIPES } from './pipes';
 import { NewAnnotationComponent } from './components/new-annotation/new-annotation.component';
 import { FilterPlottedEventsComponent } from './components/filter-plotted-events/filter-plotted-events.component';
@@ -90,7 +89,6 @@ import { FilterPlottedEventsComponent } from './components/filter-plotted-events
 @NgModule({
   imports: [
     CommonModule,
-    TreeModule,
     RouterModule,
     FormsModule,
     LetModule,

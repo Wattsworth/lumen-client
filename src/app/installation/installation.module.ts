@@ -7,7 +7,6 @@ import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
-import { TreeModule } from '@circlon/angular-tree-component';
 import { AlertModule } from 'ngx-bootstrap/alert';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
@@ -44,7 +43,6 @@ import { EditEventstreamComponent } from './components/edit-eventstream/edit-eve
     ReactiveFormsModule,
     FormsModule,
     RouterModule,
-    TreeModule,
     NgSelectModule,
     SharedModule,
     FontAwesomeModule,

@@ -26,7 +26,6 @@
               "src/styles.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/@claviska/jquery-minicolors/jquery.minicolors.css",
-              "node_modules/@circlon/angular-tree-component/css/angular-tree-component.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css"
             ],

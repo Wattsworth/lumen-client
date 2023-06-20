@@ -1,3 +1,3 @@
-import {DatabaseTabComponent} from './database/database.tab';
+//import {DatabaseTabComponent} from './database/database.tab';
 import {AdminTabComponent} from './admin/admin.tab';
-export const TABS = [DatabaseTabComponent, AdminTabComponent];
+export const TABS = [AdminTabComponent];
