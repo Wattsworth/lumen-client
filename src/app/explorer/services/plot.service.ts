@@ -336,6 +336,17 @@ export class PlotService {
     this.store.dispatch(PlotActions.setDataViewsLoaded());
   }
 
+  //expand node in file tree
+  //
+  expandNode(id: string){
+    this.store.dispatch(PlotActions.expandNode({id}));
+  }
+
+  //collapse node in file tree
+  //
+  collapseNode(id: string){
+    this.store.dispatch(PlotActions.collapseNode({id}));
+  }
 
   ///------ helpers ------------
 

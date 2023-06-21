@@ -65,7 +65,6 @@ import{
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
-
 import {TabsModule } from 'ngx-bootstrap/tabs';
 import {  TimepickerModule } from 'ngx-bootstrap/timepicker'
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
@@ -85,13 +84,14 @@ import { SELECTORS } from './selectors';
 import { PIPES } from './pipes';
 import { NewAnnotationComponent } from './components/new-annotation/new-annotation.component';
 import { FilterPlottedEventsComponent } from './components/filter-plotted-events/filter-plotted-events.component';
-
+import { CdkTreeModule } from '@angular/cdk/tree';
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
     FormsModule,
     LetModule,
+    CdkTreeModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     NgSelectModule,

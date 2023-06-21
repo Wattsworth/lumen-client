@@ -218,6 +218,10 @@ export const reducer = createReducer(
     //override data retrieval view states
      nilms_loaded: state.nilms_loaded, 
      data_views_loaded: state.data_views_loaded })),
+  //expand node in file tree
+  on(actions.expandNode,(state:IState, {id})=>({...state, expanded_nodes: state.expanded_nodes.concat([id])})),
+  //collapse node in file tree
+  on(actions.collapseNode,(state:IState, {id})=>({...state, expanded_nodes: state.expanded_nodes.filter(x=>x!=id)})),
   //set flag to indicate nilms are loaded
   on(actions.setNilmLoaded,(state: IState) => ({...state, nilms_loaded: true })),
   //set flag to indicate data views are loaded

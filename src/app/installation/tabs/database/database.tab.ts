@@ -15,8 +15,9 @@ import {
 } from '../../../store/data';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
+import {NestedTreeControl} from '@angular/cdk/tree'
 import { Dictionary } from '@ngrx/entity';
-import { faCoffee, faCogs } from '@fortawesome/free-solid-svg-icons';
+import { faCogs } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'installation-database-tab',
@@ -28,8 +29,23 @@ export class DatabaseTabComponent {
   @Input() nilm: INilm;
 
   private subs: Subscription[];
-  public nilmTree$: Observable<DbTreeNode[]>
+  public dbNodes$: Observable<DbTreeNode[]>
+  public selectedNode?: DbTreeNode;
+  pendingChildren:Array<string> = []
+  treeControl = new NestedTreeControl<DbTreeNode>(node => node.children )
+
   faCogs = faCogs;
+
+
+  hasChildren = (_:number, node: DbTreeNode) => node.hasChildren;
+  isNilm = (_:number, node: DbTreeNode) => node.type=='nilm';
+  isFolder = (_:number, node: DbTreeNode) => node.type=='dbFolder';
+  isStream = (_:number, node: DbTreeNode) => node.type=='dbStream';
+  isEventStream = (_:number, node: DbTreeNode) => node.type=='dbEventStream';
+  isElement = (_:number, node: DbTreeNode) => node.type=='dbElement';
+  isDataApp =  (_:number, node: DbTreeNode) => node.type=='dataApp';
+  isLoading = (node: DbTreeNode) => node.hasChildren && node.children == null && node.isExpanded;
+
 
   constructor(
     public installationService: InstallationService,
@@ -37,50 +53,57 @@ export class DatabaseTabComponent {
     public installationSelectors: InstallationSelectors,
   ) {
     this.subs = [];
-   
-    this.nilmTree$ = combineLatest(
+    this.dbNodes$ = combineLatest(
       [this.installationSelectors.nilm$,
-      this.installationSelectors.data$]).pipe(
-        
-        map(([nilm, data]) => this.mapNilm(nilm, 
+      this.installationSelectors.data$,
+      this.installationSelectors.expanded_nodes$]).pipe(
+        map(([nilm, data,expanded_nodes]) => this.mapNilm(nilm, 
           data.dataApps.entities,
           data.dbFolders.entities,
           data.dbStreams.entities,
-          data.eventStreams.entities)));
-      
-    
+          data.eventStreams.entities,
+          expanded_nodes)));
   };
+  
 
   public refresh(){
-    this.installationService.refresh(this.nilm);
-  }
-  
-  public toggleNode(event: any){
-    if(event.isExpanded == false)
-      return; //nothing to do
-    let node = event.node;
-    if(node.hasChildren && node.children == null){
-      this.dbFolderService.loadFolder(node.data.dbId);
-    }
+    this.installationService.refresh();
   }
 
-  public selectNode(event: any) {
-    let node: any = event.node;
-    switch (node.data.type) {
+  public toggleNode(node: DbTreeNode){
+    if(node.isExpanded){
+      this.installationService.collapseNode(node.id);
+      return; //nothing to do
+    }
+    this.installationService.expandNode(node.id);
+    
+  }
+  public nodeSelected(node:DbTreeNode){
+    if(this.selectedNode === undefined){
+      return false
+    }
+    return this.selectedNode.id == node.id;
+  }
+
+  public selectNode(node: DbTreeNode) {
+    this.selectedNode = node;
+    let id = +node.id.slice(1, node.id.length);
+
+    switch (node.type) {
       case 'dbFolder':
-        this.installationService.selectDbFolder(node.data.dbId);
+        this.installationService.selectDbFolder(id);
         return;
       case 'dbStream':
-        this.installationService.selectDbStream(node.data.dbId);
+        this.installationService.selectDbStream(id);
         return;
       case 'dataApp':
-        this.installationService.selectDataApp(node.data.dbId);
+        this.installationService.selectDataApp(id);
         return;
       case 'eventStream':
-        this.installationService.selectEventStream(node.data.dbId);
+        this.installationService.selectEventStream(id);
         return;
       default:
-        console.log(`unknown type ${node.data.type}`);
+        console.log(`unknown type ${node.type}`);
     }
   }
 
@@ -90,6 +113,7 @@ export class DatabaseTabComponent {
     folders: {[id: number]: IDbFolder },
     streams: {[id: number]: IDbStream },
     eventStreams: Dictionary<IEventStream>,
+    expanded_nodes: string[]
   ): DbTreeNode[] {    
 
     //first map folders
@@ -100,7 +124,7 @@ export class DatabaseTabComponent {
     let folder_nodes = root.subfolders
       .filter(id => folders[id] !== undefined)
       .map(id => this.mapFolder(
-        folders[id], folders, streams, eventStreams))
+        folders[id], folders, streams, eventStreams, expanded_nodes))
     let module_nodes = this.mapDataApps(nilm.data_apps, data_apps)
     return module_nodes.concat(folder_nodes);
     }
@@ -128,7 +152,8 @@ export class DatabaseTabComponent {
     folder: IDbFolder,
     folders:  {[id: number]: IDbFolder },
     streams:  {[id: number]: IDbStream },
-    eventStreams: Dictionary<IEventStream>
+    eventStreams: Dictionary<IEventStream>,
+    expanded_nodes: string[]
   ): DbTreeNode {
     let children = null;
     //if folder is loaded, map children
@@ -138,7 +163,8 @@ export class DatabaseTabComponent {
         folder.subfolders
           .filter(id => folders[id] !== undefined)
           .map(id => this.mapFolder(
-            folders[id], folders, streams, eventStreams))
+            folders[id], folders, streams, eventStreams,
+            expanded_nodes))
             .sort((a,b) => a.name > b.name ? 1:-1),
         //now map streams
         folder.streams
@@ -153,22 +179,38 @@ export class DatabaseTabComponent {
           .sort((a,b) => a.name > b.name ? 1:-1))
     }
     //create the DbNode and return it
-    return {
-      id: 'f' + folder.id,
-      dbId: folder.id,
+    let nodeId = 'f' + folder.id
+    let node = {
+      id: nodeId,
       name: folder.name,
       type: 'dbFolder',
       children: children,
-      hasChildren: true
+      hasChildren: true,
+      isExpanded: expanded_nodes.indexOf(nodeId)!=-1
     }
+    // see if we need to load data
+    if(folder.shallow && node.isExpanded) {
+      this.getChildren(node);
+    }
+    return node;
   }
+
+  getChildren(node: DbTreeNode){
+    if (this.pendingChildren.includes(node.id)){
+      return; //ignore duplicate requests for the same node
+    }
+    let id = +node.id.slice(1, node.id.length);
+    this.pendingChildren.push(node.id);
+        this.dbFolderService.loadFolder(id).subscribe(
+          ()=>{},()=>{},
+          ()=>this.pendingChildren = this.pendingChildren.filter(x=>x!=node.id));
+    }
 
   mapStream(
     stream: IDbStream,
   ): DbTreeNode {
     return {
       id: 's' + stream.id,
-      dbId: stream.id,
       name: stream.name,
       type: 'dbStream',
       children: [],
@@ -176,16 +218,19 @@ export class DatabaseTabComponent {
     }
   }
 
+
   mapEventStream(
     stream: IEventStream,
   ): DbTreeNode {
+    //let plotted = this.plotService.isEventStreamPlotted(stream);
+
+    //create the DbNode and return it
     return {
-      id: 'v' + stream.id,
-      dbId: stream.id,
+      id: 'v' + stream.id, //e is  taken by elements
       name: stream.name,
       type: 'eventStream',
       children: [],
-      hasChildren: false
+      hasChildren: false,
     }
   }
 
@@ -198,7 +243,6 @@ export class DatabaseTabComponent {
 
 export interface DbTreeNode {
   id: string;
-  dbId: number|string;
   name: string;
   type: string;
   refreshing?: boolean;

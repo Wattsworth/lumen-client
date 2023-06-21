@@ -5,29 +5,55 @@
   <div class="col-sm-3 ">
     <div class="app-content border-right-0">
       <div class="node-tree pl-2">
-        <tree-root [nodes]="nilmTree$ | async" 
-          (toggleExpanded)="toggleNode($event)"
-          (activate)="selectNode($event)">
-          <ng-template #treeNodeTemplate let-node="node">
-            <span [ngSwitch]="node.data.type">
-              <span *ngSwitchCase="'dataApp'">
-                  <fa-icon [icon]="['fas', 'cubes']"></fa-icon>
-              </span>
-              <span *ngSwitchCase="'dbFolder'">
-                <fa-icon [icon]="['fas', 'folder-open']" *ngIf="node.isExpanded" class="folder"></fa-icon>
-                <fa-icon [icon]="['fas', 'folder']" *ngIf="!node.isExpanded" class="folder"></fa-icon>
-              </span>
-              <span *ngSwitchCase="'dbStream'">
-                <fa-icon [icon]="['fas', 'database']"></fa-icon>
-              </span>
-              <span *ngSwitchCase="'eventStream'">
-                <fa-icon [icon]="['fas', 'chart-bar']"></fa-icon>
-              </span>
+        <cdk-tree [dataSource]="dbNodes$" [treeControl]="treeControl" >
+          <!-- == folder element == -->
+          <cdk-nested-tree-node *cdkTreeNodeDef="let node; when: isFolder">
+            <div>
+            <!-- expand/collapse button-->
+            <span  cdkTreeNodeToggle  class="tree-node">
+              <fa-icon [icon]="['fas', node.isExpanded ? 'folder-open' : 'folder']" 
+              (click)="toggleNode(node)"
+              [fixedWidth]="true" class="ml-1 folder-icon" >
+              </fa-icon>
+              <span (click)="selectNode(node)" [class.selected-name]="nodeSelected(node)" class="selectable-name">{{node.name}}</span>
             </span>
-            {{ node.data.name }}
-          </ng-template>
-          <ng-template #loadingTemplate><fa-icon [icon]="['fas', 'spinner']" [spin]="true"></fa-icon> loading</ng-template>
-        </tree-root>
+            <!-- children -->
+            <div *ngIf="isLoading(node)" class="ml-3">
+              <fa-icon [icon]="['fas', 'spinner']" [spin]="true"></fa-icon> loading...
+            </div>
+            <div [class.tree-invisible]="!node.isExpanded" class="ml-3">
+              <ng-container cdkTreeNodeOutlet></ng-container>
+            </div>
+            </div>
+          </cdk-nested-tree-node>
+           <!-- == event stream element == -->
+           <cdk-tree-node *cdkTreeNodeDef="let node; when: isEventStream" class="tree-node">
+            <div>
+            <span >
+              <fa-icon [icon]="['fas', 'chart-bar']" class="ml-1"></fa-icon>
+              <span (click)="selectNode(node)" [class.selected-name]="nodeSelected(node)" class="selectable-name">{{node.name}}</span>
+            </span>
+            </div>
+          </cdk-tree-node>
+          <!-- == stream element == -->
+          <cdk-tree-node *cdkTreeNodeDef="let node; when: isStream" class="tree-node">
+            <div>
+            <span>
+              <fa-icon [icon]="['fas', 'database']" class="ml-1"></fa-icon>
+              <span (click)="selectNode(node)" [class.selected-name]="nodeSelected(node)" class="selectable-name">{{node.name}}</span>
+            </span>
+            </div>
+          </cdk-tree-node>
+          <!-- == data app == -->
+          <cdk-tree-node *cdkTreeNodeDef="let node; when: isDataApp" class="tree-node">
+            <div class="data-app-node">
+              <span class="ml-1">
+                <fa-icon [icon]="['fas', 'cubes']"></fa-icon>
+                <span (click)="selectNode(node)" [class.selected-name]="nodeSelected(node)" class="selectable-name">{{node.name}}</span>
+              </span>
+            </div>
+          </cdk-tree-node>
+        </cdk-tree>       
       </div>
       <!--TODO: (click)="console.log('TODO: installationService.refresh()')"-->
       <button class="btn btn-primary btn-block refresh" 

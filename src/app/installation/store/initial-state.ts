@@ -15,5 +15,6 @@ export const defaultInstallation: IInstallation = {
   rootFolderId: null,
   nilm: null,
   refreshing: false,
-  busy: false
+  busy: false,
+  expanded_nodes: []
 };

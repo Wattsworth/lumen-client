@@ -32,6 +32,7 @@ import {
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EffectsModule } from '@ngrx/effects';
 import { environment } from '../environments/environment';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -61,7 +62,8 @@ import { environment } from '../environments/environment';
       maxAge: 25, //retain last 25 states
       logOnly: environment.production,
     }),
-    EffectsModule.forRoot([PageEffects])
+    EffectsModule.forRoot([PageEffects]),
+    BrowserAnimationsModule
   ],
   providers: [
     AuthGuard,

@@ -36,6 +36,7 @@ export interface IState {
   time_axis_settings?: IAxisSettings;
   show_time_axis_settings?: boolean;
   visualizer_tabs?: IVisualizerTab[];
+  expanded_nodes?: string[];
   //flags to indicate whether data has been retrieved
   nilms_loaded?: boolean;
   data_views_loaded?: boolean;

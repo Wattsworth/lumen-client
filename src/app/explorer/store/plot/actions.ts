@@ -38,7 +38,8 @@ export const disableLiveUpdate = createAction('[EXPLORER: PLOT] Disable live upd
 export const toggleDataEnvelope = createAction('[EXPLORER: PLOT] Toggle data envelope');
 export const toggleAnnotations = createAction('[EXPLORER: PLOT] Toggle annotations');
 export const setLiveUpdateInterval = createAction('[EXPLORER: PLOT] Set live update interval', props<{rate: number}>());
-
+export const expandNode = createAction('[EXPLORER:PLOT] Expand Tree Node', props<{id: string}>());
+export const collapseNode = createAction('[EXPLORER:PLOT] Collapse Tree Node', props<{id: string}>())
 //Axis Settings
 export const autoScaleAxis = createAction('[EXPLORER: PLOT] Auto scale axis', props<{axis: String}>());
 export const setNilmLoaded = createAction('[EXPLORER: PLOT] Set nilms loaded');

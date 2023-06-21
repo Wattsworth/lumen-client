@@ -86,6 +86,7 @@ export class PlotSelectors {
   showAnnotations$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.show_annotations)));
   liveUpdateInterval$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.live_update_interval)));
   plottedEventStreamIDs$ =  this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.event_streams)));
+  expandedNodes$ = this.store.pipe(select(createSelector(plot_UI_Ex_, state=>state.expanded_nodes)));
   
   public plottedEventStreams$: Observable<IEventStream[]>
   public leftElements$: Observable<IDbElement[]>

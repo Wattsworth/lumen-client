@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { take } from 'rxjs/operators'
 
 import { normalize } from 'normalizr';
 
@@ -20,6 +21,7 @@ import {
   MessageService 
 } from '../services/';
 import { HttpClient } from '@angular/common/http';
+import { InstallationSelectors } from './installation.selectors';
 
 @Injectable()
 export class InstallationService {
@@ -28,6 +30,7 @@ export class InstallationService {
     private store: Store,
     private messageService: MessageService,
     private nilmService: NilmService,
+    private installationSelectors: InstallationSelectors,
     private http: HttpClient
   ) { }
 
@@ -76,12 +79,24 @@ export class InstallationService {
   }
 
   // ---refreshInstallation: refresh current installation ----
-  public refresh(nilm: INilm){
-    this.store.dispatch(uiActions.refreshing());;
-    this.nilmService.refreshNilm(nilm.id).subscribe({
+  public refresh(){
+    this.store.dispatch(uiActions.refreshing());
+    let nilm_id:number
+    this.installationSelectors.nilm_id$.pipe(take(1)).subscribe(id => nilm_id=id);
+    this.nilmService.refreshNilm(nilm_id).subscribe({
       next: success => this.store.dispatch(uiActions.refreshed()),
       error: error => this.store.dispatch(uiActions.refreshed()),
     });
+  }
+
+  // ---expandNode: expand a node in the tree -----
+  public expandNode(id: string) {
+    this.store.dispatch(uiActions.expandNode({id}));
+  };
+
+  // ---collapseNode: collapse a node in the tree -----
+  public collapseNode(id: string) {
+    this.store.dispatch(uiActions.collapseNode({id}));
   }
 
 }

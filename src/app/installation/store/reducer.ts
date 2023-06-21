@@ -16,4 +16,6 @@ export const reducer = createReducer(
   on(actions.setNilm, (state: IInstallation, {id})=>({...state, nilm: id})),
   on(actions.refreshing, (state: IInstallation)=>({...state, refreshing: true})),
   on(actions.refreshed, (state: IInstallation)=>({...state, refreshing: false})),
+  on(actions.expandNode,(state:IInstallation, {id})=>({...state, expanded_nodes: state.expanded_nodes.concat([id])})),
+  on(actions.collapseNode,(state:IInstallation, {id})=>({...state, expanded_nodes: state.expanded_nodes.filter(x=>x!=id)}))
 );

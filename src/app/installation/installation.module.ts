@@ -36,9 +36,11 @@ import { InstallationSelectors } from './installation.selectors';
 import { SharedModule } from '../shared/shared.module';
 import { EditModuleComponent } from './components/edit-module/edit-module.component';
 import { EditEventstreamComponent } from './components/edit-eventstream/edit-eventstream.component';
+import { CdkTreeModule } from '@angular/cdk/tree';
 
 @NgModule({
   imports: [
+    CdkTreeModule,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,

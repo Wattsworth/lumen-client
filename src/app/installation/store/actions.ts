@@ -10,3 +10,5 @@ export const selectEventStream = createAction('[INSTALLATION] Select event strea
 export const setNilm = createAction('[INSTALLATION] Set nilm', props<{id: number}>());
 export const refreshing = createAction('[INSTALLATION] Refreshing');
 export const refreshed = createAction('[INSTALLATION] Refreshed');
+export const expandNode = createAction('[INSTALLATION] Expand node', props<{id: string}>());
+export const collapseNode = createAction('[INSTALLATION] Collapse node', props<{id: string}>());

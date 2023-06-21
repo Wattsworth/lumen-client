@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { share } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { normalize } from 'normalizr';
 import * as schema from '../../api';
@@ -11,6 +12,7 @@ import { entityFactory,
   defaultEventStream} from '../../store/data/initial-state'
 import { IDbFolder } from '../../store/data';
 import * as actions from '../../store/data/actions';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class DbFolderService {
@@ -23,12 +25,16 @@ export class DbFolderService {
   ) { }
 
 
-  public loadFolder(dbFolderId: number): void {
-    this.http
+  public loadFolder(dbFolderId: number): Observable<any> {
+    let o = this.http
       .get(`db_folders/${dbFolderId}.json`, {})
-      .subscribe(
+      .pipe(share());
+
+    o.subscribe(
       json => this._dispatch(json),
       error => this.messageService.setErrorsFromAPICall(error));
+    
+      return o; //for other subscribers
   }
 
   public updateFolder(dbFolder: IDbFolder): void {

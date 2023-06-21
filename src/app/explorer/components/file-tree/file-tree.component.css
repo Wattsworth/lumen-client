@@ -1,4 +1,49 @@
+/* NEW STYLES */
 
+.tree-invisible{
+  display: none;
+}
+
+.folder-icon{
+  color: tan;
+}
+
+.expandable-node{
+  cursor: pointer;
+}
+
+
+.nilm-node > .refresh{
+  visibility: hidden;
+}
+.nilm-node:hover > .refresh{
+  visibility: visible;
+}
+
+
+.data-app-node{
+  cursor: pointer !important;
+  border-radius: 3px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-right: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: white;
+  display: inline;
+}
+.data-app-node:hover{
+  background: #e6e4e4;
+  border-color: gray;
+}
+.data-app-node > .new-tab{
+  visibility: hidden;
+}
+.data-app-node:hover > .new-tab{
+  visibility: visible;
+}
+
+/* END NEW STYLES */
 div.nilms-loading{
   color: gray;
   position: absolute;

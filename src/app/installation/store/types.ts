@@ -10,4 +10,5 @@ export interface IInstallation {
   rootFolderId?: number;
   refreshing?: boolean;
   busy?: boolean;
+  expanded_nodes?: string[];
 }

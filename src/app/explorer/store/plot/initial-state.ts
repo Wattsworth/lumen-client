@@ -40,6 +40,7 @@ export const defaultPlotState: IState = {
   show_left_axis_settings: false,
   show_right_axis_settings: false,
   show_time_axis_settings: false,
+  expanded_nodes: [],
   //
   nilms_loaded: false,
   data_views_loaded: false,

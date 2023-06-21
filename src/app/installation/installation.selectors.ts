@@ -48,7 +48,7 @@ export class InstallationSelectors {
   dbStream_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDbStream)));
   dataApp_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedDataApp)));
   eventStream_id$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.selectedEventStream)));
-
+  expanded_nodes$= this.store.pipe(select(createSelector(selectors.installation_UI_,state=>state.expanded_nodes)));
   public nilm$: Observable<INilm>;
   public dbNodes$: Observable<DbTreeNode[]>;
   public rootDbFolder$: Observable<IDbFolder>;
