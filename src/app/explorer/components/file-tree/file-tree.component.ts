@@ -53,7 +53,7 @@ export class FileTreeComponent implements OnInit {
   isNilm = (_:number, node: DbTreeNode) => node.type=='nilm';
   isFolder = (_:number, node: DbTreeNode) => node.type=='dbFolder';
   isStream = (_:number, node: DbTreeNode) => node.type=='dbStream';
-  isEventStream = (_:number, node: DbTreeNode) => node.type=='dbEventStream';
+  isEventStream = (_:number, node: DbTreeNode) => node.type=='eventStream';
   isElement = (_:number, node: DbTreeNode) => node.type=='dbElement';
   isDataApp =  (_:number, node: DbTreeNode) => node.type=='dataApp';
   isLoading = (node: DbTreeNode) => node.hasChildren && node.children == null && node.isExpanded;
