@@ -82,6 +82,7 @@
   </cdk-tree-node>
   <!-- == event stream app -->
   <cdk-tree-node *cdkTreeNodeDef="let node; when: isEventStream">
+    <div>
     <!--plot events button-->
     <span class="tree-button plot"
     *ngIf="node.plotted==false"
@@ -93,9 +94,11 @@
       (click)="plotService.hideEventsAndDuplicates(node.stream)">
       <fa-icon [icon]="['fas', 'chart-bar']"></fa-icon> hide </span>
     {{ node.name }}
+    </div>
   </cdk-tree-node>
   <!-- == data app == -->
   <cdk-tree-node *cdkTreeNodeDef="let node; when: isDataApp">
+    <div>
     <div class="data-app-node">
       <span (click)="interfacesService.add_internal(+node.id.substring(1))" class="ml-1">
         <fa-icon [icon]="['fas', 'cubes']"></fa-icon>
@@ -103,6 +106,7 @@
         </span>
         <fa-icon [icon]="['fas', 'external-link-alt']" class="icon-button new-tab"
           (click)="interfacesService.add_external(+node.id.substring(1))"></fa-icon>
+    </div>
     </div>
   </cdk-tree-node>
   <!-- default -->
