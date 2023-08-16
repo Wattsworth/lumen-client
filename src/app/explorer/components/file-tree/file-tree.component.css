@@ -7,11 +7,19 @@
 .folder-icon{
   color: tan;
 }
-
+.data-stream-icon{
+  vertical-align: center;
+}
 .expandable-node{
   cursor: pointer;
 }
-
+.active-data-stream{
+  color: #3c763d;
+  margin-left: -5px;
+  font-size: 6px;
+  text-align: center;
+  vertical-align: middle
+}
 
 .nilm-node > .refresh{
   visibility: hidden;

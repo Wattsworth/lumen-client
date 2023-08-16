@@ -258,6 +258,7 @@ export class FileTreeComponent implements OnInit {
       type: 'dbStream',
       children: children,
       hasChildren: children != null,
+      active: stream.active,
       isExpanded: expanded_nodes.indexOf(nodeId)!=-1
     }
   }
@@ -313,6 +314,7 @@ export interface DbTreeNode {
   id: string;
   name: string;
   type: string;
+  active?: boolean;
   refreshing?: boolean;
   isExpanded?: boolean;
   children: DbTreeNode[];

@@ -51,7 +51,8 @@
     <div>
     <!-- expand/collapse button-->
     <span  cdkTreeNodeToggle (click)="toggleNode(node)">
-      <fa-icon [icon]="['fas', 'database']" class="ml-1"></fa-icon>
+      <fa-icon [icon]="['fas','circle']" *ngIf="node.active" class="active-data-stream"></fa-icon>
+      <fa-icon [icon]="['fas', 'database']" class="ml-1 data-stream-icon"></fa-icon>
       {{node.name}}
     </span>
     <div [class.tree-invisible]="!node.isExpanded" class="ml-3">

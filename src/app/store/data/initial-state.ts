@@ -65,6 +65,7 @@ export const defaultDbStream: types.IDbStream = {
   elements: null,
   size_on_disk: 0,
   nilm_id: null,
+  active: false,
   reloading_annotations: false
 };
 

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   helpUrl: 'http://docs.wattsworth.net/web',
-  apiUrl: 'http://192.168.64.5:3000',
+  apiUrl: 'http://localhost:3000',
   //apiUrl: '/lumen/',
   appUrl: 'http://localhost'
 };

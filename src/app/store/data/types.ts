@@ -61,6 +61,7 @@ export interface IDbStream {
   name_abbrev: string;
   locked: boolean;
   hidden: boolean;
+  active: boolean;
   elements: Array<number>;
   nilm_id: number;
   reloading_annotations: boolean;
