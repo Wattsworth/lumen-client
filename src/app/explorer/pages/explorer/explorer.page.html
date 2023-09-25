@@ -90,7 +90,9 @@
           *ngIf="((plotSelectors.eventOverflows$ | async)?.length>0) &&
              !(plotSelectors.addingPlotData$ | async) && (plotSelectors.isPlotDataValid$ | async)">
           <fa-icon [icon]="['fas', 'exclamation-triangle']"></fa-icon>
-          too many events to display
+          too many events, displaying 
+          histogram<span *ngIf="(plotSelectors.eventOverflows$ | async)?.length>1">s</span>
+          instead          
         </span>
         <ng-template #overflowTemplate>
             <span class="event-overflow-item" *ngFor="let overflow of plotSelectors.eventOverflows$ | async">

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import  tinycolor from 'tinycolor2';
 import { createSelector, Store } from '@ngrx/store';
 import * as _ from 'lodash-es';
 import { IRange } from '../store';
@@ -111,7 +112,7 @@ export class PlotService {
     //add padding to plot data if ranges are not null
     this.dataService.loadEvents(
       timeRange.min, timeRange.max, 
-      neededStreams, 0.25)
+      neededStreams, 0)
       .subscribe(
         data=>{this.store.dispatch(PlotActions.addPlotEventData({data}))}
       )
@@ -128,7 +129,7 @@ export class PlotService {
     this.store.dispatch(PlotActions.addingPlotData());
     this.dataService.loadEvents(
       timeRange.min, timeRange.max, 
-      [stream], 0.25)
+      [stream], 0)
       .subscribe(
         data=>{this.store.dispatch(PlotActions.addPlotEventData({data}))}
       )
@@ -138,7 +139,8 @@ export class PlotService {
     streams: IEventStream[],
     timeRange: IRange
   ){
-    let existingData:IEventsSet
+    //NOT USED: nav plot does not display event data
+    /*let existingData:IEventsSet
     this.store.select(
       createSelector(explorer_UI_,state=>state.plot.nav_event_data))
       .pipe(take(1)).subscribe(state => existingData=state);
@@ -149,13 +151,14 @@ export class PlotService {
 
     this.store.dispatch(PlotActions.addingNavData());
     //add padding to plot data if ranges are not null
+    console.log("adding events to nav plot??")
     this.dataService.loadEvents(
       timeRange.min, timeRange.max, 
-      neededStreams, 0.25)
+      neededStreams, 0)
       .subscribe(
         data=>{this.store.dispatch(PlotActions.addNavEventData({data}))}
       )
-    
+    */
   }
   public loadPlotData(
     elements: IDbElement[],
@@ -356,9 +359,43 @@ export class PlotService {
     selectedEvents: IEventsSet
   ){
     return eventStreams.map(stream => {
-      if(eventsSet[stream.id]===undefined||eventsSet[stream.id]==null)
+      if(eventsSet[stream.id]===undefined||eventsSet[stream.id]==null){
         return null;
-  
+      }
+      if(eventsSet[stream.id].type=='histogram'){
+        let base_color = tinycolor(stream.plot_settings.color.value.fixed)
+        let max_count = Math.max(...eventsSet[stream.id].events.map(event => event.content.count))
+        let histBins = eventsSet[stream.id].events.map(event=>{
+          return {...event,
+          content: {...event.content,
+          color: base_color.setAlpha(event.content.count/max_count).toRgbString()}}
+        })
+        //override settings for histogram
+        let settings = _.cloneDeep(stream.plot_settings); //{...stream.plot_settings}
+        settings.color.type= 'attribute' //color based on count
+        settings.color.value.attribute = 'color'
+        settings.marker.type= 'fixed' // no marker
+        settings.marker.size = 0
+        settings.label.type= 'fixed' // no label
+        settings.label.value.fixed = ''
+        settings.position.type= 'fixed' //fixed height & position
+        settings.height.type= 'fixed'
+        
+        return {
+          label: stream.name,
+          yaxis: 5, //this is the event y-axis (not shown on plot)
+          //bars: { show: false, barWidth: 2 },
+          //points: { show: false },
+          lines: { show: false },
+          events: {
+            show: true,
+            stream_id: stream.id,
+            settings: settings,
+            color: stream.default_color
+          },
+          data: histBins
+        }
+      }
       let eventsWithSelect = eventsSet[stream.id].events.map(event=>{
         let selected=false;
         if(selectedEvents[stream.id]!=undefined){
@@ -367,7 +404,7 @@ export class PlotService {
           }
         }
         return {...event, selected}
-      })
+      })      
       return {
         label: stream.name,
         yaxis: 5, //this is the event y-axis (not shown on plot)

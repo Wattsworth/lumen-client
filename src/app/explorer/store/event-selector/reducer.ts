@@ -39,6 +39,7 @@ export const reducer = createReducer(
             start_time: Math.min(...events.map(e=>e.start_time)),
             end_time: Math.max(...events.map(e=>e.end_time)),
             count: events.length,
+            type: eventsSet[id].type,
             events: events
           };
         }
@@ -64,6 +65,7 @@ export const reducer = createReducer(
             start_time: Math.min(...events.map(e=>e.start_time)),
             end_time: Math.max(...events.map(e=>e.end_time)),
             count: events.length,
+            type: eventsSet[id].type,
             events: events
           };
         }

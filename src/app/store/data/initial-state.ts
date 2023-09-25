@@ -177,6 +177,7 @@ export const defaultEvent: types.IEvents = {
   end_time: null,
   valid: true,
   count: 0,
+  type: 'unknown',
   events: [],
 };
 

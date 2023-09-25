@@ -140,7 +140,7 @@ export class PlotSelectors {
     this.eventOverflows$ = combineLatest(
       [this.eventStreams$,this.plottedEventStreamIDs$, this.plotEventData$]).pipe(
         map(([streams, ids, events]) => {
-          let overflow_ids = ids.filter(id => id in events && events[id].count>0 && events[id].events.length==0);
+          let overflow_ids = ids.filter(id => id in events && events[id].type == 'histogram');
           return overflow_ids.map(id => {
             let name = streams[id].name;
             if (streams[id].plot_settings.display_name != '')

@@ -217,6 +217,7 @@ export interface IEvents{
   start_time: number;
   end_time: number;
   count: number; //number of events, if events is null then there are too many to display
+  type: string; //events, histogram
   events: IEvent[];
 }
 
