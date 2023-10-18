@@ -379,6 +379,7 @@ export class PlotService {
         settings.label.type= 'fixed' // no label
         settings.label.value.fixed = ''
         settings.position.type= 'fixed' //fixed height & position
+        settings.position.axis = 'float' //float on y-axis
         settings.height.type= 'fixed'
         
         return {
