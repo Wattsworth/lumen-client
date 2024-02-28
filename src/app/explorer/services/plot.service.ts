@@ -381,7 +381,6 @@ export class PlotService {
         settings.position.type= 'fixed' //fixed height & position
         settings.position.axis = 'float' //float on y-axis
         settings.height.type= 'fixed'
-        
         return {
           label: stream.name,
           yaxis: 5, //this is the event y-axis (not shown on plot)
@@ -390,6 +389,7 @@ export class PlotService {
           lines: { show: false },
           events: {
             show: true,
+            decimated: true,
             stream_id: stream.id,
             settings: settings,
             color: stream.default_color
@@ -414,6 +414,7 @@ export class PlotService {
         lines: { show: false },
         events: {
           show: true,
+          decimated: false,
           stream_id: stream.id,
           settings: stream.plot_settings
         },

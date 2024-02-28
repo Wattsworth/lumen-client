@@ -11,8 +11,10 @@ JSON content that can be used for color, label, and/or styling
             events: {
                 stream_id: null,
                 show: false,
+                decimated: false,
                 selected: false,
                 selected_event: null,
+                //add is_decimated flag
                 settings: {
                     color: {
                         type: 'fixed', //fixed, attribute, numeric

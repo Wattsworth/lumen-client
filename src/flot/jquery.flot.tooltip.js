@@ -135,12 +135,15 @@
                     return Math.abs(a * x + b * y + c) / Math.sqrt(a * a + b * b);
                 }
             };
-            var selected_event = plot.getData()
+            var item = plot.getData()
                 .filter(series=>series.events.selected)
                 .filter(series=>series.events.selected_event!=null)
-                .reduce((event,series)=>event=series.events.selected_event,null)
-            if (selected_event!=null){
-                plot.showEventTooltip(selected_event, pos);
+                .map(series=>{return {
+                    event: series.events.selected_event, 
+                    decimated: series.events.decimated}})
+                .reduce((item,arr)=>item=arr,null)
+            if (item!=null){
+                plot.showEventTooltip(item.event, pos, item.decimated);
             }
             else if (item) {
                 plot.showTooltip(item, pos);
@@ -230,33 +233,41 @@
 	        that.tipPosition.y = pos.y;
 	    };
 
-        plot.showEventTooltip = function (event, position){
+        plot.showEventTooltip = function (event, position, decimated){
+            //if the event is decimated use the 'count' attribute to
+            //display the number of events behind this particular bar
             if(!enableTooltip)
 				return;
             var $tip = that.getDomElement();
-
-	        // convert tooltip content template to real tipText
-	        var tipText = Object.keys(event.content).reduce((html,attrib)=>{
-                var value = event.content[attrib]
-                var str_value = "&mdash;"
-                switch(typeof(value)){
-                    case "number":
-                        str_value = value.toFixed(2);
-                        break;
-                    case "string":
-                        str_value = value;
-                        break;
-                    default:
-                        if(value===null){
-                            str_value = "--null--";
-                        } else {
-                            str_value = value.toString();
-                        }
-                }
-                html+="<tr><th>"+attrib+"</th><td>"+str_value+"</td></tr>";
-                return html;
-            },"<table class='table table-borderless table-sm mb-0'><tbody>");
-            tipText+="</tbody></table>"
+            if(decimated){
+                /*var tipText = "<table class='table table-borderless table-sm mb-0'><tbody>";
+                tipText+="<tr><th>Count</th><td>"+event.content['count']+"</td></tr>";
+                tipText+="</tbody></table>"*/
+                var tipText = "<span style='font-style:italic' class='text-secondary'>"+event.content['count']+" Events </span>";
+            } else {
+                // convert tooltip content template to real tipText
+                var tipText = Object.keys(event.content).reduce((html,attrib)=>{
+                    var value = event.content[attrib]
+                    var str_value = "&mdash;"
+                    switch(typeof(value)){
+                        case "number":
+                            str_value = value.toFixed(2);
+                            break;
+                        case "string":
+                            str_value = value;
+                            break;
+                        default:
+                            if(value===null){
+                                str_value = "--null--";
+                            } else {
+                                str_value = value.toString();
+                            }
+                    }
+                    html+="<tr><th>"+attrib+"</th><td>"+str_value+"</td></tr>";
+                    return html;
+                },"<table class='table table-borderless table-sm mb-0'><tbody>");
+                tipText+="</tbody></table>";
+            }
 
 	        $tip.html(tipText);
 	        plot.setTooltipPosition({ x: position.pageX, y: position.pageY });
