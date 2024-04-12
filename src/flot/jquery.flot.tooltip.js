@@ -135,15 +135,15 @@
                     return Math.abs(a * x + b * y + c) / Math.sqrt(a * a + b * b);
                 }
             };
-            var item = plot.getData()
+            var selected_event = plot.getData()
                 .filter(series=>series.events.selected)
                 .filter(series=>series.events.selected_event!=null)
                 .map(series=>{return {
                     event: series.events.selected_event, 
                     decimated: series.events.decimated}})
                 .reduce((item,arr)=>item=arr,null)
-            if (item!=null){
-                plot.showEventTooltip(item.event, pos, item.decimated);
+            if (selected_event!=null){
+                plot.showEventTooltip(selected_event.event, pos, selected_event.decimated);
             }
             else if (item) {
                 plot.showTooltip(item, pos);
