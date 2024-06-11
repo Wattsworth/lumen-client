@@ -247,14 +247,32 @@
             } else {
                 // convert tooltip content template to real tipText
                 var tipText = Object.keys(event.content).reduce((html,attrib)=>{
+                    //do not show fields with names that start and end with __ (internal fields)
+                    if(attrib.startsWith("__") && attrib.endsWith("__")){
+                        console.log("skipping internal field: "+attrib)
+                        return html;
+                    }
                     var value = event.content[attrib]
                     var str_value = "&mdash;"
                     switch(typeof(value)){
                         case "number":
-                            str_value = value.toFixed(2);
+                            //if the number is an integer don't show the decimal
+                            if(value%1===0){
+                                str_value = value.toString();
+                            } else {
+                                str_value = value.toFixed(2);
+                            }
                             break;
                         case "string":
-                            str_value = value;
+                            //truncate the string to 30 characters or less
+                            //if its is truncated add an ellipsis
+                            if(value.length>30){
+                                str_value = value.substring(0,30)+"...";
+                            } else {
+                                str_value = value;
+                            }
+                            //make string safe for html
+                            str_value = str_value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                             break;
                         default:
                             if(value===null){
@@ -268,7 +286,9 @@
                 },"<table class='table table-borderless table-sm mb-0'><tbody>");
                 tipText+="</tbody></table>";
             }
-
+            if (event.content['__link__']){
+                tipText += "<span class='text-primary' style='font-style:italic'>Click for more details</span>";
+            }
 	        $tip.html(tipText);
 	        plot.setTooltipPosition({ x: position.pageX, y: position.pageY });
 	        $tip.css({

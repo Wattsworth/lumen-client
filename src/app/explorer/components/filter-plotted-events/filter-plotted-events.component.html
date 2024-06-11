@@ -45,7 +45,9 @@
                             </ng-select>
                     </div>
                     <div class="col-3">
-                        <input type="text" class="form-control" formControlName="value" placeholder="value">
+                        <!-- use the text field 'key' to look up the associated datalist for category types-->
+                        <input type="text" class="form-control" formControlName="value" placeholder="value"
+                            [attr.list]="'eventfield-categories'+eventStream.id+'-'+filter.controls['key'].value">
                         <div *ngIf="filter.errors != null && filter.errors['valueError'] && (filter.touched || filter.dirty)" 
                         class="text-danger">
                             must be numeric

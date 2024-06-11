@@ -20,6 +20,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { defaultEventStreamPlotSettings } from '../../../store/data/initial-state';
 import { FilterPlottedEventsComponent } from '../filter-plotted-events/filter-plotted-events.component';
 import * as _ from 'lodash';
+import { Dictionary } from '@ngrx/entity';
 
 declare var $: any;
 
@@ -41,6 +42,7 @@ export class PlottedEventsComponent
   public toolTipText$: Observable<string>;
   public displayName: string;
   public eventFields: Array<string>;
+  public eventFieldCategoryGroups: { group: string, categories: string[] }[] = [];
 
   //--state for customization modal--
   public newColor: string;
@@ -78,12 +80,26 @@ export class PlottedEventsComponent
   }
   ngOnInit() {
     let s = this.eventStream.plot_settings;
-    if (this.eventStream.event_fields != null)
+    if (this.eventStream.event_fields != null){
+      //filter out any event_field names that start and end with __ (internal fields)
       this.eventFields = Object.entries(this.eventStream.event_fields)
+        .filter(entry => entry[0].startsWith('__') == false)
+        .filter(entry => entry[0].endsWith('__') == false)
         .map(entry=>entry[0])
-    else
+      //go through each field, if it starts with category: then 
+      //then find all the categories and add them to the eventFieldCategories dictionary
+      //for example category:cat,dog,elephant will add cat,dog,elephant to the dictionary under the key of the event field
+      this.eventFieldCategoryGroups = Object.keys(this.eventStream.event_fields)
+        .filter(key => this.eventStream.event_fields[key].startsWith('category:'))
+        .map(key => ({
+          group: key,
+          //remove the 'category:' prefix and parse the rest as a JSON array
+          categories: JSON.parse(this.eventStream.event_fields[key].slice(9))
+        }));      
+    }
+    else{
       this.eventFields = [] //no fields specified
-  
+    }
     this.plotSettingsForm = this.fb.group({
       display_name: [s.display_name],
       color: this.fb.group({

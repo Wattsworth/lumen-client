@@ -24,6 +24,12 @@
      aria-labelledby="mySmallModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
+      <!-- datalist of categories for the category Event Field types -->
+      <div *ngFor="let item of eventFieldCategoryGroups">
+        <datalist [attr.id]="'eventfield-categories'+eventStream.id+'-'+item.group">
+          <option *ngFor="let category of item.categories">{{ category }}</option>
+        </datalist>
+      </div>
       <!-- datalist of string Event Fields -->
       <datalist [attr.id]="'eventfields'+eventStream.id">
         <option *ngFor = "let field of eventFields">{{field}}</option>
