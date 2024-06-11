@@ -47,6 +47,7 @@
     var FlotTooltip = function (plot) {
         // variables
         this.tipPosition = {x: 0, y: 0};
+        this.displayed_event_tooltip = null;
 
         this.init(plot);
     };
@@ -89,6 +90,7 @@
 
             // bind event
             $( plot.getPlaceholder() ).bind("plothover", plothover);
+            $( plot.getPlaceholder() ).bind("plotclick", plotclick);
 
             $(eventHolder).bind('mousemove', mouseMove);
         });
@@ -105,7 +107,20 @@
        		plot.setTooltipPosition(pos);
         }
 
+        function plotclick(event, pos, item) {
+            if(that.displayed_event_tooltip==null){
+                return;
+            }
+            //if the event has a link attribute, open the link in a new tab
+            if (that.displayed_event_tooltip['content']['__link__']){
+                window.open(that.displayed_event_tooltip['content']['__link__'], '_blank');
+            }
+        }
         function plothover(event, pos, item) {
+            // change the cursor to the default arrow
+            plot.getPlaceholder().css('cursor', 'default');
+
+            
             // Simple distance formula.
             var lineDistance = function (p1x, p1y, p2x, p2y) {
                 return Math.sqrt((p2x - p1x) * (p2x - p1x) + (p2y - p1y) * (p2y - p1y));
@@ -135,6 +150,9 @@
                     return Math.abs(a * x + b * y + c) / Math.sqrt(a * a + b * b);
                 }
             };
+
+            //clear the saved event tooltip
+            that.displayed_event_tooltip = null;
             var selected_event = plot.getData()
                 .filter(series=>series.events.selected)
                 .filter(series=>series.events.selected_event!=null)
@@ -245,11 +263,12 @@
                 tipText+="</tbody></table>"*/
                 var tipText = "<span style='font-style:italic' class='text-secondary'>"+event.content['count']+" Events </span>";
             } else {
+                // save the event tooltip so we can use it for click events
+                that.displayed_event_tooltip = event;
                 // convert tooltip content template to real tipText
                 var tipText = Object.keys(event.content).reduce((html,attrib)=>{
                     //do not show fields with names that start and end with __ (internal fields)
                     if(attrib.startsWith("__") && attrib.endsWith("__")){
-                        console.log("skipping internal field: "+attrib)
                         return html;
                     }
                     var value = event.content[attrib]
@@ -287,6 +306,7 @@
                 tipText+="</tbody></table>";
             }
             if (event.content['__link__']){
+                plot.getPlaceholder().css('cursor', 'pointer');
                 tipText += "<span class='text-primary' style='font-style:italic'>Click for more details</span>";
             }
 	        $tip.html(tipText);
