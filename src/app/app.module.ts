@@ -61,7 +61,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     StoreDevtoolsModule.instrument({
       maxAge: 25, //retain last 25 states
       logOnly: environment.production,
-    }),
+    connectInZone: true}),
     EffectsModule.forRoot([PageEffects]),
     BrowserAnimationsModule
   ],

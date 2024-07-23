@@ -84,10 +84,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "lumen:build:production"
+              "buildTarget": "lumen:build:production"
             },
             "development": {
-              "browserTarget": "lumen:build:development"
+              "buildTarget": "lumen:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -95,7 +95,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "lumen:build"
+            "buildTarget": "lumen:build"
           }
         },
         "test": {
