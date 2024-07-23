@@ -161,7 +161,7 @@ export const dbElementReducer = createReducer(
      .updateOne({id: id, changes:{color: color}}, state)),
    //SET display name
    on(actions.setDbElementName, (state: types.IDbElementState, {id, name})=> dbElementAdapter
-     .updateOne({id, changes:{name}}, state)),
+     .updateOne({id, changes:{display_name: name}}, state)),
    //RESTORE: replace elements with new objects
    on(actions.restoreDbElement, (state: types.IDbElementState, {elements})=> dbElementAdapter.upsertMany(elements,state)),
    //RESET: remove display name and color setting
