@@ -128,6 +128,7 @@ export class MainPlotComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe(([plotted_streams, all_streams])=>{
           let plotted_ids = plotted_streams.map(stream=>stream.id)
           Object.values(all_streams)
+            //find all of the duplicate streams that are not already plotted
             .filter(stream=>stream.id.indexOf('_')>0 && !plotted_ids.includes(stream.id))
             .map(stream => this.plotService.plotEvents(stream))
         }))

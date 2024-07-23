@@ -52,8 +52,10 @@ export class PlotService {
 
   // add events to the plot
   public plotEvents(stream: IEventStream){
-    this.eventStreamService.assignColor(stream);
+    //NOTE: The order is important, first add the stream, then assign the color
+    //otherwise 2 copies of the event stream will be added to the UI
     this.store.dispatch(PlotActions.plotEvents({stream}))
+    this.eventStreamService.assignColor(stream);
   }
   public hideEvents(stream: IEventStream){
     //if this is a duplicate event stream it has to be removed from the 
