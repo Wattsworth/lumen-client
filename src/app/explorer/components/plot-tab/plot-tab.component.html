@@ -195,7 +195,7 @@
       <fa-icon [icon]="['fas', 'sync-alt']" class="icon-button refresh"
         *ngIf="!block.stream.reloading_annotations"
         (click)="annotationService.reloadAnnotations(block.stream.id)"></fa-icon>
-      <fa-icon [icon]="['fas', 'sync-alt']" [spin]="true" class="refreshing" 
+      <fa-icon [icon]="['fas', 'sync-alt']" animation="spin" class="refreshing" 
         *ngIf="block.stream.reloading_annotations"></fa-icon>
 
   </div>

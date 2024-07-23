@@ -10,7 +10,7 @@ import { AuthGuard } from './app.guards';
 import { AlertModule } from 'ngx-bootstrap/alert';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {ProgressbarModule } from 'ngx-bootstrap/progressbar';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 
 import { AccountModule } from './account/account.module';
@@ -35,46 +35,40 @@ import { environment } from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    MessagesComponent,
-    SessionComponent,
-  ],
-  imports: [
-    BrowserModule,
-    ReactiveFormsModule,
-    FormsModule,
-    HttpClientModule,
-    RouterModule,
-    AlertModule.forRoot(),
-    ProgressbarModule.forRoot(),
-    ModalModule.forRoot(),
-    AccountModule,
-    InstallationModule,
-    ExplorerModule,
-    appRoutes,
-    StoreModule.forRoot({
-      ui: uiReducer,
-      data: reducer
-    }),
-    StoreDevtoolsModule.instrument({
-      maxAge: 25, //retain last 25 states
-      logOnly: environment.production,
-    connectInZone: true}),
-    EffectsModule.forRoot([PageEffects]),
-    BrowserAnimationsModule
-  ],
-  providers: [
-    AuthGuard,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: JwtInterceptor,
-      multi: true
-    },
-    SERVICE_PROVIDERS,
-    //EPIC_PROVIDERS
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        MessagesComponent,
+        SessionComponent,
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        ReactiveFormsModule,
+        FormsModule,
+        RouterModule,
+        AlertModule.forRoot(),
+        ProgressbarModule.forRoot(),
+        ModalModule.forRoot(),
+        AccountModule,
+        InstallationModule,
+        ExplorerModule,
+        appRoutes,
+        StoreModule.forRoot({
+            ui: uiReducer,
+            data: reducer
+        }),
+        StoreDevtoolsModule.instrument({
+            maxAge: 25, //retain last 25 states
+            logOnly: environment.production,
+            connectInZone: true
+        }),
+        EffectsModule.forRoot([PageEffects]),
+        BrowserAnimationsModule], providers: [
+        AuthGuard,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: JwtInterceptor,
+            multi: true
+        },
+        SERVICE_PROVIDERS,
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule { }

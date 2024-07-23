@@ -68,14 +68,13 @@ import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {TabsModule } from 'ngx-bootstrap/tabs';
 import {  TimepickerModule } from 'ngx-bootstrap/timepicker'
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { LetModule } from '@ngrx/component';
 import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
 
 import { NgSelectModule } from '@ng-select/ng-select';
-
+import { LetDirective } from '@ngrx/component';
 import { SharedModule } from '../shared/shared.module';
 import { COMPONENTS } from './components';
 import { ExplorerPageComponent } from './pages/explorer/explorer.page';
@@ -90,7 +89,7 @@ import { CdkTreeModule } from '@angular/cdk/tree';
     CommonModule,
     RouterModule,
     FormsModule,
-    LetModule,
+    LetDirective,
     CdkTreeModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,

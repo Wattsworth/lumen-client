@@ -64,7 +64,7 @@
         <!-- nav loading spinner -->
         <span class="data-loading" [@fadeInOut]
           *ngIf="plotSelectors.addingNavData$ | async">
-          <fa-icon [icon]="['fas', 'spinner']" [spin]="true" [fixedWidth]="true"></fa-icon>
+          <fa-icon [icon]="['fas', 'spinner']" animation="spin" [fixedWidth]="true"></fa-icon>
           loading data
         </span>
         <span class="nav-date-range">
@@ -76,7 +76,7 @@
         <!-- plot loading spinner -->
         <span class="data-loading" [@fadeInOut]
           *ngIf="plotSelectors.addingPlotData$ | async">
-          <fa-icon [icon]="['fas', 'spinner']" [spin]="true" [fixedWidth]="true"></fa-icon>
+          <fa-icon [icon]="['fas', 'spinner']" animation="spin" [fixedWidth]="true"></fa-icon>
           loading data
         </span>
         <!-- warning if some plot data has errors -->
@@ -155,7 +155,7 @@
           <span *ngIf="plotSelectors.addingPlotData$ | async; then loading else default"></span>
         </div>
         <ng-template #loading>
-          <fa-icon [icon]="['fas', 'spinner']" [spin]="true" size="5x"></fa-icon>
+          <fa-icon [icon]="['fas', 'spinner']" animation="spin" size="5x"></fa-icon>
           <p>Loading Data...</p>
         </ng-template>
         <ng-template #default>

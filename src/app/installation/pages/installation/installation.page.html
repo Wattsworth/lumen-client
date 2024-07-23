@@ -6,7 +6,7 @@
    class="btn btn-success help-btn"><fa-icon [icon]="['fas', 'life-ring']"></fa-icon> Help </a>
 </div>
 <div *ngIf="nilm==null" class="well">
-  <h1><fa-icon [icon]="['fas', 'spinner']" [spin]="true"></fa-icon>Loading</h1>
+  <h1><fa-icon [icon]="['fas', 'spinner']" animation="spin"></fa-icon>Loading</h1>
 </div>
 <div *ngIf="nilm!=null">
   <tabset>

@@ -19,7 +19,7 @@
             </span>
             <!-- children -->
             <div *ngIf="isLoading(node)" class="ml-3">
-              <fa-icon [icon]="['fas', 'spinner']" [spin]="true"></fa-icon> loading...
+              <fa-icon [icon]="['fas', 'spinner']" animation="spin"></fa-icon> loading...
             </div>
             <div [class.tree-invisible]="!node.isExpanded" class="ml-3">
               <ng-container cdkTreeNodeOutlet></ng-container>
@@ -59,7 +59,7 @@
       <button class="btn btn-primary btn-block refresh" 
       (click)="refresh()"
       [disabled]="installationSelectors.refreshing$ | async">
-        <fa-icon [icon]="['fas', 'sync-alt']" [spin]="true" *ngIf="installationSelectors.refreshing$ | async"></fa-icon>
+        <fa-icon [icon]="['fas', 'sync-alt']" animation="spin" *ngIf="installationSelectors.refreshing$ | async"></fa-icon>
         Refresh<span *ngIf="installationSelectors.refreshing$ | async">ing</span></button>
     </div>
   </div>

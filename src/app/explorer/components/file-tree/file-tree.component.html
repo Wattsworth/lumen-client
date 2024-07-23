@@ -1,5 +1,5 @@
 <div *ngIf="!(plotSelectors.nilmsLoaded$ | async)" class="nilms-loading">
-<fa-icon [icon]="['fas', 'spinner']" [spin]="true" size="5x"></fa-icon>
+<fa-icon [icon]="['fas', 'spinner']" animation="spin" size="5x"></fa-icon>
 <p class="lead">loading...</p>
 </div>
 <cdk-tree [dataSource]="dbNodes$" [treeControl]="treeControl" >
@@ -16,10 +16,10 @@
     <fa-icon [icon]="['fas', 'sync-alt']" class="icon-button refresh ml-1" *ngIf="!node.refreshing"
     tooltip="refresh" placement="right" [delay]="500" 
     (click)="nilmService.refreshNilm(node.nilmId)"></fa-icon>
-    <fa-icon [icon]="['fas', 'sync-alt']" [spin]="true" *ngIf="node.refreshing"></fa-icon>
+    <fa-icon [icon]="['fas', 'sync-alt']" animation="spin" *ngIf="node.refreshing"></fa-icon>
     <!-- children -->
     <div *ngIf="isLoading(node)" class="ml-3">
-      <fa-icon [icon]="['fas', 'spinner']" [spin]="true"></fa-icon> loading...
+      <fa-icon [icon]="['fas', 'spinner']" animation="spin"></fa-icon> loading...
     </div>
     <div [class.tree-invisible]="!node.isExpanded" class="ml-3">
       <ng-container cdkTreeNodeOutlet></ng-container>
@@ -39,7 +39,7 @@
     </span>
     <!-- children -->
     <div *ngIf="isLoading(node)" class="ml-3">
-      <fa-icon [icon]="['fas', 'spinner']" [spin]="true"></fa-icon> loading...
+      <fa-icon [icon]="['fas', 'spinner']" animation="spin"></fa-icon> loading...
     </div>
     <div [class.tree-invisible]="!node.isExpanded" class="ml-3">
       <ng-container cdkTreeNodeOutlet></ng-container>
