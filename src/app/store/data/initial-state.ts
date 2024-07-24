@@ -87,7 +87,7 @@ export const defaultEventStreamPlotSettings: types.IEventStreamPlotSettings = {
   },
   marker: {
     type: 'fixed',
-    size: 12,
+    size: 6,
     value: {
       fixed: '.',
       attribute: ''

@@ -60,7 +60,8 @@ export const eventStreamReducer = createReducer(
       //keep local values if they have been customized
       if(state.entities[stream.id]!==undefined){
         return {...stream, 
-          plot_settings: state.entities[stream.id].plot_settings}
+          plot_settings: state.entities[stream.id].plot_settings,
+          filter_groups: state.entities[stream.id].filter_groups}
       }
       return stream;
     });
